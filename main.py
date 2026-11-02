@@ -2,10 +2,10 @@ import os
 import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="convenienceIA API - Santo Domingo", version="2.2.0")
+app = FastAPI(title="convenienceIA API - Santo Domingo", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +40,18 @@ def home():
             return HTMLResponse(content=file.read())
     return HTMLResponse(content="<h1>convenienceIA Online</h1>")
 
+@app.get("/manifest.json")
+def get_manifest():
+    if os.path.exists("manifest.json"):
+        return FileResponse("manifest.json", media_type="application/json")
+    return JSONResponse(status_code=404, content={"error": "Manifest no encontrado"})
+
+@app.get("/service-worker.js")
+def get_sw():
+    if os.path.exists("service-worker.js"):
+        return FileResponse("service-worker.js", media_type="application/javascript")
+    return JSONResponse(status_code=404, content={"error": "Service Worker no encontrado"})
+
 @app.get("/api/negocios")
 def obtener_negocios():
     return {"negocios": cargar_negocios()}
@@ -49,7 +61,6 @@ def chat_dacliass(query: ChatQuery):
     texto = query.mensaje.lower()
     negocios = cargar_negocios()
     
-    # Búsqueda inteligente en el archivo de negocios
     for n in negocios:
         if any(palabra in n["nombre"].lower() or palabra in n["categoria"].lower() for palabra in texto.split()):
             return {"respuesta": f"🤖 dAcliass: Encontré '{n['nombre']}' en {n.get('sector', 'Santo Domingo')}. Tienen {n['oferta']} ({n['item']}) con ruta exacta en el mapa."}
