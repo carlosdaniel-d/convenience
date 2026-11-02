@@ -19,39 +19,29 @@
 
     <style>
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; 
             background-color: #f1f5f9; 
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Mapa Estético */
         #map { 
             height: 280px; 
             border-radius: 1.25rem; 
             z-index: 10;
         }
 
-        /* Ocultar barra de desplazamiento */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Animaciones */
         .card-enter {
             animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Marcador de Mapa Personalizado */
         .custom-pin {
             background-color: #4f46e5;
             color: white;
@@ -65,10 +55,7 @@
             font-size: 14px;
         }
 
-        /* Efecto Pulso de Notificación */
-        .pulse-dot {
-            position: relative;
-        }
+        .pulse-dot { position: relative; }
         .pulse-dot::before {
             content: '';
             position: absolute;
@@ -89,10 +76,10 @@
 </head>
 <body class="pb-28">
 
-    <!-- Header Estilo PedidosYa -->
-    <header class="bg-indigo-600 text-white px-5 py-3.5 sticky top-0 z-50 shadow-md flex justify-between items-center transition-all duration-300">
+    <!-- Header convenienceIA -->
+    <header class="bg-indigo-600 text-white px-5 py-3.5 sticky top-0 z-50 shadow-md flex justify-between items-center">
         <div class="flex items-center space-x-2.5">
-            <span class="text-2xl transform hover:scale-110 transition duration-200">🛒</span>
+            <span class="text-2xl">🛒</span>
             <h1 class="font-bold text-lg tracking-tight">convenienceIA</h1>
         </div>
         <button onclick="abrirChat()" class="bg-indigo-700/80 hover:bg-indigo-800 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 backdrop-blur-sm active:scale-95 transition">
@@ -101,7 +88,7 @@
         </button>
     </header>
 
-    <!-- Barra de Búsqueda y Selección de Ubicación -->
+    <!-- Buscador y Categorías -->
     <div class="bg-indigo-600 px-5 pb-5 pt-1 shadow-lg rounded-b-3xl">
         <div class="flex items-center text-indigo-200 text-xs mb-2.5">
             <span class="mr-1">📍</span> Ubicación: <span class="text-white font-semibold ml-1">Santo Domingo (Polígono Central)</span>
@@ -114,33 +101,32 @@
             <span class="absolute left-4 top-4 text-gray-400 text-sm">🔍</span>
         </div>
         
-        <!-- Categorías Deslizables -->
         <div class="flex space-x-2 mt-3.5 overflow-x-auto hide-scrollbar pb-1">
             <button onclick="filtrarCategoria('todos')" class="bg-amber-400 text-indigo-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shrink-0 active:scale-95 transition">⚡ Todo</button>
-            <button onclick="filtrarCategoria('dulce')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🍦 Dulce & Frío</button>
-            <button onclick="filtrarCategoria('comida')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🍔 Comida & Más</button>
-            <button onclick="filtrarCategoria('servicios')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🔧 Urgencias</button>
+            <button onclick="filtrarCategoria('dulce')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🍦 Dulce & Frío</button>
+            <button onclick="filtrarCategoria('comida')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🍔 Comida & Más</button>
+            <button onclick="filtrarCategoria('servicios')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🔧 Urgencias</button>
         </div>
     </div>
 
     <!-- Contenido Principal -->
     <main class="max-w-md mx-auto px-4 mt-5 space-y-5">
         
-        <!-- Banner del Asistente dAcliass -->
+        <!-- Banner dAcliass -->
         <div class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white p-5 rounded-3xl shadow-xl relative overflow-hidden border border-indigo-700/50">
             <div class="flex justify-between items-start relative z-10">
                 <div class="pr-3">
                     <span class="bg-amber-400 text-indigo-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Asistente Contextual</span>
                     <h2 class="font-bold text-base mt-1.5 tracking-tight">¡Hola! Soy dAcliass 🤖</h2>
-                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">¿Un café o un helado en Piantini? Encuentro las mejores ofertas con delivery relámpago.</p>
+                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">¿Un café o un antojo rápido? Encuentro las mejores ofertas con envío cerca de ti.</p>
                 </div>
-                <button onclick="abrirChat()" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 p-3.5 rounded-2xl shadow-lg font-bold text-lg active:scale-90 transition duration-200">
+                <button onclick="abrirChat()" class="bg-amber-400 text-indigo-950 p-3.5 rounded-2xl shadow-lg font-bold text-lg active:scale-90 transition">
                     💬
                 </button>
             </div>
         </div>
 
-        <!-- Mapa Moderno (CartoDB Positron) -->
+        <!-- Mapa -->
         <div class="bg-white p-3.5 rounded-3xl shadow-md border border-gray-100">
             <div class="flex justify-between items-center mb-2 px-1">
                 <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-wider">MAPA Y RUTA EN VIVO</h3>
@@ -149,58 +135,54 @@
             <div id="map"></div>
         </div>
 
-        <!-- Listado Dinámico de Comercios -->
+        <!-- Listado de Comercios -->
         <div>
             <div class="flex justify-between items-center mb-3 px-1">
                 <h3 class="font-bold text-gray-900 text-sm">NEGOCIOS & DESCUENTOS EN VIVO</h3>
-                <span class="text-xs text-indigo-600 font-semibold cursor-pointer">Ver todos</span>
+                <span class="text-xs text-indigo-600 font-semibold">Santo Domingo</span>
             </div>
             <div id="listaNegocios" class="space-y-3.5">
-                <!-- Se inyecta dinámicamente -->
+                <!-- Inyección dinámica -->
             </div>
         </div>
     </main>
 
-    <!-- Botón Flotante Inteligente dAcliass -->
-    <button onclick="abrirChat()" class="fixed bottom-20 right-4 bg-indigo-600 text-white p-4 rounded-full shadow-2xl border-2 border-white z-40 active:scale-90 transition duration-200 flex items-center justify-center">
+    <!-- Botón Flotante dAcliass -->
+    <button onclick="abrirChat()" class="fixed bottom-20 right-4 bg-indigo-600 text-white p-4 rounded-full shadow-2xl border-2 border-white z-40 active:scale-90 transition flex items-center justify-center">
         <span class="text-xl">🤖</span>
     </button>
 
-    <!-- Navegación Inferior Nativa -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200/80 py-2.5 px-6 flex justify-around items-center z-50 shadow-2xl">
+    <!-- Navegación Inferior -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 py-2.5 px-6 flex justify-around items-center z-50 shadow-2xl">
         <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600 active:scale-90 transition">
             <span class="text-xl">🏠</span>
             <span class="text-[10px] font-bold mt-0.5">Explorar</span>
         </button>
-        <button onclick="window.scrollTo({top:280, behavior:'smooth'})" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 active:scale-90 transition">
+        <button onclick="window.scrollTo({top:280, behavior:'smooth'})" class="flex flex-col items-center text-gray-400 active:scale-90 transition">
             <span class="text-xl">🗺️</span>
             <span class="text-[10px] font-medium mt-0.5">Mapa</span>
         </button>
-        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 active:scale-90 transition">
+        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400 active:scale-90 transition">
             <span class="text-xl">⚡</span>
             <span class="text-[10px] font-medium mt-0.5">dAcliass</span>
         </button>
     </nav>
 
-    <!-- Scripts de la Aplicación -->
+    <!-- Scripts de la App -->
     <script>
         let mapa;
         let marcadores = [];
         let negociosGlobal = [];
 
-        // Inicializar Mapa con capa aesthetic de CartoDB
         function inicializarMapa() {
             mapa = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
-            
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
                 attribution: '© CartoDB'
             }).addTo(mapa);
-
             L.control.zoom({ position: 'topright' }).addTo(mapa);
         }
 
-        // Cargar negocios desde API o Fallback Local masivo
         async function cargarNegocios() {
             try {
                 const response = await fetch('/api/negocios');
@@ -230,7 +212,7 @@
 
             lista.forEach((n, index) => {
                 const card = document.createElement('div');
-                card.className = "card-enter bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col space-y-3 hover:shadow-md transition duration-200";
+                card.className = "card-enter bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col space-y-3";
                 card.style.animationDelay = `${index * 0.05}s`;
                 
                 card.innerHTML = `
