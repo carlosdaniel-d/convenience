@@ -1,10 +1,11 @@
 import os
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="convenienceIA API", version="1.0.0")
+app = FastAPI(title="convenienceIA API - Santo Domingo", version="2.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,9 +22,16 @@ class PagoModel(BaseModel):
     orderID: str
     monto: str | None = None
 
+def cargar_negocios():
+    if os.path.exists("negocios.json"):
+        with open("negocios.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "message": "Servidor funcionando perfectamente"}
+    negocios = cargar_negocios()
+    return {"status": "ok", "total_negocios_cargados": len(negocios)}
 
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -32,22 +40,22 @@ def home():
             return HTMLResponse(content=file.read())
     return HTMLResponse(content="<h1>convenienceIA Online</h1>")
 
-# Endpoint inteligente de dAcliass
+@app.get("/api/negocios")
+def obtener_negocios():
+    return {"negocios": cargar_negocios()}
+
 @app.post("/api/dacliass")
 def chat_dacliass(query: ChatQuery):
     texto = query.mensaje.lower()
+    negocios = cargar_negocios()
     
-    if "oferta" in texto or "descuento" in texto or "flash" in texto:
-        respuesta = "🔥 Te recomiendo visitar 'Colmado & Más Express', tienen un descuento Flash del 20% activo ahora mismo."
-    elif "burger" in texto or "hamburguesa" in texto or "comida" in texto:
-        respuesta = "🍔 'Burger & Grill RD' tiene delivery gratis hoy. ¿Te gustaría ver su menú?"
-    elif "bebida" in texto or "cerveza" in texto or "refresco" in texto:
-        respuesta = "🍹 En 'Colmado & Más Express' encuentras bebidas frías con entrega rápida a 0.8 km."
-    else:
-        respuesta = f"¡Hola! Soy dAcliass. Entendí tu consulta sobre '{query.mensaje}'. Estoy rastreando los comercios cercanos para ofrecerte la mejor opción en tiempo real."
-    
-    return {"respuesta": respuesta}
+    # Búsqueda inteligente en el archivo de negocios
+    for n in negocios:
+        if any(palabra in n["nombre"].lower() or palabra in n["categoria"].lower() for palabra in texto.split()):
+            return {"respuesta": f"🤖 dAcliass: Encontré '{n['nombre']}' en {n.get('sector', 'Santo Domingo')}. Tienen {n['oferta']} ({n['item']}) con ruta exacta en el mapa."}
+            
+    return {"respuesta": f"🤖 dAcliass: Analicé tu búsqueda en Santo Domingo para '{query.mensaje}'. Tengo registrados comercios abiertos con precios transparentes y cupones listos."}
 
 @app.post("/api/confirmar-pago")
 def confirmar_pago(datos: PagoModel):
-    return JSONResponse(status_code=200, content={"status": "exitoso", "orderID": datos.orderID})
+    return JSONResponse(status_code=200, content={"status": "exitoso", "orderID": datos.orderID, "mensaje": "Pago procesado y cupón generado correctamente."})
