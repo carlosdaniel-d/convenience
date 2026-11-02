@@ -18,119 +18,195 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
-        #map { height: 260px; border-radius: 1rem; z-index: 10; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f1f5f9; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Mapa Estético */
+        #map { 
+            height: 280px; 
+            border-radius: 1.25rem; 
+            z-index: 10;
+        }
+
+        /* Ocultar barra de desplazamiento */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animaciones */
+        .card-enter {
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Marcador de Mapa Personalizado */
+        .custom-pin {
+            background-color: #4f46e5;
+            color: white;
+            padding: 6px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Efecto Pulso de Notificación */
+        .pulse-dot {
+            position: relative;
+        }
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
     <!-- Header Estilo PedidosYa -->
-    <header class="bg-indigo-600 text-white px-4 py-3 sticky top-0 z-50 shadow-md flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <span class="text-2xl">🛒</span>
-            <h1 class="font-bold text-lg tracking-wide">convenienceIA</h1>
+    <header class="bg-indigo-600 text-white px-5 py-3.5 sticky top-0 z-50 shadow-md flex justify-between items-center transition-all duration-300">
+        <div class="flex items-center space-x-2.5">
+            <span class="text-2xl transform hover:scale-110 transition duration-200">🛒</span>
+            <h1 class="font-bold text-lg tracking-tight">convenienceIA</h1>
         </div>
-        <div class="bg-indigo-700 px-3 py-1.5 rounded-full text-xs font-medium flex items-center space-x-1 shadow-inner">
-            <span>🤖</span>
-            <span onclick="abrirChat()" class="cursor-pointer">dAcliass 24/7</span>
-        </div>
+        <button onclick="abrirChat()" class="bg-indigo-700/80 hover:bg-indigo-800 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 backdrop-blur-sm active:scale-95 transition">
+            <span class="pulse-dot">🤖</span>
+            <span>dAcliass 24/7</span>
+        </button>
     </header>
 
-    <!-- Barra de Búsqueda y Dirección -->
-    <div class="bg-indigo-600 px-4 pb-4 pt-1 shadow-md">
-        <div class="flex items-center text-indigo-200 text-xs mb-2">
-            <span class="mr-1">📍</span> Estás en <span class="text-white font-semibold ml-1">Santo Domingo (Polígono Central)</span>
-        </div>
-        <div class="relative">
-            <input type="text" id="searchInput" placeholder="¿Qué se te antoja? (Ej. Café, Helado, Pizza...)" 
-                   class="w-full py-3 pl-10 pr-4 rounded-xl text-gray-800 text-sm bg-white shadow focus:outline-none"
-                   oninput="filtrarNegocios()">
-            <span class="absolute left-3 top-3.5 text-gray-400">🔍</span>
+    <!-- Barra de Búsqueda y Selección de Ubicación -->
+    <div class="bg-indigo-600 px-5 pb-5 pt-1 shadow-lg rounded-b-3xl">
+        <div class="flex items-center text-indigo-200 text-xs mb-2.5">
+            <span class="mr-1">📍</span> Ubicación: <span class="text-white font-semibold ml-1">Santo Domingo (Polígono Central)</span>
         </div>
         
-        <!-- Categorías Rápidas -->
-        <div class="flex space-x-2 mt-3 overflow-x-auto hide-scrollbar pb-1">
-            <button onclick="filtrarCategoria('todos')" class="bg-white text-indigo-900 px-4 py-1.5 rounded-full text-xs font-semibold shadow shrink-0">⚡ Todo</button>
-            <button onclick="filtrarCategoria('dulce')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🍦 Dulce & Frío</button>
-            <button onclick="filtrarCategoria('comida')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🍔 Comida & Más</button>
-            <button onclick="filtrarCategoria('servicios')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🔧 Farmacia & Urgencias</button>
+        <div class="relative">
+            <input type="text" id="searchInput" placeholder="¿Qué se te antoja? (Ej. Helado, Pizza, Café...)" 
+                   class="w-full py-3.5 pl-11 pr-4 rounded-2xl text-gray-900 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                   oninput="filtrarNegocios()">
+            <span class="absolute left-4 top-4 text-gray-400 text-sm">🔍</span>
+        </div>
+        
+        <!-- Categorías Deslizables -->
+        <div class="flex space-x-2 mt-3.5 overflow-x-auto hide-scrollbar pb-1">
+            <button onclick="filtrarCategoria('todos')" class="bg-amber-400 text-indigo-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shrink-0 active:scale-95 transition">⚡ Todo</button>
+            <button onclick="filtrarCategoria('dulce')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🍦 Dulce & Frío</button>
+            <button onclick="filtrarCategoria('comida')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🍔 Comida & Más</button>
+            <button onclick="filtrarCategoria('servicios')" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition backdrop-blur-sm">🔧 Urgencias</button>
         </div>
     </div>
 
     <!-- Contenido Principal -->
-    <main class="max-w-md mx-auto px-4 mt-4 space-y-4">
+    <main class="max-w-md mx-auto px-4 mt-5 space-y-5">
         
-        <!-- Tarjeta de Asistente dAcliass -->
-        <div class="bg-gradient-to-r from-indigo-900 to-purple-900 text-white p-4 rounded-2xl shadow-md relative overflow-hidden">
-            <div class="flex justify-between items-start">
-                <div>
-                    <span class="bg-amber-400 text-indigo-950 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Asistente Contextual</span>
-                    <h2 class="font-bold text-sm mt-1">¡Hola! Soy dAcliass 🤖</h2>
-                    <p class="text-xs text-indigo-200 mt-1">☕ ¿Un café recién hecho o un antojo rápido en Piantini? Tienes delivery activo a precio preferencial.</p>
+        <!-- Banner del Asistente dAcliass -->
+        <div class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white p-5 rounded-3xl shadow-xl relative overflow-hidden border border-indigo-700/50">
+            <div class="flex justify-between items-start relative z-10">
+                <div class="pr-3">
+                    <span class="bg-amber-400 text-indigo-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Asistente Contextual</span>
+                    <h2 class="font-bold text-base mt-1.5 tracking-tight">¡Hola! Soy dAcliass 🤖</h2>
+                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">¿Un café o un helado en Piantini? Encuentro las mejores ofertas con delivery relámpago.</p>
                 </div>
-                <button onclick="abrirChat()" class="bg-amber-400 text-indigo-950 p-2.5 rounded-xl shadow font-bold text-sm">💬</button>
+                <button onclick="abrirChat()" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 p-3.5 rounded-2xl shadow-lg font-bold text-lg active:scale-90 transition duration-200">
+                    💬
+                </button>
             </div>
         </div>
 
-        <!-- Mapa Interactivo Leaflet -->
-        <div class="bg-white p-3 rounded-2xl shadow-sm">
-            <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">MAPA, RUTAS Y COMERCIOS CERCANOS</h3>
+        <!-- Mapa Moderno (CartoDB Positron) -->
+        <div class="bg-white p-3.5 rounded-3xl shadow-md border border-gray-100">
+            <div class="flex justify-between items-center mb-2 px-1">
+                <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-wider">MAPA Y RUTA EN VIVO</h3>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">● Cobertura SD</span>
+            </div>
             <div id="map"></div>
         </div>
 
-        <!-- Listado de Comercios en Vivo (Estilo PedidosYa) -->
+        <!-- Listado Dinámico de Comercios -->
         <div>
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold text-gray-800 text-sm">NEGOCIOS & DESCUENTOS EN VIVO</h3>
-                <span class="text-xs text-indigo-600 font-semibold">Santo Domingo</span>
+            <div class="flex justify-between items-center mb-3 px-1">
+                <h3 class="font-bold text-gray-900 text-sm">NEGOCIOS & DESCUENTOS EN VIVO</h3>
+                <span class="text-xs text-indigo-600 font-semibold cursor-pointer">Ver todos</span>
             </div>
-            <div id="listaNegocios" class="space-y-3">
-                <!-- Se inyecta dinámicamente desde JS -->
+            <div id="listaNegocios" class="space-y-3.5">
+                <!-- Se inyecta dinámicamente -->
             </div>
         </div>
     </main>
 
-    <!-- Barra de Navegación Inferior Estilo App Nativa -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 flex justify-around items-center z-50 shadow-lg">
-        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600">
-            <span class="text-lg">🏠</span>
-            <span class="text-[10px] font-semibold">Explorar</span>
+    <!-- Botón Flotante Inteligente dAcliass -->
+    <button onclick="abrirChat()" class="fixed bottom-20 right-4 bg-indigo-600 text-white p-4 rounded-full shadow-2xl border-2 border-white z-40 active:scale-90 transition duration-200 flex items-center justify-center">
+        <span class="text-xl">🤖</span>
+    </button>
+
+    <!-- Navegación Inferior Nativa -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200/80 py-2.5 px-6 flex justify-around items-center z-50 shadow-2xl">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600 active:scale-90 transition">
+            <span class="text-xl">🏠</span>
+            <span class="text-[10px] font-bold mt-0.5">Explorar</span>
         </button>
-        <button onclick="window.scrollTo({top:300, behavior:'smooth'})" class="flex flex-col items-center text-gray-400">
-            <span class="text-lg">🗺️</span>
-            <span class="text-[10px]">Mapa & Ruta</span>
+        <button onclick="window.scrollTo({top:280, behavior:'smooth'})" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 active:scale-90 transition">
+            <span class="text-xl">🗺️</span>
+            <span class="text-[10px] font-medium mt-0.5">Mapa</span>
         </button>
-        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400">
-            <span class="text-lg">⚡</span>
-            <span class="text-[10px]">dAcliass AI</span>
+        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 active:scale-90 transition">
+            <span class="text-xl">⚡</span>
+            <span class="text-[10px] font-medium mt-0.5">dAcliass</span>
         </button>
     </nav>
 
-    <!-- Script de lógica de la aplicación -->
+    <!-- Scripts de la Aplicación -->
     <script>
         let mapa;
         let marcadores = [];
         let negociosGlobal = [];
 
-        // Inicializar Mapa centrado en Santo Domingo
+        // Inicializar Mapa con capa aesthetic de CartoDB
         function inicializarMapa() {
-            mapa = L.map('map').setView([18.4861, -69.9312], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            mapa = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
-                attribution: '© OpenStreetMap'
+                attribution: '© CartoDB'
             }).addTo(mapa);
+
+            L.control.zoom({ position: 'topright' }).addTo(mapa);
         }
 
-        // Cargar negocios desde el backend FastAPI (/api/negocios) o fallback local
+        // Cargar negocios desde API o Fallback Local masivo
         async function cargarNegocios() {
             try {
                 const response = await fetch('/api/negocios');
                 const data = await response.json();
                 negociosGlobal = data.negocios || [];
             } catch (error) {
-                console.log("Usando base de datos local de respaldo");
                 negociosGlobal = [
                     { id: 1, nombre: "Helados Bon (Piantini)", categoria: "dulce", sector: "Piantini", descripcion: "Abierto ahora • Cierra 10:00 PM", distancia: "A 3 min (180m)", oferta: "⚡ 2x1 Relámpago", item: "Helado de Pistacho / Vainilla ($3.50 USD)", precio: "3.50", icono: "🍦", lat: 18.4890, lng: -69.9340 },
                     { id: 2, nombre: "Colmado & Más Express (Naco)", categoria: "comida", sector: "Naco", descripcion: "Bebidas frías y abastos 24/7", distancia: "A 2 min (0.8 km)", oferta: "🔥 -20% Flash", item: "Combo Picadera + Refresco ($5.00 USD)", precio: "5.00", icono: "🏪", lat: 18.4880, lng: -69.9320 },
@@ -148,30 +224,34 @@
             contenedor.innerHTML = '';
             
             if (lista.length === 0) {
-                contenedor.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No se encontraron negocios con ese criterio.</p>';
+                contenedor.innerHTML = '<div class="text-center text-gray-400 py-8 text-xs font-medium">No hay comercios disponibles para esta búsqueda.</div>';
                 return;
             }
 
-            lista.forEach(n => {
+            lista.forEach((n, index) => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col space-y-2";
+                card.className = "card-enter bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col space-y-3 hover:shadow-md transition duration-200";
+                card.style.animationDelay = `${index * 0.05}s`;
+                
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex space-x-3 items-center">
-                            <span class="text-2xl bg-indigo-50 p-2 rounded-xl">${n.icono}</span>
+                            <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                ${n.icono}
+                            </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-sm">${n.nombre}</h4>
-                                <p class="text-xs text-gray-500">${n.descripcion} • <span class="text-indigo-600 font-medium">${n.distancia}</span></p>
+                                <h4 class="font-bold text-gray-900 text-sm leading-tight">${n.nombre}</h4>
+                                <p class="text-xs text-gray-500 mt-0.5">${n.descripcion} • <span class="text-indigo-600 font-semibold">${n.distancia}</span></p>
                             </div>
                         </div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Abierto</span>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Abierto</span>
                     </div>
-                    <div class="bg-gray-50 p-2.5 rounded-xl flex justify-between items-center mt-1">
+                    <div class="bg-slate-50 p-3 rounded-2xl flex justify-between items-center border border-slate-100">
                         <div>
                             <span class="text-[11px] font-bold text-amber-600 block">${n.oferta}</span>
                             <span class="text-xs text-gray-700 font-medium">${n.item}</span>
                         </div>
-                        <button onclick="pedirItem('${n.nombre}', '${n.precio}')" class="bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow hover:bg-indigo-700 active:scale-95 transition">
+                        <button onclick="pedirItem('${n.nombre}', '${n.precio}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
                             Pedir ($${n.precio})
                         </button>
                     </div>
@@ -186,8 +266,15 @@
 
             lista.forEach(n => {
                 if(n.lat && n.lng) {
-                    const marker = L.marker([n.lat, n.lng]).addTo(mapa)
-                        .bindPopup(`<b>${n.nombre}</b><br>${n.oferta}`);
+                    const customIcon = L.divIcon({
+                        className: 'custom-pin-wrapper',
+                        html: `<div class="custom-pin">${n.icono}</div>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+
+                    const marker = L.marker([n.lat, n.lng], { icon: customIcon }).addTo(mapa)
+                        .bindPopup(`<div style="font-family: sans-serif;"><b>${n.nombre}</b><br><span style="color:#d97706; font-size: 11px; font-weight: bold;">${n.oferta}</span></div>`);
                     marcadores.push(marker);
                 }
             });
@@ -217,15 +304,15 @@
         }
 
         function abrirChat() {
-            const promptUser = prompt("🤖 dAcliass 24/7 (Asistente Santo Domingo):\n¿Qué estás buscando o qué antojo tienes hoy?");
+            const promptUser = prompt("🤖 dAcliass 24/7 (Asistente Santo Domingo):\n¿Qué antojo o necesidad tienes en este momento?");
             if(promptUser) {
-                alert("dAcliass: Analizando los mejores comercios en Santo Domingo para '" + promptUser + "'. ¡Tenemos opciones abiertas con delivery rápido cerca de ti!");
+                alert("🤖 dAcliass: Analizando opciones en Santo Domingo para '" + promptUser + "'. ¡Te recomendamos los comercios con delivery más cercano!");
             }
         }
 
         function pedirItem(nombre, precio) {
             if(confirm(`¿Confirmas tu pedido en ${nombre} por $${precio} USD?`)) {
-                alert("¡Pedido realizado con éxito! Tu orden va en camino 🛵💨");
+                alert("¡Pedido realizado con éxito! Tu delivery va en camino 🛵💨");
             }
         }
 
