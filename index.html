@@ -6,6 +6,14 @@
     <title>convenienceIA - Encuentra lo mejor cerca de ti</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js para el Mapa Interactivo -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- SDK de PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <style>
+        #mapaContainer { height: 350px; width: 100%; border-radius: 1rem; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
@@ -16,7 +24,7 @@
                 <i class="fa-solid fa-store text-xl"></i>
                 <h1 class="text-lg font-bold tracking-wide">convenience<span class="text-amber-300">IA</span></h1>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
                 <span class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full border border-indigo-500">
                     <i class="fa-solid fa-robot text-amber-300 mr-1"></i> dAcliass Activo
                 </span>
@@ -27,7 +35,7 @@
     <!-- Contenido Principal -->
     <main class="max-w-md mx-auto p-4 flex-grow w-full space-y-4 pb-24">
 
-        <!-- Buscador en tiempo real -->
+        <!-- Buscador -->
         <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
@@ -48,46 +56,65 @@
             </button>
         </section>
 
-        <!-- Lista de Negocios -->
-        <div class="space-y-3" id="listaNegocios">
+        <!-- Pestaña 1: Explorar / Negocios -->
+        <div id="secExplorar" class="space-y-3">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Establecimientos Cercanos</h3>
 
-            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
-                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🏪</div>
-                <div class="flex-grow">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Colmado & Más Express</h4>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-0.5">Bebidas, picaderas y abastos</p>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-[11px] text-amber-600 font-bold"><i class="fa-solid fa-bolt"></i> Flash -20%</span>
-                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-location-dot"></i> 0.8 km</span>
+            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🏪</div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Colmado & Más Express</h4>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Bebidas, picaderas y abastos</p>
+                        <span class="text-[11px] text-amber-600 font-bold mt-1 block"><i class="fa-solid fa-bolt"></i> Flash -20%</span>
                     </div>
                 </div>
+                <button onclick="abrirCheckout('Colmado & Más Express', '5.00')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow">
+                    Pedir ($5)
+                </button>
             </div>
 
-            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
-                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🍔</div>
-                <div class="flex-grow">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Burger & Grill RD</h4>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-0.5">Comida rápida artesanal</p>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-[11px] text-amber-600 font-bold"><i class="fa-solid fa-bolt"></i> Envío Gratis</span>
-                        <span class="text-[11px] text-slate-400"><i class="fa-solid fa-location-dot"></i> 1.5 km</span>
+            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🍔</div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Burger & Grill RD</h4>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Comida rápida artesanal</p>
+                        <span class="text-[11px] text-amber-600 font-bold mt-1 block"><i class="fa-solid fa-bolt"></i> Envío Gratis</span>
                     </div>
                 </div>
+                <button onclick="abrirCheckout('Burger & Grill RD', '8.00')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow">
+                    Pedir ($8)
+                </button>
             </div>
+        </div>
+
+        <!-- Pestaña 2: Mapa Interactivo (Oculto por defecto) -->
+        <div id="secMapa" class="hidden space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Mapa de Comercios en Vivo</h3>
+            <div id="mapaContainer" class="shadow-sm border border-slate-200"></div>
+        </div>
+
+        <!-- Checkout de PayPal -->
+        <div id="checkoutSection" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hidden space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-sm text-slate-800" id="tituloCheckout">Finalizar Pedido</h3>
+                <button onclick="cerrarCheckout()" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-slate-500">Paga de forma segura con PayPal.</p>
+            <div id="paypal-button-container"></div>
         </div>
     </main>
 
     <!-- Modal de Chat Flotante dAcliass -->
     <div id="chatModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex justify-center items-end sm:items-center p-0 sm:p-4">
         <div class="bg-white w-full max-w-md h-[80vh] rounded-t-3xl sm:rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-            <!-- Header Modal -->
             <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-robot text-amber-300"></i>
@@ -95,13 +122,11 @@
                 </div>
                 <button onclick="cerrarChat()" class="text-white hover:text-amber-300 font-bold text-xl">&times;</button>
             </div>
-            <!-- Historial de mensajes -->
             <div id="chatHistory" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
                 <div class="bg-indigo-100 text-indigo-900 p-3 rounded-2xl max-w-[85%]">
                     ¡Hola! Soy dAcliass. ¿En qué te ayudo a encontrar hoy?
                 </div>
             </div>
-            <!-- Input de envío -->
             <div class="p-3 bg-white border-t border-slate-200 flex space-x-2">
                 <input id="userMsg" type="text" placeholder="Escribe tu mensaje..." onkeypress="if(event.key==='Enter') enviarMensaje()"
                     class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -110,18 +135,18 @@
         </div>
     </div>
 
-    <!-- Navegación Inferior -->
+    <!-- Navegación Inferior Funcional -->
     <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-40 shadow-lg">
         <div class="max-w-md mx-auto flex justify-around py-2.5">
-            <button class="flex flex-col items-center text-indigo-600">
+            <button onclick="cambiarVista('explorar')" id="btnNavExplorar" class="flex flex-col items-center text-indigo-600">
                 <i class="fa-solid fa-compass text-lg"></i>
                 <span class="text-[10px] font-medium mt-1">Explorar</span>
             </button>
-            <button class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
+            <button onclick="cambiarVista('mapa')" id="btnNavMapa" class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
                 <i class="fa-solid fa-map-location-dot text-lg"></i>
                 <span class="text-[10px] font-medium mt-1">Mapa</span>
             </button>
-            <button class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
+            <button onclick="cambiarVista('explorar')" class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
                 <i class="fa-solid fa-tags text-lg"></i>
                 <span class="text-[10px] font-medium mt-1">Descuentos</span>
             </button>
@@ -138,7 +163,6 @@
             const texto = input.value.trim();
             if(!texto) return;
 
-            // Mostrar mensaje del usuario
             history.innerHTML += `<div class="bg-slate-200 text-slate-800 p-3 rounded-2xl max-w-[85%] ml-auto">${texto}</div>`;
             input.value = '';
             history.scrollTop = history.scrollHeight;
@@ -165,6 +189,80 @@
                 t.style.display = nombre.includes(query) ? 'flex' : 'none';
             });
         }
+
+        // Sistema de Mapa Interactivo con Leaflet
+        let map;
+        function inicializarMapa() {
+            if (!map) {
+                // Coordenadas centradas en Santo Domingo, RD
+                map = L.map('mapaContainer').setView([18.4861, -69.9312], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // Marcador 1: Colmado
+                L.marker([18.4880, -69.9320]).addTo(map)
+                    .bindPopup('<b>Colmado & Más Express</b><br>Flash -20%');
+
+                // Marcador 2: Burger
+                L.marker([18.4840, -69.9300]).addTo(map)
+                    .bindPopup('<b>Burger & Grill RD</b><br>Envío Gratis');
+            }
+            setTimeout(() => { map.invalidateSize(); }, 200);
+        }
+
+        // Navegación entre vistas
+        function cambiarVista(vista) {
+            const secExplorar = document.getElementById('secExplorar');
+            const secMapa = document.getElementById('secMapa');
+            const btnExplorar = document.getElementById('btnNavExplorar');
+            const btnMapa = document.getElementById('btnNavMapa');
+
+            if (vista === 'mapa') {
+                secExplorar.classList.add('hidden');
+                secMapa.classList.remove('hidden');
+                btnMapa.className = "flex flex-col items-center text-indigo-600";
+                btnExplorar.className = "flex flex-col items-center text-slate-400 hover:text-indigo-600";
+                inicializarMapa();
+            } else {
+                secMapa.classList.add('hidden');
+                secExplorar.classList.remove('hidden');
+                btnExplorar.className = "flex flex-col items-center text-indigo-600";
+                btnMapa.className = "flex flex-col items-center text-slate-400 hover:text-indigo-600";
+            }
+        }
+
+        // PayPal
+        let paypalRendered = false;
+        function abrirCheckout(nombre, monto) {
+            document.getElementById('checkoutSection').classList.remove('hidden');
+            document.getElementById('tituloCheckout').innerText = `Pagar pedido en: ${nombre} ($${monto} USD)`;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+            if (!paypalRendered) {
+                document.getElementById('paypal-button-container').innerHTML = '';
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        return actions.order.create({ purchase_units: [{ amount: { value: monto } }] });
+                    },
+                    onApprove: async function(data, actions) {
+                        return actions.order.capture().then(async function(details) {
+                            await fetch('/api/confirmar-pago', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ orderID: data.orderID, monto: monto })
+                            });
+                            alert(`¡Pago completado con éxito por ${details.payer.name.given_name}!`);
+                            document.getElementById('checkoutSection').classList.add('hidden');
+                        });
+                    }
+                }).render('#paypal-button-container');
+                paypalRendered = true;
+            }
+        }
+
+        function cerrarCheckout() { document.getElementById('checkoutSection').classList.add('hidden'); }
     </script>
 </body>
 </html>
