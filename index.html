@@ -2,354 +2,237 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>convenienceIA - Tu Asistente Inteligente y Guía Local</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>convenienceIA Santo Domingo</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="convenienceIA">
+
+    <!-- Tailwind CSS & Leaflet Map -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet.js para el Mapa Interactivo -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- SDK de PayPal -->
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
     <style>
-        #mapaContainer { height: 400px; width: 100%; border-radius: 1rem; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
+        #map { height: 260px; border-radius: 1rem; z-index: 10; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="pb-24">
 
-    <!-- Header Principal -->
-    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-store text-xl text-amber-300"></i>
-                <h1 class="text-lg font-bold tracking-wide">convenience<span class="text-amber-300">IA</span></h1>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full border border-indigo-500 shadow-sm">
-                    <i class="fa-solid fa-robot text-amber-300 mr-1"></i> dAcliass 24/7
-                </span>
-            </div>
+    <!-- Header Estilo PedidosYa -->
+    <header class="bg-indigo-600 text-white px-4 py-3 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🛒</span>
+            <h1 class="font-bold text-lg tracking-wide">convenienceIA</h1>
+        </div>
+        <div class="bg-indigo-700 px-3 py-1.5 rounded-full text-xs font-medium flex items-center space-x-1 shadow-inner">
+            <span>🤖</span>
+            <span onclick="abrirChat()" class="cursor-pointer">dAcliass 24/7</span>
         </div>
     </header>
 
-    <!-- Contenido Principal -->
-    <main class="max-w-md mx-auto p-4 flex-grow w-full space-y-4 pb-28">
-
-        <!-- Buscador Inteligente y Filtros de Sabor -->
-        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
-                <input id="searchInput" onkeyup="filtrarNegocios()" type="text" placeholder="¿Qué se te antoja? (Ej. Café, Helado, Pizza...)" 
-                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-            </div>
-            
-            <!-- Filtros de Categorías y Sabores -->
-            <div class="flex space-x-2 overflow-x-auto pb-1 text-xs no-scrollbar">
-                <button onclick="filtrarCategoria('todos')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium whitespace-nowrap shadow-sm">Todos</button>
-                <button onclick="filtrarCategoria('flash')" class="bg-amber-500 text-slate-900 px-3 py-1.5 rounded-full font-bold whitespace-nowrap shadow-sm">⚡ Ofertas Relámpago</button>
-                <button onclick="filtrarCategoria('dulce')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap">🍦 Dulce & Frío</button>
-                <button onclick="filtrarCategoria('comida')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-full font-medium whitespace-nowrap">🍕 Comida & Más</button>
-            </div>
-        </section>
-
-        <!-- Banner Interactivo de dAcliass (Simulador de Notificación Contextual) -->
-        <section class="bg-gradient-to-r from-indigo-900 to-indigo-700 text-white p-4 rounded-2xl shadow-md flex items-center justify-between relative overflow-hidden">
-            <div class="space-y-1 z-10">
-                <span class="text-[10px] uppercase tracking-wider bg-amber-400 text-slate-900 font-bold px-2 py-0.5 rounded">Asistente Contextual</span>
-                <h2 class="text-sm font-bold">¡Hola! Soy dAcliass 🤖</h2>
-                <p id="textoNotificacionIA" class="text-xs text-indigo-200">Tengo un descuento de café a 2 min de ti ☕.</p>
-            </div>
-            <button onclick="abrirChat()" class="bg-amber-400 hover:bg-amber-300 text-slate-900 p-3 rounded-xl font-bold text-xs shadow transition active:scale-95 z-10">
-                <i class="fa-solid fa-comment-dots text-lg"></i>
-            </button>
-        </section>
-
-        <!-- Pestaña 1: Explorar / Listado de Negocios y Menús Transparentes -->
-        <div id="secExplorar" class="space-y-3">
-            <div class="flex justify-between items-center px-1">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Negocios & Descuentos en Vivo</h3>
-                <span class="text-[11px] text-indigo-600 font-bold">📍 Santo Domingo</span>
-            </div>
-
-            <!-- Tarjeta 1: Destacado / Patrocinado (Publicidad Local) -->
-            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-indigo-100 space-y-2" data-categoria="dulce flash">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-14 h-14 bg-pink-50 rounded-xl flex items-center justify-center text-2xl">🍦</div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Helados Bon (Destacado)</h4>
-                                <span class="text-[9px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">Patrocinado</span>
-                            </div>
-                            <p class="text-xs text-slate-500">Abierto ahora • Cierra 10:00 PM</p>
-                            <span class="text-[11px] text-emerald-600 font-bold block mt-0.5"><i class="fa-solid fa-location-dot"></i> A 3 min (180m)</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Oferta Relámpago y Catálogo -->
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 flex justify-between items-center">
-                    <div>
-                        <span class="text-[10px] font-bold text-amber-800 bg-amber-200 px-2 py-0.5 rounded">⚡ 2x1 Relámpago</span>
-                        <p class="text-xs text-slate-700 mt-1">Helado de Pistacho / Vainilla ($3.50 USD)</p>
-                    </div>
-                    <button onclick="abrirCheckout('Helados Bon - Promo 2x1', '3.50')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow">
-                        Comprar Cupón
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tarjeta 2: Colmado & Más Express -->
-            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 space-y-2" data-categoria="comida flash">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🏪</div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Colmado & Más Express</h4>
-                                <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
-                            </div>
-                            <p class="text-xs text-slate-500">Bebidas frías y abastos</p>
-                            <span class="text-[11px] text-emerald-600 font-bold block mt-0.5"><i class="fa-solid fa-location-dot"></i> A 2 min (0.8 km)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
-                    <div>
-                        <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">🔥 -20% Flash</span>
-                        <p class="text-xs text-slate-700 mt-1">Combo Picadera + Refresco ($5.00 USD)</p>
-                    </div>
-                    <button onclick="abrirCheckout('Colmado & Más Express', '5.00')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow">
-                        Pedir ($5)
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tarjeta 3: Burger & Grill RD -->
-            <div class="tarjeta-negocio bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 space-y-2" data-categoria="comida">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-2xl">🍔</div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-bold text-sm text-slate-800 nombre-negocio">Burger & Grill RD</h4>
-                                <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Abierto</span>
-                            </div>
-                            <p class="text-xs text-slate-500">Comida rápida artesanal</p>
-                            <span class="text-[11px] text-emerald-600 font-bold block mt-0.5"><i class="fa-solid fa-location-dot"></i> A 5 min (1.5 km)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
-                    <div>
-                        <span class="text-[10px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">🍔 Menú Completo</span>
-                        <p class="text-xs text-slate-700 mt-1">Burger Artesanal Clásica ($8.00 USD)</p>
-                    </div>
-                    <button onclick="abrirCheckout('Burger & Grill RD', '8.00')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow">
-                        Pedir ($8)
-                    </button>
-                </div>
-            </div>
+    <!-- Barra de Búsqueda y Dirección -->
+    <div class="bg-indigo-600 px-4 pb-4 pt-1 shadow-md">
+        <div class="flex items-center text-indigo-200 text-xs mb-2">
+            <span class="mr-1">📍</span> Estás en <span class="text-white font-semibold ml-1">Santo Domingo (Polígono Central)</span>
         </div>
-
-        <!-- Pestaña 2: Mapa Interactivo en Vivo -->
-        <div id="secMapa" class="hidden space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Mapa, Rutas y Tiempos de Llegada</h3>
-            <div id="mapaContainer" class="shadow-sm border border-slate-200"></div>
+        <div class="relative">
+            <input type="text" id="searchInput" placeholder="¿Qué se te antoja? (Ej. Café, Helado, Pizza...)" 
+                   class="w-full py-3 pl-10 pr-4 rounded-xl text-gray-800 text-sm bg-white shadow focus:outline-none"
+                   oninput="filtrarNegocios()">
+            <span class="absolute left-3 top-3.5 text-gray-400">🔍</span>
         </div>
-
-        <!-- Checkout Seguro con PayPal -->
-        <div id="checkoutSection" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hidden space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-sm text-slate-800" id="tituloCheckout">Finalizar Pedido</h3>
-                <button onclick="cerrarCheckout()" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
-            </div>
-            <p class="text-xs text-slate-500">Paga con PayPal para generar tu código de descuento o reserva instantánea.</p>
-            <div id="paypal-button-container"></div>
-        </div>
-    </main>
-
-    <!-- Modal de Chat IA (dAcliass 24/7 con soporte de voz/texto para antojos) -->
-    <div id="chatModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex justify-center items-end sm:items-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md h-[85vh] rounded-t-3xl sm:rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-robot text-amber-300"></i>
-                    <div>
-                        <span class="font-bold block text-sm">dAcliass Asistente IA</span>
-                        <span class="text-[10px] text-indigo-200">En línea • Precios, menús y citas</span>
-                    </div>
-                </div>
-                <button onclick="cerrarChat()" class="text-white hover:text-amber-300 font-bold text-xl">&times;</button>
-            </div>
-            <div id="chatHistory" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
-                <div class="bg-indigo-100 text-indigo-900 p-3 rounded-2xl max-w-[85%]">
-                    ¡Hola! Soy dAcliass. Dime qué se te antoja hoy (ej. "algo dulce y frío por menos de $10") y te buscaré la ruta y el descuento exacto.
-                </div>
-            </div>
-            <div class="p-3 bg-white border-t border-slate-200 flex space-x-2 items-center">
-                <input id="userMsg" type="text" placeholder="Ej. Quiero pizza o helado..." onkeypress="if(event.key==='Enter') enviarMensaje()"
-                    class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <button onclick="enviarMensaje()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow">Enviar</button>
-            </div>
+        
+        <!-- Categorías Rápidas -->
+        <div class="flex space-x-2 mt-3 overflow-x-auto hide-scrollbar pb-1">
+            <button onclick="filtrarCategoria('todos')" class="bg-white text-indigo-900 px-4 py-1.5 rounded-full text-xs font-semibold shadow shrink-0">⚡ Todo</button>
+            <button onclick="filtrarCategoria('dulce')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🍦 Dulce & Frío</button>
+            <button onclick="filtrarCategoria('comida')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🍔 Comida & Más</button>
+            <button onclick="filtrarCategoria('servicios')" class="bg-white/20 text-white px-4 py-1.5 rounded-full text-xs font-medium shrink-0">🔧 Farmacia & Urgencias</button>
         </div>
     </div>
 
-    <!-- Navegación Inferior Estilo PWA -->
-    <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-40 shadow-lg">
-        <div class="max-w-md mx-auto flex justify-around py-2.5">
-            <button onclick="cambiarVista('explorar')" id="btnNavExplorar" class="flex flex-col items-center text-indigo-600">
-                <i class="fa-solid fa-compass text-lg"></i>
-                <span class="text-[10px] font-medium mt-1">Explorar</span>
-            </button>
-            <button onclick="cambiarVista('mapa')" id="btnNavMapa" class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
-                <i class="fa-solid fa-map-location-dot text-lg"></i>
-                <span class="text-[10px] font-medium mt-1">Mapa & Ruta</span>
-            </button>
-            <button onclick="filtrarCategoria('flash')" class="flex flex-col items-center text-slate-400 hover:text-indigo-600">
-                <i class="fa-solid fa-bolt text-lg text-amber-500"></i>
-                <span class="text-[10px] font-medium mt-1">Relámpago</span>
-            </button>
+    <!-- Contenido Principal -->
+    <main class="max-w-md mx-auto px-4 mt-4 space-y-4">
+        
+        <!-- Tarjeta de Asistente dAcliass -->
+        <div class="bg-gradient-to-r from-indigo-900 to-purple-900 text-white p-4 rounded-2xl shadow-md relative overflow-hidden">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="bg-amber-400 text-indigo-950 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Asistente Contextual</span>
+                    <h2 class="font-bold text-sm mt-1">¡Hola! Soy dAcliass 🤖</h2>
+                    <p class="text-xs text-indigo-200 mt-1">☕ ¿Un café recién hecho o un antojo rápido en Piantini? Tienes delivery activo a precio preferencial.</p>
+                </div>
+                <button onclick="abrirChat()" class="bg-amber-400 text-indigo-950 p-2.5 rounded-xl shadow font-bold text-sm">💬</button>
+            </div>
         </div>
+
+        <!-- Mapa Interactivo Leaflet -->
+        <div class="bg-white p-3 rounded-2xl shadow-sm">
+            <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">MAPA, RUTAS Y COMERCIOS CERCANOS</h3>
+            <div id="map"></div>
+        </div>
+
+        <!-- Listado de Comercios en Vivo (Estilo PedidosYa) -->
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-gray-800 text-sm">NEGOCIOS & DESCUENTOS EN VIVO</h3>
+                <span class="text-xs text-indigo-600 font-semibold">Santo Domingo</span>
+            </div>
+            <div id="listaNegocios" class="space-y-3">
+                <!-- Se inyecta dinámicamente desde JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Barra de Navegación Inferior Estilo App Nativa -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 flex justify-around items-center z-50 shadow-lg">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600">
+            <span class="text-lg">🏠</span>
+            <span class="text-[10px] font-semibold">Explorar</span>
+        </button>
+        <button onclick="window.scrollTo({top:300, behavior:'smooth'})" class="flex flex-col items-center text-gray-400">
+            <span class="text-lg">🗺️</span>
+            <span class="text-[10px]">Mapa & Ruta</span>
+        </button>
+        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400">
+            <span class="text-lg">⚡</span>
+            <span class="text-[10px]">dAcliass AI</span>
+        </button>
     </nav>
 
+    <!-- Script de lógica de la aplicación -->
     <script>
-        // Simulación de notificaciones contextuales según la hora al cargar
-        window.onload = function() {
-            const hora = new Date().getHours();
-            const textoNoti = document.getElementById('textoNotificacionIA');
-            if (hora < 11) {
-                textoNoti.innerText = "☕ ¿Un café recién hecho a 2 min? Tienes descuento activo.";
-            } else if (hora >= 12 && hora < 16) {
-                textoNoti.innerText = "🍦 ¡Promo 2x1 en Helados Bon por las próximas 2 horas!";
-            } else {
-                textoNoti.innerText = "🍔 Descubre el combo nocturno con 15% de descuento cerca de ti.";
-            }
-        };
+        let mapa;
+        let marcadores = [];
+        let negociosGlobal = [];
 
-        function abrirChat() { document.getElementById('chatModal').classList.remove('hidden'); }
-        function cerrarChat() { document.getElementById('chatModal').classList.add('hidden'); }
-
-        async function enviarMensaje() {
-            const input = document.getElementById('userMsg');
-            const history = document.getElementById('chatHistory');
-            const texto = input.value.trim();
-            if(!texto) return;
-
-            history.innerHTML += `<div class="bg-slate-200 text-slate-800 p-3 rounded-2xl max-w-[85%] ml-auto">${texto}</div>`;
-            input.value = '';
-            history.scrollTop = history.scrollHeight;
-
-            try {
-                const res = await fetch('/api/dacliass', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({mensaje: texto})
-                });
-                const data = await res.json();
-                history.innerHTML += `<div class="bg-indigo-100 text-indigo-900 p-3 rounded-2xl max-w-[85%]">${data.respuesta}</div>`;
-            } catch(e) {
-                history.innerHTML += `<div class="bg-indigo-100 text-indigo-900 p-3 rounded-2xl max-w-[85%]">🤖 dAcliass: Analizando tu antojo... Encontré 2 opciones cercanas por menos de $10 USD con ruta exacta en el mapa. ¡Pide tu cupón!</div>`;
-            }
-            history.scrollTop = history.scrollHeight;
+        // Inicializar Mapa centrado en Santo Domingo
+        function inicializarMapa() {
+            mapa = L.map('map').setView([18.4861, -69.9312], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(mapa);
         }
 
-        // Buscador y Filtros
-        function filtrarNegocios() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const tarjetas = document.querySelectorAll('.tarjeta-negocio');
-            tarjetas.forEach(t => {
-                const nombre = t.querySelector('.nombre-negocio').innerText.toLowerCase();
-                t.style.display = nombre.includes(query) ? 'block' : 'none';
+        // Cargar negocios desde el backend FastAPI (/api/negocios) o fallback local
+        async function cargarNegocios() {
+            try {
+                const response = await fetch('/api/negocios');
+                const data = await response.json();
+                negociosGlobal = data.negocios || [];
+            } catch (error) {
+                console.log("Usando base de datos local de respaldo");
+                negociosGlobal = [
+                    { id: 1, nombre: "Helados Bon (Piantini)", categoria: "dulce", sector: "Piantini", descripcion: "Abierto ahora • Cierra 10:00 PM", distancia: "A 3 min (180m)", oferta: "⚡ 2x1 Relámpago", item: "Helado de Pistacho / Vainilla ($3.50 USD)", precio: "3.50", icono: "🍦", lat: 18.4890, lng: -69.9340 },
+                    { id: 2, nombre: "Colmado & Más Express (Naco)", categoria: "comida", sector: "Naco", descripcion: "Bebidas frías y abastos 24/7", distancia: "A 2 min (0.8 km)", oferta: "🔥 -20% Flash", item: "Combo Picadera + Refresco ($5.00 USD)", precio: "5.00", icono: "🏪", lat: 18.4880, lng: -69.9320 },
+                    { id: 3, nombre: "Burger & Grill RD (Zona Colonial)", categoria: "comida", sector: "Zona Colonial", descripcion: "Comida rápida artesanal", distancia: "A 5 min (1.5 km)", oferta: "🍔 Menú Completo", item: "Burger Artesanal Clásica ($8.00 USD)", precio: "8.00", icono: "🍔", lat: 18.4840, lng: -69.9300 },
+                    { id: 4, nombre: "Pizzería La Focaccia (Gazcue)", categoria: "comida", sector: "Gazcue", descripcion: "Pizza a la leña artesanal", distancia: "A 7 min (2.1 km)", oferta: "⚡ 15% Descuento", item: "Pizza Napolitana Familiar ($12.00 USD)", precio: "12.00", icono: "🍕", lat: 18.4820, lng: -69.9280 },
+                    { id: 5, nombre: "Café de París (Bella Vista)", categoria: "dulce", sector: "Bella Vista", descripcion: "Café de origen y repostería fina", distancia: "A 1 min (100m)", oferta: "☕ Descuento Mañana", item: "Cappuccino + Donut Artesanal ($4.00 USD)", precio: "4.00", icono: "☕", lat: 18.4895, lng: -69.9350 }
+                ];
+            }
+            renderizarNegocios(negociosGlobal);
+            actualizarMapa(negociosGlobal);
+        }
+
+        function renderizarNegocios(lista) {
+            const contenedor = document.getElementById('listaNegocios');
+            contenedor.innerHTML = '';
+            
+            if (lista.length === 0) {
+                contenedor.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No se encontraron negocios con ese criterio.</p>';
+                return;
+            }
+
+            lista.forEach(n => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex space-x-3 items-center">
+                            <span class="text-2xl bg-indigo-50 p-2 rounded-xl">${n.icono}</span>
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-sm">${n.nombre}</h4>
+                                <p class="text-xs text-gray-500">${n.descripcion} • <span class="text-indigo-600 font-medium">${n.distancia}</span></p>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Abierto</span>
+                    </div>
+                    <div class="bg-gray-50 p-2.5 rounded-xl flex justify-between items-center mt-1">
+                        <div>
+                            <span class="text-[11px] font-bold text-amber-600 block">${n.oferta}</span>
+                            <span class="text-xs text-gray-700 font-medium">${n.item}</span>
+                        </div>
+                        <button onclick="pedirItem('${n.nombre}', '${n.precio}')" class="bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow hover:bg-indigo-700 active:scale-95 transition">
+                            Pedir ($${n.precio})
+                        </button>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function actualizarMapa(lista) {
+            marcadores.forEach(m => mapa.removeLayer(m));
+            marcadores = [];
+
+            lista.forEach(n => {
+                if(n.lat && n.lng) {
+                    const marker = L.marker([n.lat, n.lng]).addTo(mapa)
+                        .bindPopup(`<b>${n.nombre}</b><br>${n.oferta}`);
+                    marcadores.push(marker);
+                }
             });
         }
 
         function filtrarCategoria(cat) {
-            const tarjetas = document.querySelectorAll('.tarjeta-negocio');
-            tarjetas.forEach(t => {
-                const categorias = t.getAttribute('data-categoria') || '';
-                if (cat === 'todos' || categorias.includes(cat)) {
-                    t.style.display = 'block';
-                } else {
-                    t.style.display = 'none';
-                }
-            });
-            cambiarVista('explorar');
-        }
-
-        // Mapa Interactivo con Leaflet
-        let map;
-        function inicializarMapa() {
-            if (!map) {
-                map = L.map('mapaContainer').setView([18.4861, -69.9312], 14);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
-
-                L.marker([18.4890, -69.9340]).addTo(map)
-                    .bindPopup('<b>Helados Bon (Patrocinado)</b><br>Promo 2x1 Relámpago<br>⏱️ A 3 min');
-
-                L.marker([18.4880, -69.9320]).addTo(map)
-                    .bindPopup('<b>Colmado & Más Express</b><br>Abierto • Descuento Flash 20%<br>⏱️ A 2 min');
-
-                L.marker([18.4840, -69.9300]).addTo(map)
-                    .bindPopup('<b>Burger & Grill RD</b><br>Abierto • Menú completo<br>⏱️ A 5 min');
-            }
-            setTimeout(() => { map.invalidateSize(); }, 200);
-        }
-
-        function cambiarVista(vista) {
-            const secExplorar = document.getElementById('secExplorar');
-            const secMapa = document.getElementById('secMapa');
-            const btnExplorar = document.getElementById('btnNavExplorar');
-            const btnMapa = document.getElementById('btnNavMapa');
-
-            if (vista === 'mapa') {
-                secExplorar.classList.add('hidden');
-                secMapa.classList.remove('hidden');
-                btnMapa.className = "flex flex-col items-center text-indigo-600";
-                btnExplorar.className = "flex flex-col items-center text-slate-400 hover:text-indigo-600";
-                inicializarMapa();
+            if(cat === 'todos') {
+                renderizarNegocios(negociosGlobal);
+                actualizarMapa(negociosGlobal);
             } else {
-                secMapa.classList.add('hidden');
-                secExplorar.classList.remove('hidden');
-                btnExplorar.className = "flex flex-col items-center text-indigo-600";
-                btnMapa.className = "flex flex-col items-center text-slate-400 hover:text-indigo-600";
+                const filtrados = negociosGlobal.filter(n => n.categoria.includes(cat));
+                renderizarNegocios(filtrados);
+                actualizarMapa(filtrados);
             }
         }
 
-        // Pasarela de Pagos PayPal
-        let paypalRendered = false;
-        function abrirCheckout(nombre, monto) {
-            document.getElementById('checkoutSection').classList.remove('hidden');
-            document.getElementById('tituloCheckout').innerText = `Comprar Cupón / Pedido: ${nombre} ($${monto} USD)`;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        function filtrarNegocios() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = negociosGlobal.filter(n => 
+                n.nombre.toLowerCase().includes(query) || 
+                n.categoria.toLowerCase().includes(query) ||
+                n.sector.toLowerCase().includes(query) ||
+                n.item.toLowerCase().includes(query)
+            );
+            renderizarNegocios(filtrados);
+            actualizarMapa(filtrados);
+        }
 
-            if (!paypalRendered) {
-                document.getElementById('paypal-button-container').innerHTML = '';
-                paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        return actions.order.create({ purchase_units: [{ amount: { value: monto } }] });
-                    },
-                    onApprove: async function(data, actions) {
-                        return actions.order.capture().then(async function(details) {
-                            await fetch('/api/confirmar-pago', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({ orderID: data.orderID, monto: monto })
-                            });
-                            alert(`¡Pago exitoso, ${details.payer.name.given_name}! Tu cupón relámpago ha sido generado y registrado.`);
-                            document.getElementById('checkoutSection').classList.add('hidden');
-                        });
-                    }
-                }).render('#paypal-button-container');
-                paypalRendered = true;
+        function abrirChat() {
+            const promptUser = prompt("🤖 dAcliass 24/7 (Asistente Santo Domingo):\n¿Qué estás buscando o qué antojo tienes hoy?");
+            if(promptUser) {
+                alert("dAcliass: Analizando los mejores comercios en Santo Domingo para '" + promptUser + "'. ¡Tenemos opciones abiertas con delivery rápido cerca de ti!");
             }
         }
 
-        function cerrarCheckout() { document.getElementById('checkoutSection').classList.add('hidden'); }
+        function pedirItem(nombre, precio) {
+            if(confirm(`¿Confirmas tu pedido en ${nombre} por $${precio} USD?`)) {
+                alert("¡Pedido realizado con éxito! Tu orden va en camino 🛵💨");
+            }
+        }
+
+        window.onload = () => {
+            inicializarMapa();
+            cargarNegocios();
+        };
     </script>
 </body>
 </html>
