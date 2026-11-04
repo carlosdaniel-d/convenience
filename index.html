@@ -180,3 +180,22 @@
     </div>
   </div>
 </div>
+<!-- ========================================== -->
+<!-- BLOQUE MÁXIMO 1000%: PROPINAS Y BANNER      -->
+<!-- ========================================== -->
+
+<!-- Banner Deslizante de Ofertas Flash en la parte superior del mapa -->
+<div id="banner-flash" style="position:absolute; top:70px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; background:rgba(0,230,118,0.9); color:#000; padding:8px 12px; border-radius:12px; z-index:1000; text-align:center; font-size:12px; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
+  ⚡ ¡OFERTA FLASH EN SANTO DOMINGO! Usa el cupón <span style="background:#000; color:#00E676; padding:2px 6px; border-radius:4px;">SD2026</span> para un 15% OFF.
+</div>
+
+<!-- Opciones de Propina en el Modal de Pago (Agégalo dentro de tu modal de pago existente) -->
+<div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #333;">
+  <label style="font-size: 12px; color: #aaa; display:block; margin-bottom: 6px;">☕ Propina para el motorizado:</label>
+  <div style="display: flex; gap: 6px;">
+    <button onclick="setPropina(0)" style="flex:1; background:#242424; color:#fff; border:1px solid #444; padding:6px; border-radius:6px; font-size:11px; cursor:pointer;">Sin propina</button>
+    <button onclick="setPropina(50)" style="flex:1; background:#242424; color:#00E676; border:1px solid #444; padding:6px; border-radius:6px; font-size:11px; cursor:pointer;">RD$ 50</button>
+    <button onclick="setPropina(100)" style="flex:1; background:#242424; color:#00E676; border:1px solid #444; padding:6px; border-radius:6px; font-size:11px; cursor:pointer;">RD$ 100</button>
+  </div>
+  <small id="propina-msg" style="color:#00E676; display:block; margin-top:4px; font-size:11px;">Propina seleccionada: RD$ 0</small>
+</div>
