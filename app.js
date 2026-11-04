@@ -180,3 +180,71 @@ function renderizarMarcadores(negocios) {
     marcadoresGroup.addLayer(marker);
   });
 }
+// ==========================================
+// BLOQUE 1000%: PASARELA, GPS Y RESEÑAS
+// ==========================================
+
+// 1. Modificar el botón de finalizar pedido para abrir pasarela
+window.finalizarPedido = function() {
+  if (carrito.length === 0) {
+    alert('Tu carrito está vacío.');
+    return;
+  }
+  cerrarCarrito();
+  document.getElementById('checkout-modal').classList.remove('hidden');
+};
+
+window.cerrarPago = function() {
+  document.getElementById('checkout-modal').classList.add('hidden');
+};
+
+window.procesarPagoFinal = function() {
+  const metodo = document.querySelector('input[name="metodo-pago"]:checked').value;
+  const total = carrito.reduce((sum, i) => sum + i.precio, 0);
+  
+  // Guardar pedido para el panel del dueño
+  const nuevoPedido = {
+    id: Date.now(),
+    items: [...carrito],
+    total: total,
+    metodoPago: metodo,
+    estado: 'En camino 🛵',
+    hora: new Date().toLocaleTimeString()
+  };
+
+  let pedidosDueño = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+  pedidosDueño.push(nuevoPedido);
+  localStorage.setItem('pedidos_negocio', JSON.stringify(pedidosDueño));
+
+  cerrarPago();
+  carrito = [];
+  actualizarCarritoUI();
+  
+  // Activar simulador de delivery en vivo
+  iniciarSimulacionDelivery();
+};
+
+// 2. Simulador de Delivery en el Mapa
+function iniciarSimulacionDelivery() {
+  const tracker = document.getElementById('delivery-tracker');
+  const status = document.getElementById('tracker-status');
+  tracker.classList.remove('hidden');
+  
+  status.innerText = "🏪 Comercio aceptó el pedido. Preparando...";
+  
+  setTimeout(() => {
+    status.innerText = "🛵 Motorizado recogió el pedido. ¡En ruta!";
+  }, 4000);
+
+  setTimeout(() => {
+    status.innerText = "📍 El motorizado está a 2 minutos de tu ubicación.";
+  }, 8000);
+
+  setTimeout(() => {
+    status.innerText = "✅ ¡Pedido entregado con éxito! Disfrute su compra.";
+    setTimeout(() => { tracker.classList.add('hidden'); }, 4000);
+  }, 12000);
+}
+
+// 3. Sistema de Estrellas y Reseñas en el Popup del Mapa (Inyectado al renderizar)
+// Agregamos la sección de calificación de estrellas en el HTML del popup de los negocios
