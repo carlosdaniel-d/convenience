@@ -1,53 +1,44 @@
-// Centrado en Santo Domingo, República Dominicana
-const latInicial = 18.4861;
-const lngInicial = -69.9312;
+// Inicializar mapa centrado en Santo Domingo
+const map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
 
-// Inicializar el mapa
-const map = L.map('map', {
-  zoomControl: false // Ocultamos los botones (+/-) por defecto para mayor limpieza
-}).setView([latInicial, lngInicial], 13);
-
-// Capa de mapa estilo Uber / Dark Mode (CartoDB Dark Matter)
+// Capa oscura estilo Uber (CartoDB Dark Matter)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   maxZoom: 19,
   subdomains: 'abcd',
-  attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+  attribution: '&copy; CARTO'
 }).addTo(map);
 
-// Reposicionar el control de Zoom abajo a la derecha
+// Mover los controles de zoom a la esquina inferior derecha
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-// Cargar y mostrar los comercios desde el JSON
+// Cargar los datos de negocios.json
 async function cargarNegocios() {
   try {
     const response = await fetch('negocios.json');
-    const data = await response.json();
+    if (!response.ok) throw new Error('No se pudo cargar el archivo negocios.json');
     
-    data.negocios.forEach(negocio => {
-      // Crear un marcador visual personalizado
-      const customIcon = L.divIcon({
-        className: 'custom-pin-container',
-        html: `<div class="custom-pin">📍</div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
-      });
+    const data = await response.json();
+    const listaNegocios = data.negocios || data;
 
-      // Crear Popup con diseño moderno
-      const popupContent = `
-        <div class="popup-card">
-          <h3>${negocio.nombre}</h3>
-          <p>${negocio.categoria} • ${negocio.direccion.sector}</p>
-          <span class="tag">${negocio.meta?.destacado ? '🔥 Populares' : 'Abierto'}</span>
+    listaNegocios.forEach(negocio => {
+      if (!negocio.ubicacion?.latitud || !negocio.ubicacion?.longitud) return;
+
+      // Crear marcador simple
+      const marker = L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud]).addTo(map);
+
+      // Contenido del Popup
+      const popupHtml = `
+        <div style="color: #111; font-family: Inter, sans-serif;">
+          <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">${negocio.nombre}</h3>
+          <p style="font-size: 12px; color: #555; margin: 0;">${negocio.categoria}</p>
         </div>
       `;
-
-      // Agregar marcador al mapa
-      L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud], { icon: customIcon })
-        .addTo(map)
-        .bindPopup(popupContent);
+      marker.bindPopup(popupHtml);
     });
+
+    console.log(`Se cargaron ${listaNegocios.length} negocios correctamente.`);
   } catch (error) {
-    console.error("Error cargando los negocios:", error);
+    console.error("Error al procesar los negocios:", error);
   }
 }
 
