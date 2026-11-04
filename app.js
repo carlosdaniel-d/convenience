@@ -248,3 +248,54 @@ function iniciarSimulacionDelivery() {
 
 // 3. Sistema de Estrellas y Reseñas en el Popup del Mapa (Inyectado al renderizar)
 // Agregamos la sección de calificación de estrellas en el HTML del popup de los negocios
+// ==========================================
+// BLOQUE 1000% PLUS: GPS REAL Y CUPONES
+// ==========================================
+
+// 1. Geolocalización GPS del Usuario en Santo Domingo
+function centrarMiUbicacion() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        map.setView([lat, lng], 15);
+        
+        // Agregar un marcador temporal de la posición del usuario
+        L.marker([lat, lng], {
+          icon: L.divIcon({
+            className: 'user-gps-marker',
+            html: '<div style="background:#00E676; width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 10px #00E676;"></div>'
+          })
+        }).addTo(map).bindPopup("<b>¡Tú estás aquí!</b>").openPopup();
+      },
+      (error) => {
+        alert("No pudimos obtener tu ubicación GPS. Asegúrate de permitir el acceso en tu navegador.");
+      }
+    );
+  } else {
+    alert("Tu navegador no soporta geolocalización.");
+  }
+}
+
+// 2. Sistema de Cupones de Descuento
+let descuentoAplicado = 0;
+
+window.aplicarCupom = function() {
+  const codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
+  const msg = document.getElementById('cupom-msg');
+
+  if (codigo === "SD2026" || codigo === "CONVENIENCE") {
+    descuentoAplicado = 0.15; // 15% de descuento
+    msg.innerText = "🎉 ¡Cupón aplicado con éxito! 15% de descuento.";
+    actualizarCarritoUI();
+  } else {
+    descuentoAplicado = 0;
+    msg.style.color = "#ff5252";
+    msg.innerText = "❌ Cupón inválido o expirado.";
+  }
+};
+
+// Modificación para reflejar el descuento en el total (se suma a tu función actual)
+const originalActualizarCarritoUI = window.actualizarCarritoUI || function(){};
+// Esto asegura que el total calcule el descuento si existe
