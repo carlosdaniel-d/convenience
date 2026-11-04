@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>convenienceIA Santo Domingo</title>
+    <title>Convenience — Santo Domingo</title>
     
-    <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="convenienceIA">
+    <meta name="apple-mobile-web-app-title" content="Convenience">
 
-    <!-- Tailwind CSS & Leaflet Map -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -23,48 +21,23 @@
             background-color: #f1f5f9; 
             -webkit-tap-highlight-color: transparent;
         }
-
-        #map { 
-            height: 280px; 
-            border-radius: 1.25rem; 
-            z-index: 10;
-        }
-
+        #map { height: 260px; border-radius: 1.25rem; z-index: 10; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .card-enter {
-            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
+        .card-enter { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(12px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
         .custom-pin {
-            background-color: #4f46e5;
-            color: white;
-            padding: 6px;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+            background-color: #4f46e5; color: white; padding: 6px; border-radius: 50%;
+            border: 2px solid white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
         }
-
         .pulse-dot { position: relative; }
         .pulse-dot::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
+            content: ''; position: absolute; top: -2px; right: -2px;
+            width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
         @keyframes pulse {
@@ -72,235 +45,351 @@
             70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+        #chatModal { display: none; }
+        #chatModal.open { display: flex; }
+        #notifToast {
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+            z-index: 100; max-width: 92%; width: 380px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
     </style>
 </head>
 <body class="pb-28">
 
-    <!-- Header convenienceIA -->
+    <!-- Header -->
     <header class="bg-indigo-600 text-white px-5 py-3.5 sticky top-0 z-50 shadow-md flex justify-between items-center">
         <div class="flex items-center space-x-2.5">
             <span class="text-2xl">🛒</span>
-            <h1 class="font-bold text-lg tracking-tight">convenienceIA</h1>
+            <h1 class="font-bold text-lg tracking-tight">Convenience</h1>
         </div>
         <button onclick="abrirChat()" class="bg-indigo-700/80 hover:bg-indigo-800 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 backdrop-blur-sm active:scale-95 transition">
             <span class="pulse-dot">🤖</span>
-            <span>dAcliass 24/7</span>
+            <span>dAcliass</span>
         </button>
     </header>
 
-    <!-- Buscador y Categorías -->
+    <!-- Buscador -->
     <div class="bg-indigo-600 px-5 pb-5 pt-1 shadow-lg rounded-b-3xl">
         <div class="flex items-center text-indigo-200 text-xs mb-2.5">
-            <span class="mr-1">📍</span> Ubicación: <span class="text-white font-semibold ml-1">Santo Domingo (Polígono Central)</span>
+            <span class="mr-1">📍</span> Santo Domingo • <span id="horaActual" class="text-white font-semibold ml-1"></span>
         </div>
-        
         <div class="relative">
-            <input type="text" id="searchInput" placeholder="¿Qué se te antoja? (Ej. Helado, Pizza, Café...)" 
+            <input type="text" id="searchInput" placeholder="¿Qué se te antoja? (helado, pizza, café...)" 
                    class="w-full py-3.5 pl-11 pr-4 rounded-2xl text-gray-900 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
                    oninput="filtrarNegocios()">
             <span class="absolute left-4 top-4 text-gray-400 text-sm">🔍</span>
         </div>
-        
         <div class="flex space-x-2 mt-3.5 overflow-x-auto hide-scrollbar pb-1">
-            <button onclick="filtrarCategoria('todos')" class="bg-amber-400 text-indigo-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shrink-0 active:scale-95 transition">⚡ Todo</button>
-            <button onclick="filtrarCategoria('dulce')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🍦 Dulce & Frío</button>
-            <button onclick="filtrarCategoria('comida')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🍔 Comida & Más</button>
-            <button onclick="filtrarCategoria('servicios')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0 active:scale-95 transition">🔧 Urgencias</button>
+            <button onclick="filtrarCategoria('todos')" class="bg-amber-400 text-indigo-950 px-4 py-2 rounded-xl text-xs font-bold shadow-md shrink-0">⚡ Todo</button>
+            <button onclick="filtrarCategoria('cafe')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0">☕ Café</button>
+            <button onclick="filtrarCategoria('heladeria')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0">🍦 Helado</button>
+            <button onclick="filtrarCategoria('restaurante')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0">🍔 Comida</button>
+            <button onclick="filtrarCategoria('bar')" class="bg-white/15 text-white px-4 py-2 rounded-xl text-xs font-medium shrink-0">🍺 Bar</button>
         </div>
     </div>
 
-    <!-- Contenido Principal -->
     <main class="max-w-md mx-auto px-4 mt-5 space-y-5">
-        
+
         <!-- Banner dAcliass -->
         <div class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white p-5 rounded-3xl shadow-xl relative overflow-hidden border border-indigo-700/50">
             <div class="flex justify-between items-start relative z-10">
                 <div class="pr-3">
-                    <span class="bg-amber-400 text-indigo-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Asistente Contextual</span>
-                    <h2 class="font-bold text-base mt-1.5 tracking-tight">¡Hola! Soy dAcliass 🤖</h2>
-                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">¿Un café o un antojo rápido? Encuentro las mejores ofertas con envío cerca de ti.</p>
+                    <span class="bg-amber-400 text-indigo-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Asistente IA</span>
+                    <h2 class="font-bold text-base mt-1.5">¡Hola! Soy dAcliass 🤖</h2>
+                    <p class="text-xs text-indigo-200 mt-1 leading-relaxed">Dime qué se te antoja y te encuentro lo mejor cerca con precios reales y ofertas relámpago.</p>
                 </div>
-                <button onclick="abrirChat()" class="bg-amber-400 text-indigo-950 p-3.5 rounded-2xl shadow-lg font-bold text-lg active:scale-90 transition">
-                    💬
-                </button>
+                <button onclick="abrirChat()" class="bg-amber-400 text-indigo-950 p-3.5 rounded-2xl shadow-lg font-bold text-lg active:scale-90 transition">💬</button>
             </div>
+        </div>
+
+        <!-- Ofertas relámpago -->
+        <div id="ofertasBox" class="hidden">
+            <div class="flex justify-between items-center mb-2 px-1">
+                <h3 class="text-xs font-extrabold text-amber-600 uppercase tracking-wider">⚡ Ofertas Relámpago</h3>
+            </div>
+            <div id="listaOfertasHome" class="flex space-x-3 overflow-x-auto hide-scrollbar pb-1"></div>
         </div>
 
         <!-- Mapa -->
         <div class="bg-white p-3.5 rounded-3xl shadow-md border border-gray-100">
             <div class="flex justify-between items-center mb-2 px-1">
-                <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-wider">MAPA Y RUTA EN VIVO</h3>
-                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">● Cobertura SD</span>
+                <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-wider">MAPA EN VIVO</h3>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">● SD</span>
             </div>
             <div id="map"></div>
         </div>
 
-        <!-- Listado de Comercios -->
+        <!-- Listado -->
         <div>
             <div class="flex justify-between items-center mb-3 px-1">
-                <h3 class="font-bold text-gray-900 text-sm">NEGOCIOS & DESCUENTOS EN VIVO</h3>
-                <span class="text-xs text-indigo-600 font-semibold">Santo Domingo</span>
+                <h3 class="font-bold text-gray-900 text-sm">NEGOCIOS CERCA</h3>
+                <span class="text-xs text-indigo-600 font-semibold" id="countNegocios">—</span>
             </div>
-            <div id="listaNegocios" class="space-y-3.5">
-                <!-- Inyección dinámica -->
-            </div>
+            <div id="listaNegocios" class="space-y-3.5"></div>
         </div>
     </main>
 
-    <!-- Botón Flotante dAcliass -->
-    <button onclick="abrirChat()" class="fixed bottom-20 right-4 bg-indigo-600 text-white p-4 rounded-full shadow-2xl border-2 border-white z-40 active:scale-90 transition flex items-center justify-center">
+    <!-- Toast notificación -->
+    <div id="notifToast" class="hidden"></div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="fixed inset-0 bg-black/50 z-[60] items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-5 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <div class="font-bold text-sm">dAcliass</div>
+                        <div class="text-[10px] text-emerald-600 font-semibold">En línea • Santo Domingo</div>
+                    </div>
+                </div>
+                <button onclick="cerrarChat()" class="text-gray-400 text-xl font-bold">×</button>
+            </div>
+            <div id="chatMessages" class="flex-1 overflow-y-auto space-y-3 mb-4 text-sm"></div>
+            <div class="flex space-x-2">
+                <input id="chatInput" type="text" placeholder="Ej: helado frío barato cerca..." 
+                       class="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       onkeydown="if(event.key==='Enter') enviarChat()">
+                <button onclick="enviarChat()" class="bg-indigo-600 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante -->
+    <button onclick="abrirChat()" class="fixed bottom-20 right-4 bg-indigo-600 text-white p-4 rounded-full shadow-2xl border-2 border-white z-40 active:scale-90 transition">
         <span class="text-xl">🤖</span>
     </button>
 
-    <!-- Navegación Inferior -->
+    <!-- Nav inferior -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 py-2.5 px-6 flex justify-around items-center z-50 shadow-2xl">
-        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600 active:scale-90 transition">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-indigo-600">
             <span class="text-xl">🏠</span>
             <span class="text-[10px] font-bold mt-0.5">Explorar</span>
         </button>
-        <button onclick="window.scrollTo({top:280, behavior:'smooth'})" class="flex flex-col items-center text-gray-400 active:scale-90 transition">
+        <button onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center text-gray-400">
             <span class="text-xl">🗺️</span>
             <span class="text-[10px] font-medium mt-0.5">Mapa</span>
         </button>
-        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400 active:scale-90 transition">
+        <button onclick="abrirChat()" class="flex flex-col items-center text-gray-400">
             <span class="text-xl">⚡</span>
             <span class="text-[10px] font-medium mt-0.5">dAcliass</span>
         </button>
+        <a href="/dueno" class="flex flex-col items-center text-gray-400">
+            <span class="text-xl">📊</span>
+            <span class="text-[10px] font-medium mt-0.5">Dueño</span>
+        </a>
     </nav>
 
-    <!-- Scripts de la App -->
     <script>
-        let mapa;
-        let marcadores = [];
-        let negociosGlobal = [];
+        let mapa, marcadores = [], negociosGlobal = [];
+        let userLat = 18.4861, userLon = -69.9312;
+
+        function actualizarHora() {
+            const now = new Date();
+            document.getElementById('horaActual').textContent = now.toLocaleTimeString('es-DO', {hour:'2-digit', minute:'2-digit'});
+        }
+        setInterval(actualizarHora, 30000);
+        actualizarHora();
 
         function inicializarMapa() {
-            mapa = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
+            mapa = L.map('map', { zoomControl: false }).setView([userLat, userLon], 13);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                attribution: '© CartoDB'
+                maxZoom: 19, attribution: '© CartoDB'
             }).addTo(mapa);
             L.control.zoom({ position: 'topright' }).addTo(mapa);
+            L.marker([userLat, userLon]).addTo(mapa).bindPopup('Tú estás aquí');
         }
 
         async function cargarNegocios() {
             try {
-                const response = await fetch('/api/negocios');
-                const data = await response.json();
+                const res = await fetch(`/api/negocios?lat=${userLat}&lon=${userLon}&radio_km=8`);
+                const data = await res.json();
                 negociosGlobal = data.negocios || [];
-            } catch (error) {
-                negociosGlobal = [
-                    { id: 1, nombre: "Helados Bon (Piantini)", categoria: "dulce", sector: "Piantini", descripcion: "Abierto ahora • Cierra 10:00 PM", distancia: "A 3 min (180m)", oferta: "⚡ 2x1 Relámpago", item: "Helado de Pistacho / Vainilla ($3.50 USD)", precio: "3.50", icono: "🍦", lat: 18.4890, lng: -69.9340 },
-                    { id: 2, nombre: "Colmado & Más Express (Naco)", categoria: "comida", sector: "Naco", descripcion: "Bebidas frías y abastos 24/7", distancia: "A 2 min (0.8 km)", oferta: "🔥 -20% Flash", item: "Combo Picadera + Refresco ($5.00 USD)", precio: "5.00", icono: "🏪", lat: 18.4880, lng: -69.9320 },
-                    { id: 3, nombre: "Burger & Grill RD (Zona Colonial)", categoria: "comida", sector: "Zona Colonial", descripcion: "Comida rápida artesanal", distancia: "A 5 min (1.5 km)", oferta: "🍔 Menú Completo", item: "Burger Artesanal Clásica ($8.00 USD)", precio: "8.00", icono: "🍔", lat: 18.4840, lng: -69.9300 },
-                    { id: 4, nombre: "Pizzería La Focaccia (Gazcue)", categoria: "comida", sector: "Gazcue", descripcion: "Pizza a la leña artesanal", distancia: "A 7 min (2.1 km)", oferta: "⚡ 15% Descuento", item: "Pizza Napolitana Familiar ($12.00 USD)", precio: "12.00", icono: "🍕", lat: 18.4820, lng: -69.9280 },
-                    { id: 5, nombre: "Café de París (Bella Vista)", categoria: "dulce", sector: "Bella Vista", descripcion: "Café de origen y repostería fina", distancia: "A 1 min (100m)", oferta: "☕ Descuento Mañana", item: "Cappuccino + Donut Artesanal ($4.00 USD)", precio: "4.00", icono: "☕", lat: 18.4895, lng: -69.9350 }
-                ];
+            } catch (e) {
+                negociosGlobal = [];
             }
+            document.getElementById('countNegocios').textContent = negociosGlobal.length + ' lugares';
             renderizarNegocios(negociosGlobal);
             actualizarMapa(negociosGlobal);
         }
 
+        async function cargarOfertasHome() {
+            try {
+                const data = await fetch('/api/ofertas').then(r => r.json());
+                if (data.ofertas && data.ofertas.length) {
+                    document.getElementById('ofertasBox').classList.remove('hidden');
+                    document.getElementById('listaOfertasHome').innerHTML = data.ofertas.map(o => `
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 min-w-[200px] shrink-0">
+                            <div class="text-xs font-bold text-amber-700">⚡ ${o.titulo}</div>
+                            <div class="text-[11px] text-gray-600 mt-0.5">${o.precio_oferta} DOP <span class="line-through text-gray-400">${o.precio_original}</span></div>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {}
+        }
+
         function renderizarNegocios(lista) {
-            const contenedor = document.getElementById('listaNegocios');
-            contenedor.innerHTML = '';
-            
-            if (lista.length === 0) {
-                contenedor.innerHTML = '<div class="text-center text-gray-400 py-8 text-xs font-medium">No hay comercios disponibles para esta búsqueda.</div>';
+            const cont = document.getElementById('listaNegocios');
+            cont.innerHTML = '';
+            if (!lista.length) {
+                cont.innerHTML = '<div class="text-center text-gray-400 py-8 text-xs">No hay resultados para esta búsqueda.</div>';
                 return;
             }
-
-            lista.forEach((n, index) => {
+            lista.slice(0, 30).forEach((n, i) => {
+                const dist = n.distancia_texto || n.distancia_km ? (n.distancia_texto || n.distancia_km + ' km') : '';
                 const card = document.createElement('div');
-                card.className = "card-enter bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col space-y-3";
-                card.style.animationDelay = `${index * 0.05}s`;
-                
+                card.className = 'card-enter bg-white p-4 rounded-3xl shadow-sm border border-gray-100';
+                card.style.animationDelay = (i * 0.04) + 's';
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex space-x-3 items-center">
-                            <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
-                                ${n.icono}
+                            <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-xl shadow-inner overflow-hidden">
+                                ${n.imagen ? `<img src="${n.imagen}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🛒'">` : '🛒'}
                             </div>
                             <div>
                                 <h4 class="font-bold text-gray-900 text-sm leading-tight">${n.nombre}</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">${n.descripcion} • <span class="text-indigo-600 font-semibold">${n.distancia}</span></p>
+                                <p class="text-xs text-gray-500 mt-0.5">${n.categoria || ''} • ${n.precio || ''} ${dist ? '• <span class="text-indigo-600 font-semibold">' + dist + '</span>' : ''}</p>
                             </div>
                         </div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Abierto</span>
+                        <span class="${n.abierto_ahora !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'} text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">${n.abierto_ahora !== false ? 'Abierto' : 'Cerrado'}</span>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-2xl flex justify-between items-center border border-slate-100">
-                        <div>
-                            <span class="text-[11px] font-bold text-amber-600 block">${n.oferta}</span>
-                            <span class="text-xs text-gray-700 font-medium">${n.item}</span>
-                        </div>
-                        <button onclick="pedirItem('${n.nombre}', '${n.precio}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">
-                            Pedir ($${n.precio})
-                        </button>
-                    </div>
+                    ${n.rating ? `<div class="mt-2 text-xs text-amber-600 font-semibold">★ ${n.rating} · ${n.reviews || 0} reseñas</div>` : ''}
+                    <div class="mt-2 text-xs text-gray-600 line-clamp-2">${n.descripcion || ''}</div>
                 `;
-                contenedor.appendChild(card);
+                cont.appendChild(card);
             });
         }
 
         function actualizarMapa(lista) {
             marcadores.forEach(m => mapa.removeLayer(m));
             marcadores = [];
-
-            lista.forEach(n => {
-                if(n.lat && n.lng) {
-                    const customIcon = L.divIcon({
-                        className: 'custom-pin-wrapper',
-                        html: `<div class="custom-pin">${n.icono}</div>`,
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 15]
+            lista.slice(0, 40).forEach(n => {
+                if (n.lat && n.lon) {
+                    const icon = L.divIcon({
+                        className: '',
+                        html: `<div class="custom-pin">📍</div>`,
+                        iconSize: [30, 30], iconAnchor: [15, 15]
                     });
-
-                    const marker = L.marker([n.lat, n.lng], { icon: customIcon }).addTo(mapa)
-                        .bindPopup(`<div style="font-family: sans-serif;"><b>${n.nombre}</b><br><span style="color:#d97706; font-size: 11px; font-weight: bold;">${n.oferta}</span></div>`);
-                    marcadores.push(marker);
+                    const m = L.marker([n.lat, n.lon], { icon }).addTo(mapa)
+                        .bindPopup(`<b>${n.nombre}</b><br><span style="color:#d97706;font-size:11px">${n.categoria || ''} · ${n.precio || ''}</span>`);
+                    marcadores.push(m);
                 }
             });
         }
 
         function filtrarCategoria(cat) {
-            if(cat === 'todos') {
+            if (cat === 'todos') {
                 renderizarNegocios(negociosGlobal);
                 actualizarMapa(negociosGlobal);
             } else {
-                const filtrados = negociosGlobal.filter(n => n.categoria.includes(cat));
-                renderizarNegocios(filtrados);
-                actualizarMapa(filtrados);
+                const f = negociosGlobal.filter(n => 
+                    (n.categoria || '').toLowerCase().includes(cat) || 
+                    (n.subcategoria || '').toLowerCase().includes(cat)
+                );
+                renderizarNegocios(f);
+                actualizarMapa(f);
             }
         }
 
         function filtrarNegocios() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtrados = negociosGlobal.filter(n => 
-                n.nombre.toLowerCase().includes(query) || 
-                n.categoria.toLowerCase().includes(query) ||
-                n.sector.toLowerCase().includes(query) ||
-                n.item.toLowerCase().includes(query)
-            );
-            renderizarNegocios(filtrados);
-            actualizarMapa(filtrados);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const f = negociosGlobal.filter(n => {
+                const t = `${n.nombre} ${n.categoria} ${n.subcategoria} ${n.descripcion} ${(n.tags||[]).join(' ')}`.toLowerCase();
+                return t.includes(q);
+            });
+            renderizarNegocios(f);
+            actualizarMapa(f);
         }
 
+        // ===== CHAT dAcliass =====
         function abrirChat() {
-            const promptUser = prompt("🤖 dAcliass 24/7 (Asistente Santo Domingo):\n¿Qué antojo o necesidad tienes en este momento?");
-            if(promptUser) {
-                alert("🤖 dAcliass: Analizando opciones en Santo Domingo para '" + promptUser + "'. ¡Te recomendamos los comercios con delivery más cercano!");
+            document.getElementById('chatModal').classList.add('open');
+            document.getElementById('chatInput').focus();
+            if (!document.getElementById('chatMessages').children.length) {
+                agregarMensaje('bot', '🤖 Hola. Dime qué se te antoja (helado, café, pizza, algo barato cerca...) y te busco lo mejor en Santo Domingo.');
+            }
+        }
+        function cerrarChat() {
+            document.getElementById('chatModal').classList.remove('open');
+        }
+        function agregarMensaje(tipo, texto) {
+            const div = document.createElement('div');
+            div.className = tipo === 'user' 
+                ? 'bg-indigo-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 ml-8' 
+                : 'bg-slate-100 text-gray-800 rounded-2xl rounded-bl-md px-4 py-2.5 mr-8';
+            div.innerHTML = texto;
+            document.getElementById('chatMessages').appendChild(div);
+            document.getElementById('chatMessages').scrollTop = 9999;
+        }
+        async function enviarChat() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            agregarMensaje('user', msg);
+            input.value = '';
+            agregarMensaje('bot', 'Analizando...');
+            try {
+                const res = await fetch('/api/dacliass', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ mensaje: msg, lat: userLat, lon: userLon, radio_km: 5 })
+                });
+                const data = await res.json();
+                // quitar "Analizando..."
+                const msgs = document.getElementById('chatMessages');
+                msgs.removeChild(msgs.lastChild);
+                agregarMensaje('bot', data.respuesta || 'No encontré nada específico.');
+                if (data.recomendaciones && data.recomendaciones.length) {
+                    let extra = data.recomendaciones.map(r => 
+                        `• <b>${r.nombre}</b> (${r.precio || ''}${r.distancia_km != null ? ' · ' + r.distancia_km + ' km' : ''})`
+                    ).join('<br>');
+                    agregarMensaje('bot', extra);
+                }
+            } catch(e) {
+                const msgs = document.getElementById('chatMessages');
+                if (msgs.lastChild) msgs.removeChild(msgs.lastChild);
+                agregarMensaje('bot', 'Error de conexión. Intenta de nuevo.');
             }
         }
 
-        function pedirItem(nombre, precio) {
-            if(confirm(`¿Confirmas tu pedido en ${nombre} por $${precio} USD?`)) {
-                alert("¡Pedido realizado con éxito! Tu delivery va en camino 🛵💨");
-            }
+        // ===== NOTIFICACIONES SIMULADAS =====
+        async function mostrarNotificacionSugerida() {
+            try {
+                const data = await fetch(`/api/notificaciones/sugeridas?lat=${userLat}&lon=${userLon}`).then(r => r.json());
+                if (data.sugerencias && data.sugerencias.length) {
+                    const s = data.sugerencias[0];
+                    const toast = document.getElementById('notifToast');
+                    toast.innerHTML = `
+                        <div class="bg-white shadow-2xl rounded-2xl p-4 border border-indigo-100 flex items-start space-x-3">
+                            <div class="text-2xl">🔔</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm text-gray-900">${s.titulo}</div>
+                                <div class="text-xs text-gray-600 mt-0.5">${s.cuerpo}</div>
+                            </div>
+                            <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-gray-400 text-lg">×</button>
+                        </div>
+                    `;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => toast.classList.add('hidden'), 8000);
+                }
+            } catch(e) {}
+        }
+
+        // Geolocalización real si el usuario permite
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                userLat = pos.coords.latitude;
+                userLon = pos.coords.longitude;
+                if (mapa) mapa.setView([userLat, userLon], 14);
+                cargarNegocios();
+            }, () => {}, { timeout: 5000 });
         }
 
         window.onload = () => {
             inicializarMapa();
             cargarNegocios();
+            cargarOfertasHome();
+            setTimeout(mostrarNotificacionSugerida, 2500);
         };
     </script>
 </body>
