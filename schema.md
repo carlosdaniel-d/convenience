@@ -1,52 +1,37 @@
-# Schema de datos — Convenience
+# Schema de datos — Convenience v0.5
 
-## Negocio (ya existente en negocios.json)
-
+## Negocio
 ```json
 {
   "id": "neg_001",
   "nombre": "El Conuco",
   "categoria": "restaurante",
-  "subcategoria": "comida típica",
-  "descripcion": "...",
   "lat": 18.4712,
   "lon": -69.9025,
-  "direccion": "Calle El Conde 152, Zona Colonial",
-  "telefono": "+1 809-682-3919",
-  "whatsapp": "+18096823919",
-  "horario": "11:00-23:00",
   "rating": 4.6,
-  "reviews": 1240,
   "precio": "$$",
-  "tags": ["típico", "familiar", "terraza"],
-  "imagen": "https://...",
-  "destacado": true,
-  "abierto_ahora": true
+  "tags": ["típico"],
+  "abierto_ahora": true,
+  "destacado": true
 }
 ```
 
-## Oferta Relámpago (ofertas.json)
-
+## Oferta Relámpago
 ```json
 {
   "id": "oferta_001",
   "negocio_id": "neg_001",
-  "titulo": "2x1 Helado de Pistacho",
-  "descripcion": "Válido solo las próximas 2 horas",
+  "titulo": "2x1 Helado",
   "descuento_porcentaje": 50,
   "precio_original": 350,
   "precio_oferta": 175,
-  "moneda": "DOP",
   "activa": true,
-  "creada": "2026-11-04T14:00:00",
-  "expira": "2026-11-04T16:00:00",
-  "stock": 15,
-  "tipo": "relampago"
+  "expira": "2026-11-04T18:00:00",
+  "stock": 15
 }
 ```
 
-## Ítem de Menú (futuro - menus.json)
-
+## Ítem de Menú
 ```json
 {
   "id": "item_001",
@@ -55,23 +40,35 @@
   "precio": 450,
   "moneda": "DOP",
   "categoria": "platos fuertes",
-  "tags": ["típico", "caliente", "familiar"],
-  "disponible": true,
-  "imagen": null
+  "tags": ["típico", "caliente"],
+  "disponible": true
 }
 ```
 
-## Cupón usado (para comisión)
-
+## Cupón
 ```json
 {
-  "id": "cupon_001",
+  "id": "cup_xxx",
+  "codigo": "CONV-A1B2C3",
   "oferta_id": "oferta_001",
   "negocio_id": "neg_001",
-  "usuario_id": "user_xxx",
-  "codigo": "CONV-8F3A",
-  "usado_en": "2026-11-04T15:22:00",
+  "titulo": "2x1 Helado",
+  "precio_oferta": 175,
+  "generado": "2026-11-04T15:00:00",
+  "usado": false,
   "comision_usd": 1.5,
-  "estado": "cobrado"
+  "estado": "activo"
 }
 ```
+
+## Clima (Open-Meteo)
+Endpoint: `GET /api/clima?lat=18.48&lon=-69.93`
+Devuelve temperatura real, sensación, lluvia, código WMO, flag `caluroso`.
+
+## Endpoints nuevos v0.5
+- `GET /api/clima`
+- `GET /api/menus` / `GET /api/menus/{negocio_id}` / `POST /api/menus`
+- `POST /api/cupones/generar?oferta_id=...`
+- `POST /api/cupones/canjear` { "codigo": "CONV-XXXX" }
+- `GET /api/cupones`
+- `POST /api/push/subscribe`

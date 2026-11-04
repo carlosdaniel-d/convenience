@@ -1,0 +1,82 @@
+[
+  {
+    "id": "item_001",
+    "negocio_id": "neg_001",
+    "nombre": "Sancocho Dominicano",
+    "precio": 450,
+    "moneda": "DOP",
+    "categoria": "platos fuertes",
+    "tags": ["típico", "caliente", "familiar"],
+    "disponible": true
+  },
+  {
+    "id": "item_002",
+    "negocio_id": "neg_001",
+    "nombre": "Mofongo de Camarones",
+    "precio": 550,
+    "moneda": "DOP",
+    "categoria": "platos fuertes",
+    "tags": ["típico", "mariscos"],
+    "disponible": true
+  },
+  {
+    "id": "item_003",
+    "negocio_id": "neg_001",
+    "nombre": "Jugo Natural de Chinola",
+    "precio": 120,
+    "moneda": "DOP",
+    "categoria": "bebidas",
+    "tags": ["frío", "natural"],
+    "disponible": true
+  },
+  {
+    "id": "item_004",
+    "negocio_id": "neg_005",
+    "nombre": "Cappuccino Clásico",
+    "precio": 180,
+    "moneda": "DOP",
+    "categoria": "café",
+    "tags": ["caliente", "mañana"],
+    "disponible": true
+  },
+  {
+    "id": "item_005",
+    "negocio_id": "neg_005",
+    "nombre": "Cappuccino + Donut",
+    "precio": 280,
+    "moneda": "DOP",
+    "categoria": "combos",
+    "tags": ["mañana", "dulce"],
+    "disponible": true
+  },
+  {
+    "id": "item_006",
+    "negocio_id": "neg_002",
+    "nombre": "Parrillada de Mariscos",
+    "precio": 1450,
+    "moneda": "DOP",
+    "categoria": "mariscos",
+    "tags": ["premium", "vista al mar"],
+    "disponible": true
+  },
+  {
+    "id": "item_007",
+    "negocio_id": "neg_002",
+    "nombre": "Ceviche del Día",
+    "precio": 650,
+    "moneda": "DOP",
+    "categoria": "entradas",
+    "tags": ["frío", "fresco"],
+    "disponible": true
+  },
+  {
+    "id": "item_008",
+    "negocio_id": "neg_003",
+    "nombre": "Bandeja Típica Jalao",
+    "precio": 890,
+    "moneda": "DOP",
+    "categoria": "platos fuertes",
+    "tags": ["típico", "show"],
+    "disponible": true
+  }
+]
