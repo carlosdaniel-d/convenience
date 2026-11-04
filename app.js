@@ -398,3 +398,65 @@ window.abrirHistorialPedidos = function() {
 window.cerrarHistorialPedidos = function() {
   document.getElementById('historial-modal').classList.add('hidden');
 };
+// ==========================================
+// BLOQUE SUPREMO: FAVORITOS, WHATSAPP Y TARIFA
+// ==========================================
+
+let favoritos = JSON.parse(localStorage.getItem('mis_favoritos')) || [];
+
+// 1. Sistema de Favoritos
+window.toggleFavorito = function(id) {
+  const index = favoritos.indexOf(id);
+  if (index > -1) {
+    favoritos.splice(index, 1);
+    alert('❌ Removido de favoritos.');
+  } else {
+    favoritos.push(id);
+    alert('❤️ ¡Agregado a tus favoritos con éxito!');
+  }
+  localStorage.setItem('mis_favoritos', JSON.stringify(favoritos));
+  document.getElementById('fav-count').innerText = favoritos.length;
+};
+
+window.abrirFavoritos = function() {
+  const modal = document.getElementById('fav-modal');
+  const contenedor = document.getElementById('lista-favoritos');
+  const guardados = todosLosNegocios.filter(n => favoritos.includes(n.id));
+
+  if (guardados.length === 0) {
+    contenedor.innerHTML = `<p style="color: #666; font-size: 13px;">No tienes favoritos guardados aún.</p>`;
+  } else {
+    contenedor.innerHTML = guardados.map(n => `
+      <div style="background:#242424; padding:10px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong>${n.nombre}</strong><br><small style="color:#aaa;">📍 ${n.sector}</small>
+        </div>
+        <button onclick="verProductos(${n.id}); cerrarFavoritos();" style="background:#00E676; border:none; color:#000; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">Ver</button>
+      </div>
+    `).join('');
+  }
+  modal.classList.remove('hidden');
+};
+
+window.cerrarFavoritos = () => document.getElementById('fav-modal').classList.add('hidden');
+
+// 2. Chat de Soporte
+window.abrirChatSoporte = () => document.getElementById('chat-modal').classList.remove('hidden');
+window.cerrarChatSoporte = () => document.getElementById('chat-modal').classList.add('hidden');
+window.enviarMensajeChat = function() {
+  const txt = document.getElementById('chat-input').value;
+  if(txt.trim() !== "") {
+    alert("📩 Mensaje enviado al equipo de soporte. Te responderemos en breve.");
+    document.getElementById('chat-input').value = "";
+    cerrarChatSoporte();
+  }
+};
+
+// 3. Compartir por WhatsApp
+window.compartirWhatsApp = function(nombre, sector) {
+  const texto = encodeURIComponent(`¡Mira este comercio en Santo Domingo en convenienceIA: *${nombre}* (${sector})! 🚀 Pídelo ya.`);
+  window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
+};
+
+// Actualizar contador de favoritos inicial
+document.getElementById('fav-count').innerText = favoritos.length;
