@@ -135,3 +135,48 @@ function cargarNegociosTotales() {
 
 // Ejecutar la fusión al abrir la app
 cargarNegociosTotales();
+// ==========================================
+// FUNCIÓN PARA OBTENER LOGO SEGÚN CATEGORÍA O CUSTOM
+// ==========================================
+function obtenerLogoNegocio(negocio) {
+  // Si el negocio tiene una foto/logo personalizada, la usamos
+  if (negocio.logoUrl) return negocio.logoUrl;
+
+  // Logos predeterminados en alta resolución por categoría
+  const logosPorCategoria = {
+    "Supermercado": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
+    "Farmacia 24h": "https://cdn-icons-png.flaticon.com/512/4320/4320337.png",
+    "Bebidas & Licores": "https://cdn-icons-png.flaticon.com/512/920/920581.png",
+    "Comida Rápida & Delivery": "https://cdn-icons-png.flaticon.com/512/732/732217.png",
+    "Conveniencia": "https://cdn-icons-png.flaticon.com/512/1162/1162456.png"
+  };
+
+  return logosPorCategoria[negocio.categoria] || "https://cdn-icons-png.flaticon.com/512/1162/1162456.png";
+}
+
+// Reemplazamos la función de dibujar marcadores para incluir la imagen/logo
+function renderizarMarcadores(negocios) {
+  marcadoresGroup.clearLayers();
+  
+  negocios.forEach(negocio => {
+    const logoSrc = obtenerLogoNegocio(negocio);
+    const marker = L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud]);
+
+    const popupHtml = `
+      <div style="color:#111; font-family:'Inter', sans-serif; padding:6px; text-align:center; max-width:200px;">
+        <img src="${logoSrc}" alt="${negocio.nombre}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 10px; margin-bottom: 6px; background: #f0f0f0; padding: 4px;">
+        <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700;">${negocio.nombre}</h4>
+        <span style="display:inline-block; background:#00E676; color:#000; font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; margin-bottom:6px;">
+          ${negocio.categoria}
+        </span>
+        <p style="margin:0 0 8px 0; font-size:11px; color:#666;">📍 ${negocio.sector}</p>
+        <button onclick="verProductos(${negocio.id})" style="width:100%; background:#111; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700;">
+          Ver Menú / Productos 🛍️
+        </button>
+      </div>
+    `;
+
+    marker.bindPopup(popupHtml);
+    marcadoresGroup.addLayer(marker);
+  });
+}
