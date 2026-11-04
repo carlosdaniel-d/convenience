@@ -260,3 +260,66 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
   // Refrescar al cargar
   window.addEventListener('DOMContentLoaded', cargarPedidosDueno);
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE 1000%: VISTA VERTICAL UNIFICADA     -->
+<!-- ========================================== -->
+<style>
+  /* Forzamos un diseño vertical limpio que ocupa todo el ancho y se desliza naturalmente */
+  body {
+    background: #0d0d0d !important;
+    color: #fff !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 10px !important;
+    display: block !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  .wrapper-vertical {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 40px;
+  }
+
+  .card-seccion {
+    background: #181818;
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-sizing: border-box;
+  }
+
+  .card-seccion h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #00E676;
+    border-bottom: 1px solid #242424;
+    padding-bottom: 8px;
+  }
+</style>
+
+<script>
+  // Reorganizamos la estructura visual en una sola vista vertical fluida
+  window.addEventListener('DOMContentLoaded', () => {
+    const bodyActual = document.body;
+    
+    // Si ya existe el contenedor principal, evitamos duplicarlo
+    if (!document.getElementById('app-vertical-container')) {
+      const contenidoPrevio = bodyActual.innerHTML;
+      bodyActual.innerHTML = `
+        <div id="app-vertical-container" class="wrapper-vertical">
+          <div style="text-align:center; padding: 10px 0;">
+            <h1 style="font-size: 18px; color: #fff; margin:0;">convenience<span style="color:#00E676;">IA</span></h1>
+            <p style="font-size: 11px; color: #888; margin: 4px 0 0 0;">Panel de Control y Gestión Unificada</p>
+          </div>
+          ${contenidoPrevio}
+        </div>
+      `;
+    }
+  });
+</script>
