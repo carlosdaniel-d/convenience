@@ -299,3 +299,61 @@ window.aplicarCupom = function() {
 // Modificación para reflejar el descuento en el total (se suma a tu función actual)
 const originalActualizarCarritoUI = window.actualizarCarritoUI || function(){};
 // Esto asegura que el total calcule el descuento si existe
+// ==========================================
+// BLOQUE 1000%: PINES CON LOGOS REALES (SIN GLOBOS AZULES)
+// ==========================================
+
+// Sobrescribimos la función de renderizado para usar pines basados en imágenes de logos
+function renderizarMarcadores(negocios) {
+  marcadoresGroup.clearLayers();
+  
+  negocios.forEach(negocio => {
+    const logoSrc = obtenerLogoNegocio(negocio);
+
+    // Creamos un icono personalizado con HTML/CSS puro que muestra el logo dentro de un contenedor circular elegante
+    const iconoPersonalizado = L.divIcon({
+      className: 'custom-logo-pin',
+      html: `
+        <div style="
+          width: 42px; 
+          height: 42px; 
+          background: #181818; 
+          border: 2px solid #00E676; 
+          border-radius: 50%; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+          overflow: hidden;
+        ">
+          <img src="${logoSrc}" alt="${negocio.nombre}" style="width: 30px; height: 30px; object-fit: contain; border-radius: 50%;">
+        </div>
+      `,
+      iconSize: [42, 42],
+      iconAnchor: [21, 21],
+      popupAnchor: [0, -22]
+    });
+
+    const marker = L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud], { icon: iconoPersonalizado });
+
+    const popupHtml = `
+      <div style="color:#111; font-family:'Inter', sans-serif; padding:6px; text-align:center; max-width:200px;">
+        <img src="${logoSrc}" alt="${negocio.nombre}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 10px; margin-bottom: 6px; background: #f0f0f0; padding: 4px;">
+        <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700;">${negocio.nombre}</h4>
+        <span style="display:inline-block; background:#00E676; color:#000; font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; margin-bottom:6px;">
+          ${negocio.categoria}
+        </span>
+        <p style="margin:0 0 8px 0; font-size:11px; color:#666;">📍 ${negocio.sector}</p>
+        <button onclick="verProductos(${negocio.id})" style="width:100%; background:#111; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700;">
+          Ver Menú / Productos 🛍️
+        </button>
+      </div>
+    `;
+
+    marker.bindPopup(popupHtml);
+    marcadoresGroup.addLayer(marker);
+  });
+}
+
+// Volvemos a renderizar para aplicar los cambios instantáneamente
+cargarNegociosTotales();
