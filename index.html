@@ -135,3 +135,48 @@
     </div>
   </div>
 </div>
+<!-- ========================================== -->
+<!-- BLOQUE SUPREMO: FAVORITOS Y CHAT DE AYUDA -->
+<!-- ========================================== -->
+
+<!-- Botón Flotante de Favoritos -->
+<button onclick="abrirFavoritos()" style="position:absolute; bottom:155px; left:20px; background:#181818; color:#ff5252; border:1px solid #ff5252; padding: 10px 14px; border-radius: 25px; font-size: 12px; font-weight: bold; z-index:1000; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.5);">
+  ❤️ Favoritos (<span id="fav-count">0</span>)
+</button>
+
+<!-- Botón Flotante de Soporte / Chat en Vivo -->
+<button onclick="abrirChatSoporte()" style="position:absolute; bottom:155px; right:20px; background:#181818; color:#00E676; border:1px solid #00E676; width:45px; height:45px; border-radius:50%; font-size:18px; z-index:1000; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.5);">
+  💬
+</button>
+
+<!-- Modal de Favoritos -->
+<div id="fav-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>❤️ Tus Comercios Favoritos</h3>
+      <button onclick="cerrarFavoritos()" class="btn-close">&times;</button>
+    </div>
+    <div id="lista-favoritos" style="max-height: 250px; overflow-y: auto;">
+      <p style="color: #666; font-size: 13px;">No tienes favoritos guardados aún.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Chat de Soporte -->
+<div id="chat-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>💬 Asistencia convenienceIA</h3>
+      <button onclick="cerrarChatSoporte()" class="btn-close">&times;</button>
+    </div>
+    <div style="padding: 10px 0; font-size: 13px;">
+      <div style="background:#242424; padding:10px; border-radius:10px; margin-bottom:10px;">
+        🤖 <strong>Asistente:</strong> ¡Hola! ¿Tienes dudas con tu pedido en Santo Domingo? Escríbenos aquí.
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="flex:1; background:#242424; border:1px solid #444; padding:10px; border-radius:8px; color:#fff; font-size:12px;">
+        <button onclick="enviarMensajeChat()" style="background:#00E676; border:none; color:#000; font-weight:bold; padding:10px 14px; border-radius:8px; cursor:pointer;">Enviar</button>
+      </div>
+    </div>
+  </div>
+</div>
