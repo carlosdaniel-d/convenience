@@ -411,3 +411,36 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
     <p>• Pasarela de pagos: <strong style="color:#00E676;">Multimodal (Efectivo/Tarjeta/PayPal)</strong></p>
   </div>
 </div>
+<!-- ========================================== -->
+<!-- PANEL ACUMULATIVO: CONTROL DE PREPARACIÓN  -->
+<!-- ========================================== -->
+<div class="panel-card" style="margin-top: 20px;">
+  <h2>🍳 Flujo de Preparación de Pedidos</h2>
+  <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Actualiza la fase actual de la orden activa:</p>
+  
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <button onclick="actualizarFaseOrden('Pedido Aceptado 📑')" style="background:#242424; color:#fff; border:1px solid #00E676; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; text-align:left;">
+      1. 📑 Aceptar y Confirmar Orden
+    </button>
+    <button onclick="actualizarFaseOrden('En Preparación / Cocina 👨‍🍳')" style="background:#242424; color:#fff; border:1px solid #ff9800; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; text-align:left;">
+      2. 👨‍🍳 En Cocina / Empaque
+    </button>
+    <button onclick="actualizarFaseOrden('Listo para Retiro de Repartidor 📦')" style="background:#242424; color:#fff; border:1px solid #2196f3; padding:10px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer; text-align:left;">
+      3. 📦 Listo para Delivery
+    </button>
+  </div>
+</div>
+
+<script>
+  function actualizarFaseOrden(nuevaFase) {
+    let pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+    if (pedidos.length > 0) {
+      pedidos[pedidos.length - 1].estado = nuevaFase;
+      localStorage.setItem('pedidos_negocio', JSON.stringify(pedidos));
+      if (typeof cargarPedidosDueno === 'function') cargarPedidosDueno();
+      alert(`Estado de la última orden actualizado a: ${nuevaFase}`);
+    } else {
+      alert("No hay pedidos activos para actualizar.");
+    }
+  }
+</script>
