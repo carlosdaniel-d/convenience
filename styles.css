@@ -1,77 +1,48 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+html, body { width: 100%; height: 100%; overflow: hidden; background-color: #0d0d0d; color: #fff; }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background-color: #0d0d0d;
-}
+#map { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
 
-/* Forzar altura absoluta para que Leaflet pinte el mapa */
-#map {
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-/* Estilo barra flotante */
 .search-overlay {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 420px;
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 14px 18px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+  position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+  width: 92%; max-width: 440px; background: rgba(18, 18, 18, 0.90);
+  backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 14px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000;
 }
 
-.brand-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.brand-header h2 {
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.dot-live {
-  width: 8px;
-  height: 8px;
-  background-color: #00E676;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #00E676;
-}
+.brand-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.brand-title { display: flex; align-items: center; gap: 8px; }
+.brand-title h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.dot-live { width: 8px; height: 8px; background-color: #00E676; border-radius: 50%; box-shadow: 0 0 10px #00E676; }
+.btn-dueno-link { font-size: 12px; color: #00E676; text-decoration: none; font-weight: 600; background: rgba(0,230,118,0.1); padding: 4px 10px; border-radius: 12px; }
 
 .search-box input {
-  width: 100%;
-  background: #242424;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 10px 14px;
-  color: #ffffff;
-  font-size: 14px;
-  outline: none;
+  width: 100%; background: #242424; border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; margin-bottom: 10px;
 }
 
-.search-box input::placeholder {
-  color: #71717a;
+.categories-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.categories-bar::-webkit-scrollbar { display: none; }
+.cat-btn {
+  background: #242424; border: 1px solid rgba(255,255,255,0.1); color: #ccc;
+  padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; whitespace: nowrap; cursor: pointer;
 }
+.cat-btn.active { background: #00E676; color: #000; border-color: #00E676; font-weight: 700; }
+
+.cart-floating-btn {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: #00E676; color: #000; font-weight: 700; border: none; padding: 14px 28px;
+  border-radius: 30px; font-size: 15px; box-shadow: 0 10px 25px rgba(0,230,118,0.4); z-index: 1000; cursor: pointer;
+}
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: flex-end; }
+.modal-content { background: #181818; width: 100%; max-height: 80vh; border-radius: 24px 24px 0 0; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; }
+.btn-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+
+.item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #242424; }
+.btn-add { background: #00E676; border: none; color: #000; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.cart-footer { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+.cart-total { font-size: 16px; font-weight: 700; }
+.btn-checkout { background: #00E676; border: none; color: #000; font-weight: 700; padding: 12px 20px; border-radius: 12px; cursor: pointer; }
+.hidden { display: none !important; }
