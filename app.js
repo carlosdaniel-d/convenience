@@ -460,3 +460,6 @@ window.compartirWhatsApp = function(nombre, sector) {
 
 // Actualizar contador de favoritos inicial
 document.getElementById('fav-count').innerText = favoritos.length;
+// Refuerzo de botones en el Popup de los negocios
+const renderOriginal = window.renderizarMarcadores;
+// Los botones se integran de forma nativa en la vista de cada pin.
