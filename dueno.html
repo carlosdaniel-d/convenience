@@ -194,3 +194,69 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
   }
   window.addEventListener('DOMContentLoaded', calcularIngresosDueno);
 </script>
+<!-- ========================================== -->
+<!-- MEJORA 1000%: CORRECCIÓN DE DISEÑO DE PEDIDOS -->
+<!-- ========================================== -->
+<style>
+  /* Hacemos que el panel del dueño sea más ancho y cómodo en móviles */
+  .panel-card {
+    max-width: 95% !important;
+    width: 420px !important;
+  }
+  
+  /* Estilo mejorado para las tarjetas de pedidos (evita cortes) */
+  .pedido-card-item {
+    background: #202020 !important;
+    border: 1px solid #333 !important;
+    border-left: 4px solid #00E676 !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    margin-bottom: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    text-align: left !important;
+  }
+
+  .pedido-header-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 13px !important;
+  }
+
+  .pedido-details {
+    font-size: 12px !important;
+    color: #ccc !important;
+    word-break: break-word !important;
+  }
+</style>
+
+<script>
+  // Sobrescribimos la función de cargar pedidos para usar el nuevo diseño limpio sin cortes
+  window.cargarPedidosDueno = function() {
+    const contenedor = document.getElementById('lista-pedidos-dueno');
+    const pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+
+    if (pedidos.length === 0) {
+      contenedor.innerHTML = `<p style="color: #666; font-size: 13px; text-align: center;">No hay pedidos nuevos todavía...</p>`;
+      return;
+    }
+
+    contenedor.innerHTML = pedidos.reverse().map(p => `
+      <div class="pedido-card-item">
+        <div class="pedido-header-row">
+          <strong style="color:#00E676;">🕒 ${p.hora}</strong>
+          <span style="background:rgba(0,230,118,0.15); color:#00E676; padding:2px 8px; border-radius:6px; font-weight:bold;">RD$ ${p.total}</span>
+        </div>
+        <div class="pedido-details">
+          <span>💳 Pago: <strong>${p.metodoPago}</strong></span><br>
+          <span>📦 Estado: <span style="color:#00E676;">${p.estado}</span></span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Refrescar al cargar
+  window.addEventListener('DOMContentLoaded', cargarPedidosDueno);
+</script>
