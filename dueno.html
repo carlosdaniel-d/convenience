@@ -155,3 +155,20 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
   // Cargar al abrir el panel de dueños
   window.addEventListener('DOMContentLoaded', cargarPedidosDueno);
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE 1000% PLUS: ALERTA DE NUEVOS PEDIDOS-->
+<!-- ========================================== -->
+<div id="alerta-nuevo-pedido" class="hidden" style="background: rgba(0,230,118,0.2); border: 2px solid #00E676; padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; animation: pulse 1.5s infinite;">
+  🔔 <strong style="color:#00E676;">¡NUEVO PEDIDO ENTRANTE!</strong> Revisa la lista abajo.
+</div>
+
+<script>
+  // Verificar cada 5 segundos si hay nuevos pedidos en localStorage
+  setInterval(() => {
+    const pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+    const alerta = document.getElementById('alerta-nuevo-pedido');
+    if (pedidos.length > 0) {
+      alerta.classList.remove('hidden');
+    }
+  }, 5000);
+</script>
