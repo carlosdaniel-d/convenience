@@ -586,3 +586,38 @@ window.obtenerDesgloseTarifas = function(subtotal) {
     totalFinal: subtotal + itbis + tarifaServicio
   };
 };
+// ==========================================
+// BLOQUE ADVANCED 1000%: AUDIO Y SEGUIMIENTO
+// ==========================================
+
+// 1. Alerta de sonido web mediante AudioContext
+window.reproducirAlertaSonora = function() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota D5
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  } catch (e) {
+    console.log("Audio no habilitado aún por interacción de usuario.");
+  }
+};
+
+// 2. Componente de seguimiento del estado del pedido
+window.generarBarraProgresoHTML = function(estadoActual) {
+  const fases = ['Aceptado', 'En Cocina', 'En camino 🛵', 'Entregado'];
+  return `
+    <div class="progress-tracker">
+      ${fases.map(fase => `
+        <div class="progress-step ${estadoActual.includes(fase) ? 'active' : ''}">
+          ●<br>${fase}
+        </div>
+      `).join('')}
+    </div>
+  `;
+};
