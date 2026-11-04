@@ -530,3 +530,16 @@ window.mostrarFacturaDigital = function(pedido) {
 window.cerrarFactura = function() {
   document.getElementById('factura-modal').classList.add('hidden');
 };
+// ==========================================
+// BLOQUE MÁXIMO 1000%: LÓGICA DE PROPINAS
+// ==========================================
+
+let propinaSeleccionada = 0;
+
+window.setPropina = function(monto) {
+  propinaSeleccionada = monto;
+  document.getElementById('propina-msg').innerText = `Propina seleccionada: RD$ ${monto}`;
+};
+
+// Modificamos la suma total para incluir la propina de manera automática al pagar
+const baseProcesarPagoFinal = window.procesarPagoFinal;
