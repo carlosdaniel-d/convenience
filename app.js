@@ -463,3 +463,70 @@ document.getElementById('fav-count').innerText = favoritos.length;
 // Refuerzo de botones en el Popup de los negocios
 const renderOriginal = window.renderizarMarcadores;
 // Los botones se integran de forma nativa en la vista de cada pin.
+// ==========================================
+// BLOQUE SUPREMO 1000%: LÓGICA DE TICKET
+// ==========================================
+
+const originalProcesarPagoFinal = window.procesarPagoFinal;
+
+window.procesarPagoFinal = function() {
+  const metodo = document.querySelector('input[name="metodo-pago"]:checked').value;
+  const total = carrito.reduce((sum, i) => sum + i.precio, 0);
+  const itemsComprados = [...carrito];
+  const horaActual = new Date().toLocaleTimeString();
+
+  // Guardar pedido para el panel del dueño
+  const nuevoPedido = {
+    id: Date.now(),
+    items: itemsComprados,
+    total: total,
+    metodoPago: metodo,
+    estado: 'En camino 🛵',
+    hora: horaActual
+  };
+
+  let pedidosDueño = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+  pedidosDueño.push(nuevoPedido);
+  localStorage.setItem('pedidos_negocio', JSON.stringify(pedidosDueño));
+
+  cerrarPago();
+  carrito = [];
+  actualizarCarritoUI();
+  
+  // Mostrar modal de factura digital
+  mostrarFacturaDigital(nuevoPedido);
+  
+  // Activar simulador de delivery
+  if (typeof iniciarSimulacionDelivery === 'function') {
+    iniciarSimulacionDelivery();
+  }
+};
+
+window.mostrarFacturaDigital = function(pedido) {
+  const modal = document.getElementById('factura-modal');
+  const contenedor = document.getElementById('contenido-factura');
+
+  const listaHtml = pedido.items.map(i => `
+    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+      <span>${i.nombre}</span>
+      <strong>RD$ ${i.precio}</strong>
+    </div>
+  `).join('');
+
+  contenedor.innerHTML = `
+    <p style="margin:0 0 6px 0; color:#00E676; font-weight:bold;">📍 convenienceIA - Santo Domingo</p>
+    <p style="margin:0 0 6px 0;">Orden ID: #${pedido.id}</p>
+    <p style="margin:0 0 10px 0;">Hora: ${pedido.hora} | Pago: ${pedido.metodoPago}</p>
+    <div style="margin-bottom: 10px;">${listaHtml}</div>
+    <div style="border-top:1px solid #444; padding-top:6px; display:flex; justify-content:space-between; font-size:14px; color:#fff;">
+      <strong>Total Pagado:</strong>
+      <strong style="color:#00E676;">RD$ ${pedido.total}</strong>
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+};
+
+window.cerrarFactura = function() {
+  document.getElementById('factura-modal').classList.add('hidden');
+};
