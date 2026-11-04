@@ -371,3 +371,22 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
     <button onclick="cerrarFactura();" class="btn-checkout" style="width:100%;">Entendido, ¡A esperar! 🛵</button>
   </div>
 </div>
+<!-- ========================================== -->
+<!-- PANEL SUPREMO: ESTADO DEL NEGOCIO          -->
+<!-- ========================================== -->
+<div class="panel-card" style="margin-top: 20px;">
+  <h2>🟢 Estatus del Establecimiento</h2>
+  <div style="display: flex; gap: 10px;">
+    <button onclick="cambiarEstadoNegocio('Abierto 🟢')" style="flex:1; background:#00E676; border:none; color:#000; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">Abierto</button>
+    <button onclick="cambiarEstadoNegocio('Cerrado 🔴')" style="flex:1; background:#ff5252; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">Cerrar</button>
+  </div>
+  <p id="status-actual-negocio" style="font-size: 12px; color: #aaa; margin-top: 8px; text-align: center;">Estado actual: Abierto 🟢</p>
+</div>
+
+<script>
+  function cambiarEstadoNegocio(estado) {
+    localStorage.setItem('estatus_negocio', estado);
+    document.getElementById('status-actual-negocio').innerText = `Estado actual: ${estado}`;
+    alert(`Estatus actualizado a: ${estado}`);
+  }
+</script>
