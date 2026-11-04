@@ -1,0 +1,47 @@
+[
+  {
+    "id": "oferta_001",
+    "negocio_id": "neg_001",
+    "titulo": "Sancocho 2x1 para dos",
+    "descripcion": "Válido solo hoy en horas de almuerzo",
+    "descuento_porcentaje": 40,
+    "precio_original": 900,
+    "precio_oferta": 540,
+    "moneda": "DOP",
+    "activa": true,
+    "creada": "2026-11-04T12:00:00",
+    "expira": "2026-11-05T23:59:00",
+    "stock": 12,
+    "tipo": "relampago"
+  },
+  {
+    "id": "oferta_002",
+    "negocio_id": "neg_005",
+    "titulo": "Cappuccino + Donut a mitad de precio",
+    "descripcion": "Promo de mañana hasta las 11am",
+    "descuento_porcentaje": 50,
+    "precio_original": 350,
+    "precio_oferta": 175,
+    "moneda": "DOP",
+    "activa": true,
+    "creada": "2026-11-04T07:00:00",
+    "expira": "2026-11-04T11:00:00",
+    "stock": 25,
+    "tipo": "relampago"
+  },
+  {
+    "id": "oferta_003",
+    "negocio_id": "neg_002",
+    "titulo": "Mariscos del día -20%",
+    "descripcion": "Solo por las próximas 3 horas",
+    "descuento_porcentaje": 20,
+    "precio_original": 1200,
+    "precio_oferta": 960,
+    "moneda": "DOP",
+    "activa": true,
+    "creada": "2026-11-04T14:00:00",
+    "expira": "2026-11-04T17:00:00",
+    "stock": 8,
+    "tipo": "relampago"
+  }
+]
