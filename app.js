@@ -621,3 +621,65 @@ window.generarBarraProgresoHTML = function(estadoActual) {
     </div>
   `;
 };
+// ==========================================
+// EXPANSION DE NEGOCIOS LOCALE Y MAPA DARK
+// ==========================================
+
+const negociosSantoDomingoAdicionales = [
+  {
+    id: 101,
+    nombre: "Chef Pepper Piantini",
+    categoria: "Restaurante",
+    sector: "Piantini",
+    logo: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+    ubicacion: { latitud: 18.4712, longitud: -69.9315 }
+  },
+  {
+    id: 102,
+    nombre: "Farmacia Carol - Naco",
+    categoria: "Farmacia",
+    sector: "Naco",
+    logo: "https://cdn-icons-png.flaticon.com/512/4320/4320337.png",
+    ubicacion: { latitud: 18.4758, longitud: -69.9234 }
+  },
+  {
+    id: 103,
+    nombre: "Supermercado Bravo Enriquillo",
+    categoria: "Supermercado",
+    sector: "Bella Vista",
+    logo: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    ubicacion: { latitud: 18.4510, longitud: -69.9520 }
+  },
+  {
+    id: 104,
+    nombre: "Pica Pollo Expreso Zona U",
+    categoria: "Comida Rápida",
+    sector: "Zona Universitaria",
+    logo: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
+    ubicacion: { latitud: 18.4625, longitud: -69.9140 }
+  },
+  {
+    id: 105,
+    nombre: "Helados Bon Gazcue",
+    categoria: "Postres",
+    sector: "Gazcue",
+    logo: "https://cdn-icons-png.flaticon.com/512/938/938525.png",
+    ubicacion: { latitud: 18.4680, longitud: -69.8985 }
+  },
+  {
+    id: 106,
+    nombre: "Adrian Tropical Malecon",
+    categoria: "Restaurante",
+    sector: "Malecón",
+    logo: "https://cdn-icons-png.flaticon.com/512/3448/3448609.png",
+    ubicacion: { latitud: 18.4589, longitud: -69.8970 }
+  }
+];
+
+// Unimos los negocios adicionales a la lista global sin borrar los existentes
+if (typeof todosLosNegocios !== 'undefined' && Array.isArray(todosLosNegocios)) {
+  todosLosNegocios.push(...negociosSantoDomingoAdicionales);
+  if (typeof renderizarMarcadores === 'function') {
+    renderizarMarcadores(todosLosNegocios);
+  }
+}
