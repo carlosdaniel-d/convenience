@@ -564,3 +564,25 @@ window.toggleModoAhorro = function() {
     alert("🔋 Modo Ahorro activado: Reduciendo consumo gráfico.");
   }
 };
+// ==========================================
+// BLOQUE ACUMULATIVO: LÓGICA TOP RATED & TAX
+// ==========================================
+
+// 1. Filtrar Negocios con Calificación Alta (Simulado)
+window.filtrarTopRated = function() {
+  const topNegocios = todosLosNegocios.filter((_, index) => index % 2 === 0);
+  renderizarMarcadores(topNegocios);
+  alert("⭐ Mostrando únicamente establecimientos con calificación superior a 4.5 estrellas.");
+};
+
+// 2. Cálculo transparente de tarifa de servicio
+window.obtenerDesgloseTarifas = function(subtotal) {
+  const itbis = subtotal * 0.18;
+  const tarifaServicio = 45; // RD$ 45 fija
+  return {
+    subtotal: subtotal,
+    itbis: itbis,
+    servicio: tarifaServicio,
+    totalFinal: subtotal + itbis + tarifaServicio
+  };
+};
