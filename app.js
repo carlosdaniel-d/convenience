@@ -789,3 +789,13 @@ const negociosZonaOesteSD = [
     categoria: "Comida Rápida",
     sector: "Herrera",
     logo: "
+// ==========================================
+// REFORZAR RENDERIZADO DEL MAPA
+// ==========================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (typeof map !== 'undefined' && map !== null) {
+      map.invalidateSize();
+    }
+  }, 500);
+});
