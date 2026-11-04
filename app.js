@@ -1,9 +1,8 @@
 // ==========================================
-// 1. CONFIGURACIÓN DEL MAPA
+// 1. INICIALIZAR MAPA EN SANTO DOMINGO
 // ==========================================
 const map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
 
-// Capa limpia de OpenStreetMap (sin requerir API Key)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; OpenStreetMap contributors'
@@ -15,7 +14,7 @@ let todosLosNegocios = [];
 let marcadoresGroup = L.layerGroup().addTo(map);
 
 // ==========================================
-// 2. GENERADOR DE 300 NEGOCIOS EN SANTO DOMINGO
+// 2. GENERADOR DE 300 NEGOCIOS
 // ==========================================
 const sectoresSD = [
   { nombre: "Piantini", lat: 18.4750, lng: -69.9380 },
@@ -40,40 +39,29 @@ const tiposNegocios = [
 
 function generar300Negocios() {
   const lista = [];
-  let idCounter = 1;
-
   for (let i = 0; i < 300; i++) {
     const sector = sectoresSD[i % sectoresSD.length];
     const tipo = tiposNegocios[i % tiposNegocios.length];
     const nombreBase = tipo.nombres[Math.floor(Math.random() * tipo.nombres.length)];
 
-    // Variación aleatoria de coordenadas alrededor del sector
-    const latOffset = (Math.random() - 0.5) * 0.025;
-    const lngOffset = (Math.random() - 0.5) * 0.025;
-
     lista.push({
-      id: idCounter++,
+      id: i + 1,
       nombre: `${nombreBase} ${sector.nombre} #${Math.floor(Math.random() * 90 + 10)}`,
       categoria: tipo.cat,
       sector: sector.nombre,
       ubicacion: {
-        latitud: sector.lat + latOffset,
-        longitud: sector.lng + lngOffset
+        latitud: sector.lat + (Math.random() - 0.5) * 0.025,
+        longitud: sector.lng + (Math.random() - 0.5) * 0.025
       }
     });
   }
   return lista;
 }
 
-// ==========================================
-// 3. RENDERIZADO DE MARCADORES Y BÚSQUEDA
-// ==========================================
 function renderizarMarcadores(negocios) {
   marcadoresGroup.clearLayers();
-
   negocios.forEach(negocio => {
     const marker = L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud]);
-
     const popupHtml = `
       <div style="font-family: Inter, sans-serif; padding: 4px; color: #111;">
         <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold;">${negocio.nombre}</h4>
@@ -83,49 +71,29 @@ function renderizarMarcadores(negocios) {
         <p style="margin: 0; font-size: 12px; color: #666;">📍 ${negocio.sector}, Santo Domingo</p>
       </div>
     `;
-
     marker.bindPopup(popupHtml);
     marcadoresGroup.addLayer(marker);
   });
 }
 
-async function inicializarApp() {
-  try {
-    // Intentar obtener de negocios.json si existe datos locales
-    const res = await fetch('negocios.json');
-    if (res.ok) {
-      const data = await res.json();
-      const datosJson = data.negocios || data;
-      if (Array.isArray(datosJson) && datosJson.length >= 300) {
-        todosLosNegocios = datosJson;
-      } else {
-        todosLosNegocios = generar300Negocios();
-      }
-    } else {
-      todosLosNegocios = generar300Negocios();
-    }
-  } catch (e) {
-    todosLosNegocios = generar300Negocios();
-  }
+// ==========================================
+// 3. EJECUTAR AL CARGAR
+// ==========================================
+todosLosNegocios = generar300Negocios();
+renderizarMarcadores(todosLosNegocios);
 
-  renderizarMarcadores(todosLosNegocios);
-  console.log(`✅ ${todosLosNegocios.length} negocios cargados en el mapa.`);
+// Activar buscador de inmediato
+const searchInput = document.getElementById('search-input');
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const texto = e.target.value.toLowerCase().trim();
+    const filtrados = todosLosNegocios.filter(n =>
+      n.nombre.toLowerCase().includes(texto) ||
+      n.categoria.toLowerCase().includes(texto) ||
+      n.sector.toLowerCase().includes(texto)
+    );
+    renderizarMarcadores(filtrados);
+  });
 }
 
-// Configurar filtro en tiempo real en la barra de búsqueda
-document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const texto = e.target.value.toLowerCase().trim();
-      const filtrados = todosLosNegocios.filter(n =>
-        n.nombre.toLowerCase().includes(texto) ||
-        n.categoria.toLowerCase().includes(texto) ||
-        n.sector.toLowerCase().includes(texto)
-      );
-      renderizarMarcadores(filtrados);
-    });
-  }
-});
-
-inicializarApp();
+console.log(`✅ ${todosLosNegocios.length} negocios inyectados directamente en el mapa.`);
