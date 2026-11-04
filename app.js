@@ -1,17 +1,22 @@
-// Inicializar mapa centrado en Santo Domingo
+// ==========================================
+// CONFIGURACIÓN INICIAL DEL MAPA
+// ==========================================
+// Coordenadas iniciales centradas en Santo Domingo
 const map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
 
-// Capa oscura estilo Uber (CartoDB Dark Matter)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+// Capa de mapa limpia de OpenStreetMap (Sin errores de API Key)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  subdomains: 'abcd',
-  attribution: '&copy; CARTO'
+  attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
 // Mover los controles de zoom a la esquina inferior derecha
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-// Cargar los datos de negocios.json
+
+// ==========================================
+// CARGA DE DATOS DESDE NEGOCIOS.JSON
+// ==========================================
 async function cargarNegocios() {
   try {
     const response = await fetch('negocios.json');
@@ -23,14 +28,14 @@ async function cargarNegocios() {
     listaNegocios.forEach(negocio => {
       if (!negocio.ubicacion?.latitud || !negocio.ubicacion?.longitud) return;
 
-      // Crear marcador simple
+      // Crear marcador en el mapa
       const marker = L.marker([negocio.ubicacion.latitud, negocio.ubicacion.longitud]).addTo(map);
 
-      // Contenido del Popup
+      // Contenido estilizado del Popup para cada comercio
       const popupHtml = `
-        <div style="color: #111; font-family: Inter, sans-serif;">
-          <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">${negocio.nombre}</h3>
-          <p style="font-size: 12px; color: #555; margin: 0;">${negocio.categoria}</p>
+        <div style="color: #111; font-family: Inter, sans-serif; padding: 4px;">
+          <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">${negocio.nombre || 'Comercio'}</h3>
+          <p style="font-size: 12px; color: #555; margin: 0;">${negocio.categoria || 'Convenience'} • ${negocio.direccion?.sector || 'Santo Domingo'}</p>
         </div>
       `;
       marker.bindPopup(popupHtml);
@@ -42,4 +47,5 @@ async function cargarNegocios() {
   }
 }
 
+// Ejecutar la función al cargar el script
 cargarNegocios();
