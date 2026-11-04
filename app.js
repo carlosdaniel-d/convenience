@@ -683,3 +683,109 @@ if (typeof todosLosNegocios !== 'undefined' && Array.isArray(todosLosNegocios)) 
     renderizarMarcadores(todosLosNegocios);
   }
 }
+// ==========================================
+// EXPANSIÓN MASIVA: LOS GIRASOLES, PANTOJA, LOS ALCARRIZOS Y HERRERA
+// ==========================================
+
+const negociosZonaOesteSD = [
+  // Los Girasoles
+  {
+    id: 201,
+    nombre: "Colmado Calle G",
+    categoria: "Colmado",
+    sector: "Los Girasoles",
+    logo: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+    ubicacion: { latitud: 18.5120, longitud: -69.9750 }
+  },
+  {
+    id: 202,
+    nombre: "Colmado Popular 24h",
+    categoria: "Colmado",
+    sector: "Los Girasoles",
+    logo: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    ubicacion: { latitud: 18.5145, longitud: -69.9721 }
+  },
+  {
+    id: 203,
+    nombre: "Colmado El Millón",
+    categoria: "Colmado",
+    sector: "Los Girasoles",
+    logo: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
+    ubicacion: { latitud: 18.5102, longitud: -69.9784 }
+  },
+
+  // Pantoja
+  {
+    id: 204,
+    nombre: "L&R Comercial Pantoja",
+    categoria: "Supermercado",
+    sector: "Pantoja",
+    logo: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    ubicacion: { latitud: 18.5250, longitud: -69.9910 }
+  },
+  {
+    id: 205,
+    nombre: "Distribuidora Pantoja",
+    categoria: "Distribuidora",
+    sector: "Pantoja",
+    logo: "https://cdn-icons-png.flaticon.com/512/4320/4320337.png",
+    ubicacion: { latitud: 18.5280, longitud: -69.9885 }
+  },
+  {
+    id: 206,
+    nombre: "SMARKET, SRL",
+    categoria: "Supermercado",
+    sector: "Pantoja",
+    logo: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    ubicacion: { latitud: 18.5310, longitud: -69.9940 }
+  },
+
+  // Los Alcarrizos
+  {
+    id: 207,
+    nombre: "La Clave Comercial",
+    categoria: "Comercio",
+    sector: "Los Alcarrizos",
+    logo: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+    ubicacion: { latitud: 18.5385, longitud: -70.0150 }
+  },
+  {
+    id: 208,
+    nombre: "Jeeh Games Store",
+    categoria: "Tecnología",
+    sector: "Los Alcarrizos",
+    logo: "https://cdn-icons-png.flaticon.com/512/3448/3448609.png",
+    ubicacion: { latitud: 18.5410, longitud: -70.0120 }
+  },
+  {
+    id: 209,
+    nombre: "Auto Repuestos Alcarrizos",
+    categoria: "Repuestos",
+    sector: "Los Alcarrizos",
+    logo: "https://cdn-icons-png.flaticon.com/512/938/938525.png",
+    ubicacion: { latitud: 18.5350, longitud: -70.0180 }
+  },
+
+  // Herrera
+  {
+    id: 210,
+    nombre: "L&R Comercial Deluxe (Isabel Aguiar)",
+    categoria: "Supermercado",
+    sector: "Herrera",
+    logo: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    ubicacion: { latitud: 18.4750, longitud: -69.9650 }
+  },
+  {
+    id: 211,
+    nombre: "Almacenes Herrera",
+    categoria: "Almacén",
+    sector: "Herrera",
+    logo: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+    ubicacion: { latitud: 18.4720, longitud: -69.9680 }
+  },
+  {
+    id: 212,
+    nombre: "Food Shop y Bar Herrera",
+    categoria: "Comida Rápida",
+    sector: "Herrera",
+    logo: "
