@@ -357,3 +357,44 @@ function renderizarMarcadores(negocios) {
 
 // Volvemos a renderizar para aplicar los cambios instantáneamente
 cargarNegociosTotales();
+// ==========================================
+// BLOQUE INFINITO: LÓGICA DE HISTORIAL Y SOS
+// ==========================================
+
+// 1. Filtrar Modo SOS (Farmacias y Supermercados 24h)
+window.filtrarModoSOS = function() {
+  const filtradosSOS = todosLosNegocios.filter(n => 
+    n.categoria.toLowerCase().includes('farmacia') || 
+    n.nombre.toLowerCase().includes('24h') ||
+    n.categoria.toLowerCase().includes('supermercado')
+  );
+  renderizarMarcadores(filtradosSOS);
+  alert("🚨 Modo SOS activado: Mostrando servicios esenciales y farmacias.");
+};
+
+// 2. Historial de Pedidos del Cliente
+window.abrirHistorialPedidos = function() {
+  const modal = document.getElementById('historial-modal');
+  const contenedor = document.getElementById('lista-historial-cliente');
+  const pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+
+  if (pedidos.length === 0) {
+    contenedor.innerHTML = `<p style="color: #666; font-size: 13px;">No has realizado ningún pedido todavía.</p>`;
+  } else {
+    contenedor.innerHTML = pedidos.reverse().map(p => `
+      <div style="background:#242424; padding:12px; border-radius:10px; margin-bottom:10px; border-left: 4px solid #00E676;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+          <span style="color:#00E676; font-weight:bold;">🕒 ${p.hora}</span>
+          <span>${p.metodoPago}</span>
+        </div>
+        <p style="font-size:13px; font-weight:bold; margin:0 0 4px 0;">Total: RD$ ${p.total}</p>
+        <small style="color:#aaa;">Estado: ${p.estado}</small>
+      </div>
+    `).join('');
+  }
+  modal.classList.remove('hidden');
+};
+
+window.cerrarHistorialPedidos = function() {
+  document.getElementById('historial-modal').classList.add('hidden');
+};
