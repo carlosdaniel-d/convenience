@@ -799,3 +799,12 @@ window.addEventListener('load', () => {
     }
   }, 500);
 });
+// ========================================== -->
+// FORZAR RECALCULADO DE TAMAÑO DE LEAFLET     -->
+// ========================================== -->
+setTimeout(() => {
+  if (typeof map !== 'undefined' && map !== null) {
+    map.invalidateSize(true);
+    console.log("Mapa recalculado y forzado a mostrarse.");
+  }
+}, 1000);
