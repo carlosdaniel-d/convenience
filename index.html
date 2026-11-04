@@ -266,3 +266,50 @@
     box-shadow: 0 0 15px rgba(0, 230, 118, 0.6), 0 4px 10px rgba(0,0,0,0.9) !important;
   }
 </style>
+<!-- ========================================== -->
+<!-- CORRECCIÓN SUPREMA: ORDEN Y MAPA VISIBLE   -->
+<!-- ========================================== -->
+<style>
+  /* Forzamos que el mapa ocupe toda la pantalla de fondo de forma absoluta */
+  #map, .leaflet-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1 !important;
+  }
+
+  /* Agrupamos los controles flotantes superiores en un panel ordenado con scroll horizontal */
+  .controles-flotantes-superior {
+    position: fixed !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 95% !important;
+    max-width: 450px !important;
+    z-index: 1000 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none; /* Permite hacer clic a través del contenedor vacío */
+  }
+
+  .controles-flotantes-superior > * {
+    pointer-events: auto; /* Reactiva los clics en los elementos internos */
+  }
+
+  /* Barra inferior de accesos rápidos ordenada */
+  .barra-inferior-flotante {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    max-width: 400px !important;
+    z-index: 1000 !important;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+</style>
