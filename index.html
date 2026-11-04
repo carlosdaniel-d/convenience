@@ -313,3 +313,22 @@
     gap: 10px;
   }
 </style>
+<!-- ========================================== -->
+<!-- BLINDAJE TOTAL DEL MAPA LEAFLET            -->
+<!-- ========================================== -->
+<style>
+  /* Aseguramos que el contenedor del mapa tenga tamaño real visible */
+  #map {
+    width: 100% !important;
+    height: 100vh !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 0 !important;
+    background: #0d0d0d !important;
+  }
+
+  /* Asegurar que las capas del mapa queden por debajo de los menús flotantes */
+  .leaflet-pane { z-index: 2 !important; }
+  .leaflet-top, .leaflet-bottom { z-index: 3 !important; }
+</style>
