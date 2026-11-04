@@ -3,34 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>convenienceIA - Mapa</title>
-
-  <!-- Leaflet CSS (Obligatorio para que cargue el mapa) -->
+  <title>convenienceIA - Santo Domingo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Tus estilos propios -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Contenedor del Mapa -->
   <div id="map"></div>
 
-  <!-- Panel Flotante -->
+  <!-- Header Flotante con Buscador y Filtros (3) -->
   <div class="search-overlay">
     <div class="brand-header">
-      <span class="dot-live"></span>
-      <h2>convenienceIA</h2>
+      <div class="brand-title">
+        <span class="dot-live"></span>
+        <h2>convenienceIA</h2>
+      </div>
+      <a href="dueno.html" class="btn-dueno-link">Soy Dueño 💼</a>
     </div>
+
     <div class="search-box">
-      <input type="text" id="search-input" placeholder="Buscar comercios en Santo Domingo...">
+      <input type="text" id="search-input" placeholder="Buscar comercios o sectores...">
+    </div>
+
+    <!-- Filtros de Categorías -->
+    <div class="categories-bar">
+      <button class="cat-btn active" data-cat="Todos">Todos</button>
+      <button class="cat-btn" data-cat="Supermercado">🛒 Super</button>
+      <button class="cat-btn" data-cat="Farmacia 24h">💊 Farmacia</button>
+      <button class="cat-btn" data-cat="Bebidas & Licores">🍷 Licores</button>
+      <button class="cat-btn" data-cat="Comida Rápida & Delivery">🍕 Comida</button>
     </div>
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- Botón Flotante del Carrito (2) -->
+  <button id="cart-btn" class="cart-floating-btn hidden" onclick="abrirCarrito()">
+    🛒 Ver Pedido (<span id="cart-count">0</span>)
+  </button>
+
+  <!-- Modal de Pedido / Carrito (2) -->
+  <div id="cart-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-business-name">Tu Pedido</h3>
+        <button onclick="cerrarCarrito()" class="btn-close">&times;</button>
+      </div>
+      <div id="cart-items" class="cart-items-list"></div>
+      <div class="cart-footer">
+        <div class="cart-total">Total: <span id="cart-total-price">RD$ 0</span></div>
+        <button onclick="finalizarPedido()" class="btn-checkout">Confirmar Pedido 🚀</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Tu script principal -->
   <script src="app.js"></script>
 </body>
 </html>
