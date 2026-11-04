@@ -243,3 +243,26 @@
     font-weight: bold;
   }
 </style>
+<!-- ========================================== -->
+<!-- BLOQUE MAPA ESTÉTICO DARK & NEON GREEN     -->
+<!-- ========================================== -->
+<style>
+  /* Transformación estilizada en modo oscuro para las baldosas del mapa Leaflet */
+  .leaflet-tile-pane {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) !important;
+  }
+  
+  /* Estilo visual perfeccionado para los contenedores de los pines de logos */
+  .custom-logo-pin {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .custom-logo-pin:hover {
+    transform: scale(1.15) !important;
+    z-index: 9999 !important;
+  }
+  .custom-logo-pin div {
+    background: #0d0d0d !important;
+    border: 2px solid #00E676 !important;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.6), 0 4px 10px rgba(0,0,0,0.9) !important;
+  }
+</style>
