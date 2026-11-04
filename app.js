@@ -120,3 +120,18 @@ window.finalizarPedido = () => {
 
 todosLosNegocios = generar300Negocios();
 renderizarMarcadores(todosLosNegocios);
+// ==========================================
+// INTEGRACIÓN DE NEGOCIOS REALES DE USUARIOS (Fase 2)
+// ==========================================
+function cargarNegociosTotales() {
+  const negociosGenerados = generar300Negocios();
+  const negociosGuardados = JSON.parse(localStorage.getItem('mis_negocios')) || [];
+  
+  // Unimos los creados por dueños reales + los 300 automáticos
+  todosLosNegocios = [...negociosGuardados, ...negociosGenerados];
+  renderizarMarcadores(todosLosNegocios);
+  console.log(`✅ Total cargado: ${todosLosNegocios.length} negocios en el mapa.`);
+}
+
+// Ejecutar la fusión al abrir la app
+cargarNegociosTotales();
