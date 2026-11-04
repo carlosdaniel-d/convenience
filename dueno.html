@@ -172,3 +172,25 @@ logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo
     }
   }, 5000);
 </script>
+<!-- ========================================== -->
+<!-- PANEL FINANCIERO / MÉTRICAS PARA DUEÑOS   -->
+<!-- ========================================== -->
+<div class="panel-card" style="margin-top: 20px; background: #121212; border: 1px solid #00E676;">
+  <h2 style="font-size: 16px; color: #00E676; margin-bottom: 10px;">📊 Resumen de Ingresos</h2>
+  <div style="display: flex; justify-content: space-between; font-size: 14px;">
+    <span>Total Facturado:</span>
+    <strong id="total-facturado-dueno" style="color: #00E676;">RD$ 0</strong>
+  </div>
+</div>
+
+<script>
+  function calcularIngresosDueno() {
+    const pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+    const sumaTotal = pedidos.reduce((acc, p) => acc + p.total, 0);
+    const elem = document.getElementById('total-facturado-dueno');
+    if (elem) {
+      elem.innerText = `RD$ ${sumaTotal}`;
+    }
+  }
+  window.addEventListener('DOMContentLoaded', calcularIngresosDueno);
+</script>
