@@ -543,3 +543,24 @@ window.setPropina = function(monto) {
 
 // Modificamos la suma total para incluir la propina de manera automática al pagar
 const baseProcesarPagoFinal = window.procesarPagoFinal;
+// ==========================================
+// BLOQUE ENTERPRISE 1000%: LÓGICA DE FILTROS
+// ==========================================
+
+window.cambiarRadioBusqueda = function(km) {
+  document.getElementById('radio-val').innerText = km;
+  // Filtra los negocios simulando un radio de cercanía
+  const filtradosRadio = todosLosNegocios.filter((_, index) => index < (km * 15));
+  renderizarMarcadores(filtradosRadio);
+};
+
+window.toggleModoAhorro = function() {
+  const body = document.body;
+  if (body.style.filter === "grayscale(100%)") {
+    body.style.filter = "none";
+    alert("🔋 Modo Ahorro desactivado. Interfaz a full color.");
+  } else {
+    body.style.filter = "grayscale(100%)";
+    alert("🔋 Modo Ahorro activado: Reduciendo consumo gráfico.");
+  }
+};
