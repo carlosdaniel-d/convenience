@@ -2,159 +2,87 @@
 
 **Super-app de descubrimiento local con IA para Santo Domingo y República Dominicana.**
 
-Convenience no espera a que busques. Te empuja el antojo exacto en el momento exacto usando **hora + clima + ubicación + historial**.
+Convenience no espera a que busques. Te empuja el antojo exacto en el momento exacto usando **hora + clima real + ubicación + historial**.
 
 > “Sé que te acaba de costar levantarte... y creo que necesitas un café recién hecho a 2 minutos de ti.”
 
 ---
 
-## 🚀 Estado actual (v0.4)
+## 🚀 Estado actual (v0.5)
 
 | Módulo | Estado |
 |--------|--------|
-| Mapa interactivo (Leaflet) | ✅ Funcional |
-| 500+ negocios reales SD | ✅ Cargados |
-| API FastAPI | ✅ Mejorada |
-| dAcliass (IA contextual) | ✅ Mejorada (filtros reales) |
-| Ofertas Relámpago | ✅ Estructura + endpoints |
-| Panel Dueño (básico) | ✅ `/dueno` |
-| Notificaciones simuladas | ✅ Frontend |
-| Geofencing simulado | ✅ |
+| Mapa interactivo (Leaflet) | ✅ |
+| 500+ negocios reales SD | ✅ |
+| **Clima real (Open-Meteo)** | ✅ |
+| dAcliass (IA + clima + menús) | ✅ |
+| Ofertas Relámpago | ✅ |
+| **Menús con precios** | ✅ |
+| **Sistema de cupones + comisión** | ✅ |
+| Panel Dueño | ✅ |
+| Notificaciones + geofencing | ✅ |
+| **Push notifications (Web)** | ✅ (permiso + SW listo) |
 | PWA | ✅ |
 
 ---
 
-## 🎯 Visión del producto
+## Nuevas capacidades v0.5
 
-### 1. Motor de Notificaciones Inteligentes
-- Hora del día + clima + antojos previos
-- Ejemplos reales del pitch:
-  - 8:00 AM → café cerca
-  - 2:00 PM día caluroso → helado 2x1
-  - Viernes 19:30 → combo familiar
-  - Geofence 50m → “Estás a 50 metros de...”
+### 1. Clima real
+- Endpoint `/api/clima` usa **Open-Meteo** (sin API key).
+- dAcliass y las notificaciones se adaptan: día caluroso → empuja helado, lluvia → sugiere delivery/caliente.
 
-### 2. Motor de Atracción y Descubrimiento
-- Mapa con ruta y tiempo exacto
-- Catálogo transparente con precios
-- Descuentos dinámicos relámpago (el dueño los activa cuando el local está solo)
+### 2. Menús con precios
+- `menus.json` + endpoints `/api/menus` y `/api/menus/{negocio_id}`.
+- dAcliass muestra ítems reales con precio en DOP.
 
-### 3. dAcliass — Asistente 24/7
-- Texto o voz: “Tengo antojo de algo dulce y frío por menos de $10 cerca”
-- Filtra menús, precios, rating, distancia, tags
+### 3. Sistema de cupones
+- Generar: `POST /api/cupones/generar?oferta_id=...` → código `CONV-XXXXXX`
+- Canjear en caja: `POST /api/cupones/canjear` `{ "codigo": "CONV-XXXX" }`
+- Cada canje genera comisión de **$1.5 USD** (configurable).
 
-### 4. Monetización
-- Featured / pay-per-click / impresión
-- Comisión por cupón usado ($1-2 USD)
-- Suscripción dueños para analytics + posición preferente
+### 4. Push notifications
+- Botón “Activar Push” pide permiso.
+- Service Worker listo para recibir push reales.
+- Notificaciones del sistema cuando hay permiso + toast in-app siempre.
 
 ---
 
-## 📋 Roadmap
-
-### Fase 1 — MVP mágico (actual → 2-3 semanas)
-- [x] Mejorar dAcliass con filtrado real de negocios
-- [x] Estructura de ofertas relámpago + menús
-- [x] Panel dueño básico
-- [x] Notificaciones y geofencing simulados
-- [ ] Integrar clima real (OpenWeather)
-- [ ] Persistencia de preferencias de usuario
-- [ ] QR / código de cupón para comisión
-
-### Fase 2 — Monetización
-- [ ] Sistema de featured
-- [ ] Tracking de cupones usados
-- [ ] Dashboard analytics para dueños
-- [ ] Stripe / PayPal para comisiones
-
-### Fase 3 — Diferenciadores
-- [ ] Notificaciones push reales (FCM / OneSignal)
-- [ ] Geofencing nativo
-- [ ] Integración WhatsApp Business para atención
-- [ ] App nativa (React Native + Expo)
-- [ ] Voz (Web Speech API + backend)
-
----
-
-## 🔧 Stack técnico
-
-- **Frontend**: HTML + Tailwind + Leaflet (PWA)
-- **Backend**: FastAPI (Python)
-- **Datos**: `negocios.json` (500+ negocios reales de Santo Domingo)
-- **Mapas**: Leaflet + CartoDB
-- **IA**: Reglas inteligentes + keywords (próximo: embeddings)
-
----
-
-## 🚀 Cómo correr local
+## Cómo correr
 
 ```bash
 pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Abre http://localhost:8000
-
-- Usuario: `/`
-- Panel dueño: `/dueno`
-- API docs: `/docs`
-
----
-
-## 📊 Estructura de datos clave
-
-### Negocio (existente)
-```json
-{
-  "id": "neg_001",
-  "nombre": "El Conuco",
-  "categoria": "restaurante",
-  "lat": 18.4712,
-  "lon": -69.9025,
-  "rating": 4.6,
-  "precio": "$$",
-  "tags": ["típico", "familiar"],
-  "abierto_ahora": true,
-  "destacado": true
-}
-```
-
-### Oferta Relámpago (nueva)
-```json
-{
-  "id": "oferta_001",
-  "negocio_id": "neg_001",
-  "titulo": "2x1 Helado de Pistacho",
-  "descripcion": "Válido solo las próximas 2 horas",
-  "descuento_porcentaje": 50,
-  "precio_original": 350,
-  "precio_oferta": 175,
-  "moneda": "DOP",
-  "activa": true,
-  "expira": "2026-11-04T18:00:00",
-  "stock": 15,
-  "tipo": "relampago"
-}
-```
-
-### Ítem de menú (nueva estructura)
-```json
-{
-  "id": "item_001",
-  "negocio_id": "neg_001",
-  "nombre": "Sancocho Dominicano",
-  "precio": 450,
-  "moneda": "DOP",
-  "categoria": "platos fuertes",
-  "tags": ["típico", "caliente"],
-  "disponible": true
-}
-```
+- App: http://localhost:8000
+- Panel dueño: http://localhost:8000/dueno
+- API docs: http://localhost:8000/docs
+- Clima: http://localhost:8000/api/clima
 
 ---
 
-## 👤 Contribución
+## Endpoints clave
 
-Este repo es el corazón de Convenience. Cualquier mejora en dAcliass, ofertas o UX se sube aquí.
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/clima` | Clima real Santo Domingo |
+| POST | `/api/dacliass` | Chat IA contextual |
+| GET | `/api/ofertas` | Ofertas activas |
+| POST | `/api/ofertas` | Crear oferta relámpago |
+| GET | `/api/menus` | Menús |
+| POST | `/api/cupones/generar` | Generar cupón |
+| POST | `/api/cupones/canjear` | Canjear cupón |
+| GET | `/api/notificaciones/sugeridas` | Sugerencias por hora+clima |
 
-Hecho con cariño y ambición desde Santo Domingo 🇩🇴
+---
+
+## Roadmap siguiente
+
+- [ ] Integrar OneSignal / Firebase para push backend real
+- [ ] VAPID keys + envío masivo de push
+- [ ] Más ítems de menú por negocio
+- [ ] Dashboard de comisiones para dueños
+- [ ] App nativa (React Native + Expo)
+
+Hecho con ambición desde Santo Domingo 🇩🇴
