@@ -123,3 +123,35 @@
   <input type="url" id="logo-negocio" placeholder="https://ejemplo.com/logo.png">
 </div>
 logoUrl: document.getElementById('logo-negocio') ? document.getElementById('logo-negocio').value.trim() : ''
+<!-- ========================================== -->
+<!-- PANEL DE GESTIÓN DE PEDIDOS PARA EL DUEÑO  -->
+<!-- ========================================== -->
+<div class="panel-card" style="margin-top: 20px;">
+  <h2>📥 Pedidos Recibidos en Vivo</h2>
+  <div id="lista-pedidos-dueno" style="max-height: 200px; overflow-y: auto; font-size: 13px;">
+    <p style="color: #666;">No hay pedidos nuevos todavía...</p>
+  </div>
+  <button onclick="cargarPedidosDueno()" class="btn-submit" style="background:#242424; color:#00E676; border:1px solid #00E676; margin-top:10px;">Actualizar Pedidos 🔄</button>
+</div>
+
+<script>
+  function cargarPedidosDueno() {
+    const contenedor = document.getElementById('lista-pedidos-dueno');
+    const pedidos = JSON.parse(localStorage.getItem('pedidos_negocio')) || [];
+
+    if (pedidos.length === 0) {
+      contenedor.innerHTML = `<p style="color: #666;">No hay pedidos nuevos todavía...</p>`;
+      return;
+    }
+
+    contenedor.innerHTML = pedidos.reverse().map(p => `
+      <div style="background:#242424; padding:10px; border-radius:8px; margin-bottom:8px; border-left: 3px solid #00E676;">
+        <strong>🕒 ${p.hora}</strong> - <span style="color:#00E676;">RD$ ${p.total}</span> (${p.metodoPago})<br>
+        <small style="color:#aaa;">Estado: ${p.estado}</small>
+      </div>
+    `).join('');
+  }
+
+  // Cargar al abrir el panel de dueños
+  window.addEventListener('DOMContentLoaded', cargarPedidosDueno);
+</script>
