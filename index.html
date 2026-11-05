@@ -1227,3 +1227,74 @@ setTimeout(() => {
     }, 1400);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: ETA, LOGROS Y NOTAS    -->
+<!-- ========================================== -->
+<style>
+  /* Campo de Notas Especiales */
+  .input-nota-express {
+    width: 100%;
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    margin-top: 6px;
+    outline: none;
+  }
+  .input-nota-express:focus { border-color: #00E676; }
+
+  /* Botón Flotante de Logros */
+  .btn-logros-vip {
+    position: fixed;
+    bottom: 215px;
+    left: 15px;
+    z-index: 1000;
+    background: rgba(24, 24, 24, 0.95);
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+</style>
+
+<!-- Botón Flotante de Logros VIP -->
+<button class="btn-logros-vip" onclick="verLogrosComprador()">🏆 Logros VIP</button>
+
+<script>
+  // 1. Sistema de Logros de Comprador Estrella
+  function verLogrosComprador() {
+    alert("🏆 Tus Logros en Santo Domingo:\n• 🥇 Explorador de Pantoja & Herrera (Completado)\n• 🥈 Maestro del Ahorro 24h (Desbloqueado)\n• 🥉 Cliente Frecuente Piantini (Nivel 2)");
+  }
+
+  // 2. Cálculo Dinámico de ETA (Minutos Estimados)
+  window.calcularETAEstimado = function(radioKm) {
+    const minutos = 15 + (parseInt(radioKm) * 3);
+    return minutos;
+  };
+
+  // Inyectar campo de Notas Especiales y ETA automáticamente dentro del modal de factura si existe
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-factura .modal-box div');
+      if (modalBox && !document.getElementById('seccion-notas-injected')) {
+        const divNotas = document.createElement('div');
+        divNotas.id = 'seccion-notas-injected';
+        divNotas.style.marginTop = "8px";
+        divNotas.style.borderTop = "1px dashed #444";
+        divNotas.style.paddingTop = "6px";
+        divNotas.innerHTML = `
+          <span style="font-size:10px; color:#aaa;">⏱️ Tiempo estimado (ETA): <strong style="color:#00E676;" id="eta-txt">25-30 min</strong></span><br>
+          <span style="font-size:10px; color:#aaa; margin-top:4px; display:block;">📝 Notas para el repartidor o comercio:</span>
+          <input type="text" class="input-nota-express" placeholder="Ej. Tocar timbre, dejar en recepción...">
+        `;
+        modalBox.appendChild(divNotas);
+      }
+    }, 1600);
+  });
+</script>
