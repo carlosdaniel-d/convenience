@@ -2459,17 +2459,17 @@
       }
 
       // ==========================================
-      // 3. AQUÍ VA LA URL REAL DE TU BACKEND EN RENDER
-      // ==========================================
-      const URL_DE_TU_SERVIDOR = 'https://tu-backend-en-render.onrender.com/api/pedidos';
+// CONFIGURACIÓN DE LA URL DEL BACKEND EN RENDER
+// ==========================================
+const URL_DE_TU_SERVIDOR = 'https://convenience-1.onrender.com/api/pedidos';
 
-      const respuesta = await fetch(URL_DE_TU_SERVIDOR, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payloadPedido)
-      });
+const respuesta = await fetch(URL_DE_TU_SERVIDOR, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payloadPedido)
+});
 
       const resultado = await respuesta.json();
 
