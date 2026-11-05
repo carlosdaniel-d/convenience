@@ -1298,3 +1298,93 @@ setTimeout(() => {
     }, 1600);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: NIVELES Y PAGOS MÓVILES-->
+<!-- ========================================== -->
+<style>
+  /* Selector de Métodos de Pago Móvil */
+  .pago-movil-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .pago-chip {
+    background: #111;
+    border: 1px solid #444;
+    color: #ccc;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 9px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .pago-chip.active {
+    background: #00E676;
+    color: #000;
+    font-weight: bold;
+    border-color: #00E676;
+  }
+
+  /* Botón Flotante de Rango / Lealtad */
+  .btn-rango-vip {
+    position: fixed;
+    bottom: 265px;
+    left: 15px;
+    z-index: 1000;
+    background: rgba(24, 24, 24, 0.95);
+    border: 1px solid #ff9800;
+    color: #ff9800;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+</style>
+
+<!-- Botón Flotante de Rango VIP -->
+<button class="btn-rango-vip" onclick="verRangoLealtad()">⭐ Nivel: Oro</button>
+
+<script>
+  // 1. Sistema de Rango de Lealtad
+  function verRangoLealtad() {
+    alert("⭐ Tu Rango Actual: CLIENTE ORO\n• Beneficios activos: 15% de descuento en envíos, acumulación doble de ConvenienceCoins y soporte prioritario en Santo Domingo.");
+  }
+
+  // 2. Selector interactivo de Pago Móvil
+  window.seleccionarPagoMovil = function(metodo, btn) {
+    document.querySelectorAll('.pago-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(`💳 Método de pago seleccionado: ${metodo}`);
+    }
+  };
+
+  // Inyectar selector de Pago Móvil automáticamente dentro del modal de factura si existe
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-factura .modal-box div');
+      if (modalBox && !document.getElementById('seccion-pago-injected')) {
+        const divPago = document.createElement('div');
+        divPago.id = 'seccion-pago-injected';
+        divPago.style.marginTop = "8px";
+        divPago.style.borderTop = "1px dashed #444";
+        divPago.style.paddingTop = "6px";
+        divPago.innerHTML = `
+          <span style="font-size:10px; color:#aaa;">💳 Seleccionar Método de Pago:</span>
+          <div class="pago-movil-grid">
+            <button class="pago-chip active" onclick="seleccionarPagoMovil('Efectivo', this)">💵 Efectivo</button>
+            <button class="pago-chip" onclick="seleccionarPagoMovil('Banreservas', this)">🏦 Banreservas</button>
+            <button class="pago-chip" onclick="seleccionarPagoMovil('Banco Popular', this)">💳 B. Popular</button>
+            <button class="pago-chip" onclick="seleccionarPagoMovil('Banco BHD', this)">📱 BHD</button>
+            <button class="pago-chip" onclick="seleccionarPagoMovil('PayPal', this)">🌐 PayPal</button>
+            <button class="pago-chip" onclick="seleccionarPagoMovil('Tarjeta', this)">💳 T. Crédito</button>
+          </div>
+        `;
+        modalBox.appendChild(divPago);
+      }
+    }, 1800);
+  });
+</script>
