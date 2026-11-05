@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>convenienceIA - Santo Domingo</title>
+  <title>convenienceIA - Santo Domingo 1000%</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -122,8 +122,14 @@
       text-align: center;
     }
 
+    .search-box-container {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
     .input-busqueda {
-      width: 100%;
+      flex: 1;
       background: rgba(24, 24, 24, 0.95);
       border: 1px solid #333;
       padding: 7px 12px;
@@ -131,6 +137,16 @@
       color: #fff;
       font-size: 11px;
       outline: none;
+    }
+
+    .btn-mic {
+      background: rgba(24, 24, 24, 0.95);
+      border: 1px solid #00E676;
+      color: #00E676;
+      padding: 6px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
     }
 
     .categorias-scroll {
@@ -288,7 +304,7 @@
 </head>
 <body>
 
-  <!-- MAPA -->
+  <!-- MAPA DE FONDO -->
   <div id="map"></div>
 
   <!-- HEADER PRINCIPAL -->
@@ -302,7 +318,10 @@
       ⚡ ¡OFERTA SD! Usa el cupón <span style="background:#000; color:#00E676; padding:1px 4px; border-radius:3px;">SD2026</span> (15% OFF)
     </div>
 
-    <input type="text" id="search-input" class="input-busqueda" placeholder="🔍 Buscar plato o negocio (ej. Pantoja, Herrera)..." oninput="filtrarNegocios(this.value)">
+    <div class="search-box-container">
+      <input type="text" id="search-input" class="input-busqueda" placeholder="🔍 Buscar plato o negocio (ej. Pantoja, Herrera)..." oninput="filtrarNegocios(this.value)">
+      <button class="btn-mic" onclick="simularVozIA()" title="Búsqueda por Voz">🎙️</button>
+    </div>
 
     <div class="categorias-scroll">
       <button class="chip-btn active" onclick="filtrarCategoria('todos')">Todos</button>
@@ -327,7 +346,8 @@
     <div id="tools-menu" class="tools-menu hidden">
       <button class="floating-btn" onclick="simularRutaDelivery()" style="color:#ff9800; border-color:#ff9800;">🛵 Simular Delivery</button>
       <button class="floating-btn" onclick="reproducirAlertaAudio()">🔔 Probar Audio</button>
-      <button class="floating-btn" onclick="toggleIdioma()" style="color:#00e676; border-color:#00e676;">🌐 ES / EN</button>
+      <button class="floating-btn" onclick="toggleEcoDelivery()" style="color:#00e676; border-color:#00e676;">🌿 Modo Eco</button>
+      <button class="floating-btn" onclick="toggleIdioma()">🌐 ES / EN</button>
     </div>
   </div>
 
@@ -346,12 +366,21 @@
   <div id="modal-factura" class="modal-overlay hidden">
     <div class="modal-box">
       <button onclick="cerrarTicket()" style="background:none;border:none;color:#aaa;float:right;font-size:18px;cursor:pointer;">&times;</button>
-      <h3 style="color:#00E676; margin-bottom:6px; font-size:13px;">🧾 Ticket Digital & QR Code</h3>
+      <h3 style="color:#00E676; margin-bottom:6px; font-size:13px;">🧾 Ticket Digital & Cuentas Claras</h3>
       <div style="font-size:11px; color:#ccc; border-top:1px dashed #444; border-bottom:1px dashed #444; padding:6px 0; margin:6px 0;">
-        <p>• Estado: Procesando en Santo Domingo</p>
-        <p>• Delivery: RD$ <span id="modal-envio">125</span></p>
+        <p>• Cobertura: Santo Domingo Oeste & D.N.</p>
+        <p>• Delivery: RD$ <span id="modal-envio">125</span> <span id="tag-eco" style="color:#00E676; font-size:9px;"></span></p>
         
-        <!-- SECCIÓN DE PROPINA -->
+        <!-- DIVIDIR CUENTA -->
+        <div style="margin-top:6px; background:#222; padding:6px; border-radius:8px;">
+          <span style="font-size:10px; color:#aaa;">👥 Dividir cuenta entre personas:</span>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <input type="number" id="split-personas" min="1" max="10" value="1" style="width:45px; background:#111; border:1px solid #444; color:#fff; padding:2px 4px; border-radius:4px; font-size:11px;" oninput="calcularSplit(this.value)">
+            <span style="font-size:10px; color:#00E676;">Por persona: RD$ <strong id="monto-persona">575</strong></span>
+          </div>
+        </div>
+
+        <!-- PROPINA -->
         <div style="margin-top:6px;">
           <span style="font-size:10px; color:#aaa;">Propina para el Repartidor:</span>
           <div style="display:flex; gap:6px; margin-top:4px;">
@@ -361,7 +390,7 @@
           </div>
         </div>
 
-        <!-- CÓDIGO QR SIMULADO -->
+        <!-- QR SIMULADO -->
         <div style="text-align:center; margin-top:8px; background:#000; padding:6px; border-radius:8px;">
           <span style="font-size:9px; color:#00E676;">QR Verificación de Orden #SD-9021</span>
           <div style="font-family:monospace; font-size:14px; letter-spacing:3px; color:#fff; margin-top:2px;">█▀█ █ █▀▀</div>
@@ -379,6 +408,8 @@
     let marcadoresGroup;
     let deliveryMarker = null;
     let idiomaActual = 'es';
+    let esEcoDelivery = false;
+    let subtotalSimulado = 450;
 
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
@@ -453,13 +484,16 @@
 
     function actualizarRadio(val) {
       document.getElementById('radio-val').innerText = val;
-      const costo = 75 + (parseInt(val) * 10);
+      let costo = 75 + (parseInt(val) * 10);
+      if (esEcoDelivery) costo = Math.round(costo * 0.85);
       document.getElementById('costo-envio').innerText = costo;
       document.getElementById('modal-envio').innerText = costo;
+      calcularSplit(document.getElementById('split-personas').value);
     }
 
     function abrirTicket() {
       document.getElementById('modal-factura').classList.remove('hidden');
+      calcularSplit(document.getElementById('split-personas').value);
     }
 
     function cerrarTicket() {
@@ -469,6 +503,28 @@
     function setPropina(monto, btn) {
       document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
+    }
+
+    function simularVozIA() {
+      const sugerencias = ["Pica Pollo", "Farmacia Pantoja", "Comercial Herrera", "Pizza Bella Vista"];
+      const res = sugerencias[Math.floor(Math.random() * sugerencias.length)];
+      document.getElementById('search-input').value = res;
+      filtrarNegocios(res);
+      alert(`🎙️ Escuchado: "${res}"`);
+    }
+
+    function toggleEcoDelivery() {
+      esEcoDelivery = !esEcoDelivery;
+      document.getElementById('tag-eco').innerText = esEcoDelivery ? " (🌱 15% OFF Eco)" : "";
+      actualizarRadio(document.getElementById('radio-val').innerText);
+      alert(esEcoDelivery ? "🌱 Delivery Ecológico activado (-15% en costo de envío)." : "Delivery estándar activo.");
+    }
+
+    function calcularSplit(cant) {
+      const personas = parseInt(cant) || 1;
+      const costoEnvio = parseInt(document.getElementById('modal-envio').innerText) || 125;
+      const total = subtotalSimulado + costoEnvio;
+      document.getElementById('monto-persona').innerText = Math.round(total / personas);
     }
 
     function simularRutaDelivery() {
@@ -522,7 +578,7 @@
       if (idiomaActual === 'en') {
         document.getElementById('btn-owner').innerText = "Owner 💼";
         document.getElementById('banner-text').innerHTML = "⚡ SD DEAL! Use code <span style='background:#000; color:#00E676; padding:1px 4px;'>SD2026</span> (15% OFF)";
-        document.getElementById('search-input').placeholder = "🔍 Search dish or store...";
+        document.getElementById('search-input').placeholder = "🔍 Search store or dish...";
         alert("Language switched to English.");
       } else {
         document.getElementById('btn-owner').innerText = "Soy Dueño 💼";
