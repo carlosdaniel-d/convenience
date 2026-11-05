@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>convenienceIA - Santo Domingo (Live Production)</title>
+  <title>convenienceIA - Santo Domingo (Production Engine)</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -41,9 +41,22 @@
       backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 11px;
     }
 
-    /* Badge de Coins SD */
+    /* Barra de Filtros por Sector */
+    .filtros-sectores-bar {
+      position: fixed; top: 125px; left: 15px; right: 15px; z-index: 997;
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;
+    }
+    .filtros-sectores-bar::-webkit-scrollbar { display: none; }
+    .chip-sector {
+      background: rgba(18, 18, 18, 0.92); border: 1px solid var(--neon-green); color: var(--neon-green);
+      padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800;
+      white-space: nowrap; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+    .chip-sector.active, .chip-sector:hover { background: var(--neon-green); color: #000; }
+
+    /* Badge Coins SD */
     .coins-badge-bar {
-      position: fixed; top: 125px; right: 15px; z-index: 999;
+      position: fixed; top: 170px; right: 15px; z-index: 999;
       background: rgba(18, 18, 18, 0.95); border: 1px solid #ffd700;
       border-radius: 20px; padding: 6px 14px; font-size: 11px; font-weight: 900;
       color: #ffd700; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
@@ -110,7 +123,25 @@
       box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
     }
 
-    /* Botón Flotante de Soporte IA WhatsApp */
+    /* Panel de Historial Lateral */
+    .historial-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 300px; z-index: 9999999;
+      background: #0d0d0d; border-left: 1px solid var(--neon-green);
+      box-shadow: -10px 0 40px rgba(0,0,0,0.9); padding: 20px; color: #fff;
+      transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
+      display: flex; flex-direction: column;
+    }
+    .historial-drawer.active { transform: translateX(0); }
+
+    .btn-historial-flotante {
+      position: fixed; bottom: 160px; left: 15px; z-index: 10000;
+      background: #151515; border: 1px solid var(--neon-green);
+      color: var(--neon-green); width: 45px; height: 45px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+
+    /* Botón Flotante de Soporte WhatsApp */
     .btn-soporte-flotante {
       position: fixed; bottom: 100px; right: 15px; z-index: 99999;
       background: #25D366; color: #000; border: none; width: 48px; height: 48px;
@@ -118,7 +149,7 @@
       font-size: 24px; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.6); cursor: pointer;
     }
 
-    /* Toast de Notificaciones */
+    /* Toast Container */
     .toast-container-app {
       position: fixed; bottom: 95px; right: 15px; z-index: 999999;
       display: flex; flex-direction: column; gap: 8px; pointer-events: none;
@@ -160,8 +191,8 @@
   <div class="top-bar">
     <div class="brand">🟢 convenienceIA</div>
     <div style="display:flex; gap:8px;">
-      <button class="top-btn" onclick="mostrarToast('Monedero ConveniencePay activo. Saldo: RD$ 2,450', '💳')">Monedero</button>
-      <button class="top-btn" onclick="mostrarToast('Asistente IA operando 24/7', '🤖')">IA Bot</button>
+      <button class="top-btn" onclick="obtenerUbicacionGPSReal()">📍 GPS Real</button>
+      <button class="top-btn" onclick="toggleHistorialDrawer()">📦 Historial</button>
     </div>
   </div>
 
@@ -175,9 +206,34 @@
     <button onclick="cambiarDireccionPrompt()" style="background:#222; border:1px solid var(--neon-green); color:var(--neon-green); padding:4px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">Cambiar</button>
   </div>
 
+  <!-- Barra de Filtros por Sectores -->
+  <div class="filtros-sectores-bar">
+    <button class="chip-sector active" onclick="filtrarSectorMapa('TODOS', this)">⚡ Todos SD</button>
+    <button class="chip-sector" onclick="filtrarSectorMapa('Girasoles', this)">📍 Girasoles</button>
+    <button class="chip-sector" onclick="filtrarSectorMapa('Pantoja', this)">📍 Pantoja</button>
+    <button class="chip-sector" onclick="filtrarSectorMapa('Herrera', this)">📍 Herrera</button>
+    <button class="chip-sector" onclick="filtrarSectorMapa('Piantini', this)">📍 Piantini</button>
+    <button class="chip-sector" onclick="filtrarSectorMapa('Naco', this)">📍 Naco</button>
+  </div>
+
   <!-- Badge Coins -->
   <div class="coins-badge-bar">
     🪙 <span id="lbl-coins-usuario">250</span> Coins SD
+  </div>
+
+  <!-- Botón Flotante Historial -->
+  <button class="btn-historial-flotante" onclick="toggleHistorialDrawer()" title="Historial de Pedidos">📦</button>
+
+  <!-- Panel Lateral de Historial Persistente -->
+  <div id="panel-historial" class="historial-drawer">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #222; padding-bottom:10px;">
+      <h3 style="font-size:15px; font-weight:900; color:var(--neon-green);">📦 Tus Pedidos Recientes</h3>
+      <button onclick="toggleHistorialDrawer()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
+    </div>
+    <div id="lista-historial-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>
+    </div>
+    <button onclick="limpiarHistorialPedidos()" style="background:rgba(255,82,82,0.15); border:1px solid #ff5252; color:#ff5252; padding:10px; border-radius:12px; font-weight:bold; font-size:11px; cursor:pointer; margin-top:10px;">🗑️ Limpiar Historial</button>
   </div>
 
   <!-- Menú Maestro Acordeón -->
@@ -185,8 +241,8 @@
   <div id="acordeon-lateral" class="acordeon-lateral-box">
     <span style="font-size:9px; color:#888; font-weight:bold; text-transform:uppercase; border-bottom:1px solid #333; padding-bottom:4px;">Utilidades Enterprise</span>
     <button class="btn-opcion-acordeon" onclick="abrirSoporteIAWhatsApp()">💬 Soporte IA WhatsApp</button>
+    <button class="btn-opcion-acordeon" onclick="copiarLinkCherchaModal()">🍕 Modo Chercha (Pedido Grupal)</button>
     <button class="btn-opcion-acordeon" onclick="mostrarToast('Código Embajador: SD-GIRASOLES20', '🎁')">🎁 Código Embajador</button>
-    <button class="btn-opcion-acordeon" onclick="mostrarToast('Tránsito fluido en Kennedy y 27 de Febrero', '🚦')">🚦 Estado Tráfico SD</button>
   </div>
 
   <!-- Botón Flotante Soporte -->
@@ -223,7 +279,7 @@
       <button onclick="agregarAlCarro('Bolsa de Hielo Grande', 120)" style="background:var(--neon-green); color:#000; border:none; padding:6px 12px; border-radius:10px; font-weight:bold; font-size:11px; cursor:pointer;">+ Añadir</button>
     </div>
 
-    <!-- Módulo de Propinas y Cupones -->
+    <!-- Módulo de Propinas, Cupones y Horarios -->
     <div style="background:#151515; border:1px solid #333; border-radius:12px; padding:10px; margin-top:10px; font-size:11px;">
       <div style="font-weight: bold; color: var(--neon-green); margin-bottom: 6px;">🛵 Propina Voluntaria:</div>
       <div style="display: flex; gap: 6px; margin-bottom: 10px;">
@@ -231,6 +287,12 @@
         <button onclick="seleccionarPropina(50, this)" style="background:var(--neon-green); border:1px solid var(--neon-green); color:#000; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 50</button>
         <button onclick="seleccionarPropina(100, this)" style="background:#1e1e1e; border:1px solid #444; color:#fff; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 100</button>
       </div>
+
+      <div style="font-weight: bold; color: #ccc; margin-bottom: 4px;">⏱️ Tiempo de Entrega:</div>
+      <select id="select-tiempo-entrega" style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 6px; border-radius: 8px; font-size: 11px; outline: none; margin-bottom: 8px;">
+        <option value="Exprés (15 - 20 min)">🚀 Exprés (15 - 20 minutos)</option>
+        <option value="Programado">📅 Programar para más tarde</option>
+      </select>
       
       <div style="display:flex; gap:6px;">
         <input type="text" id="input-cupon-promo" placeholder="Cupón (ej. SD2026)" style="background:#0a0a0a; border:1px solid #333; color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; flex:1; outline:none;">
@@ -305,10 +367,11 @@
       grupoPines.addLayer(marker);
     }
 
-    // 3. Carrito y Operaciones Funcionales
+    // 3. Estado del Carrito y LocalStorage
     window.carritoApp = { items: [], total: 0, negocioActual: "Comercio SD" };
     window.propinaActual = 50;
-    window.coinsActuales = 250;
+    window.coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250');
+    document.getElementById('lbl-coins-usuario').innerText = window.coinsActuales;
 
     function abrirDrawerComercio(negocio) {
       window.carritoApp.negocioActual = negocio.nombre;
@@ -351,6 +414,57 @@
       }
     }
 
+    // 4. Persistencia LocalStorage para Historial de Pedidos
+    function guardarPedidoEnHistorial(negocio, items, total) {
+      let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+      const nuevoPedido = {
+        id: 'SD-' + Math.floor(1000 + Math.random() * 9000),
+        fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        negocio: negocio,
+        items: items,
+        total: total
+      };
+      historial.unshift(nuevoPedido);
+      if (historial.length > 10) historial.pop();
+      localStorage.setItem('convenience_historial_pedidos', JSON.stringify(historial));
+      renderizarHistorial();
+    }
+
+    function renderizarHistorial() {
+      const contenedor = document.getElementById('lista-historial-container');
+      if (!contenedor) return;
+      let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+      if (historial.length === 0) {
+        contenedor.innerHTML = `<div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>`;
+        return;
+      }
+      let html = '';
+      historial.forEach(p => {
+        html += `
+          <div style="background:#141414; border:1px solid #282828; border-radius:12px; padding:10px; font-size:11px;">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--neon-green); margin-bottom:4px;">
+              <span>${p.negocio}</span>
+              <span>#${p.id}</span>
+            </div>
+            <div style="color:#aaa; font-size:10px; margin-bottom:6px;">🕒 ${p.fecha}</div>
+            <div style="color:#fff; font-weight:bold;">Total: RD$ ${p.total.toLocaleString()}</div>
+          </div>
+        `;
+      });
+      contenedor.innerHTML = html;
+    }
+
+    function toggleHistorialDrawer() {
+      document.getElementById('panel-historial').classList.toggle('active');
+    }
+
+    function limpiarHistorialPedidos() {
+      localStorage.removeItem('convenience_historial_pedidos');
+      renderizarHistorial();
+      mostrarToast("Historial borrado.", "🗑️");
+    }
+
+    // 5. Checkout Real por WhatsApp y Actualización de Coins
     function enviarPedidoWhatsApp() {
       if (window.carritoApp.items.length === 0) {
         mostrarToast("Tu carrito está vacío.", "⚠️");
@@ -366,21 +480,56 @@
       });
 
       const totalFinal = window.carritoApp.total + window.propinaActual;
-      detalleTexto += `%0A🛵 *Propina:* RD$ ${window.propinaActual}%0A`;
+      const tiempoEntrega = document.getElementById('select-tiempo-entrega').value;
+
+      detalleTexto += `%0A⏱️ *Tipo de Entrega:* ${tiempoEntrega}%0A`;
+      detalleTexto += `🛵 *Propina:* RD$ ${window.propinaActual}%0A`;
       detalleTexto += `💰 *Total Final:* RD$ ${totalFinal.toLocaleString()}%0A`;
       detalleTexto += `📍 *Destino:* ${document.getElementById('lbl-dir-actual').innerText}%0A`;
 
-      // Sumar Coins por compra
+      // Guardar en historial persistente
+      guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
+
+      // Sumar Coins reales y guardar en LocalStorage
       window.coinsActuales += 50;
+      localStorage.setItem('convenience_coins', window.coinsActuales);
       document.getElementById('lbl-coins-usuario').innerText = window.coinsActuales;
 
       const urlWa = `https://wa.me/18095550199?text=${detalleTexto}`;
       window.open(urlWa, '_blank');
+      
       cerrarDrawerComercio();
+      window.carritoApp.items = [];
+      window.carritoApp.total = 0;
+      document.getElementById('lbl-total-carrito').innerText = "RD$ 0.00";
+      document.getElementById('lbl-cant-items').innerText = "0 items";
+      
       mostrarToast("¡Pedido generado! +50 Coins acreditados.", "🪙");
     }
 
-    // 4. Utilidades de UI
+    // 6. Geolocalización GPS Real del Navegador
+    function obtenerUbicacionGPSReal() {
+      if (!navigator.geolocation) {
+        mostrarToast("Tu navegador no soporta geolocalización.", "❌");
+        return;
+      }
+      mostrarToast("Obteniendo tu ubicación satelital GPS...", "📍");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          map.setView([lat, lng], 16);
+          document.getElementById('lbl-dir-actual').innerText = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)} (GPS Activo)`;
+          mostrarToast("¡Ubicación GPS sincronizada con éxito!", "✅");
+        },
+        (error) => {
+          mostrarToast("No se pudo obtener el GPS. Verifica tus permisos.", "⚠️");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    // 7. Utilidades Operativas de UI
     function mostrarToast(mensaje, icono = "⚡") {
       const contenedor = document.getElementById('toast-container');
       if (!contenedor) return;
@@ -402,13 +551,14 @@
     function cerrarSplash() {
       document.getElementById('splash-bienvenida').classList.add('hidden');
       mostrarToast("¡200+ comercios sincronizados en SD!", "📍");
+      renderizarHistorial();
     }
 
     function cambiarDireccionPrompt() {
-      const nuevaDir = prompt("Ingresa tu dirección exacta en Santo Domingo:", "Piantini, Torre Empresarial");
+      const nuevaDir = prompt("Ingresa tu dirección exacta en Santo Domingo (Sector, Calle y Número):", "Piantini, Torre Empresarial");
       if (nuevaDir && nuevaDir.trim() !== "") {
         document.getElementById('lbl-dir-actual').innerText = nuevaDir;
-        mostrarToast("Dirección actualizada.", "📍");
+        mostrarToast("Dirección actualizada correctamente.", "📍");
       }
     }
 
@@ -416,433 +566,21 @@
       const mensaje = encodeURIComponent("¡Hola! Necesito asistencia con un pedido en convenienceIA Santo Domingo.");
       window.open(`https://wa.me/18095550199?text=${mensaje}`, '_blank');
     }
-  </script>
-</body>
-</html>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: ANALÍTICA, PERSISTENCIA & ESTADOS -->
-<!-- ================================================= -->
-<style>
-  /* Panel de Historial Flotante */
-  .historial-drawer {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 300px; z-index: 9999999;
-    background: #0d0d0d; border-left: 1px solid var(--neon-green, #00E676);
-    box-shadow: -10px 0 40px rgba(0,0,0,0.9); padding: 20px; color: #fff;
-    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
-    display: flex; flex-direction: column;
-  }
-  .historial-drawer.active { transform: translateX(0); }
 
-  .btn-historial-flotante {
-    position: fixed; bottom: 160px; left: 15px; z-index: 10000;
-    background: #151515; border: 1px solid var(--neon-green, #00E676);
-    color: var(--neon-green, #00E676); width: 45px; height: 45px;
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 18px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-  }
-</style>
-
-<!-- BOTÓN FLOTANTE PARA ABRIR HISTORIAL -->
-<button class="btn-historial-flotante" onclick="toggleHistorialDrawer()" title="Historial de Pedidos">
-  📦
-</button>
-
-<!-- PANEL LATERAL DE HISTORIAL -->
-<div id="panel-historial" class="historial-drawer">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #222; padding-bottom:10px;">
-    <h3 style="font-size:15px; font-weight:900; color:var(--neon-green, #00E676);">📦 Tus Pedidos Recientes</h3>
-    <button onclick="toggleHistorialDrawer()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
-  </div>
-  
-  <div id="lista-historial-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-    <div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>
-  </div>
-
-  <button onclick="limpiarHistorialPedidos()" style="background:rgba(255,82,82,0.15); border:1px solid #ff5252; color:#ff5252; padding:10px; border-radius:12px; font-weight:bold; font-size:11px; cursor:pointer; margin-top:10px;">
-    🗑️ Limpiar Historial
-  </button>
-</div>
-
-<script>
-  // 1. Gestión de Historial Persistente con LocalStorage
-  function guardarPedidoEnHistorial(negocio, items, total) {
-    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-    const nuevoPedido = {
-      id: 'SD-' + Math.floor(1000 + Math.random() * 9000),
-      fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      negocio: negocio,
-      items: items,
-      total: total
-    };
-    
-    historial.unshift(nuevoPedido);
-    if (historial.length > 10) historial.pop(); // Mantener solo los últimos 10
-    
-    localStorage.setItem('convenience_historial_pedidos', JSON.stringify(historial));
-    renderizarHistorial();
-  }
-
-  function renderizarHistorial() {
-    const contenedor = document.getElementById('lista-historial-container');
-    if (!contenedor) return;
-
-    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-    
-    if (historial.length === 0) {
-      contenedor.innerHTML = `<div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>`;
-      return;
+    function copiarLinkCherchaModal() {
+      const link = "https://convenience-1.onrender.com/?sala=SD-" + Math.floor(1000 + Math.random() * 9000);
+      navigator.clipboard.writeText(link).then(() => {
+        mostrarToast("¡Enlace de Sala Grupal copiado!", "✅");
+      }).catch(() => {
+        alert("Enlace de sala: " + link);
+      });
+      document.getElementById('acordeon-lateral').classList.remove('active');
     }
 
-    let html = '';
-    historial.forEach(p => {
-      html += `
-        <div style="background:#141414; border:1px solid #282828; border-radius:12px; padding:10px; font-size:11px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--neon-green, #00E676); margin-bottom:4px;">
-            <span>${p.negocio}</span>
-            <span>#${p.id}</span>
-          </div>
-          <div style="color:#aaa; font-size:10px; margin-bottom:6px;">🕒 ${p.fecha}</div>
-          <div style="color:#fff; font-weight:bold;">Total: RD$ ${p.total.toLocaleString()}</div>
-        </div>
-      `;
-    });
-    contenedor.innerHTML = html;
-  }
+    function filtrarSectorMapa(sectorNombre, btnElement) {
+      document.querySelectorAll('.chip-sector').forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
 
-  function toggleHistorialDrawer() {
-    document.getElementById('panel-historial').classList.toggle('active');
-  }
-
-  function limpiarHistorialPedidos() {
-    localStorage.removeItem('convenience_historial_pedidos');
-    renderizarHistorial();
-    if (typeof mostrarToast === 'function') mostrarToast("Historial borrado.", "🗑️");
-  }
-
-  // Enganchar el guardado automático cuando se envía el pedido por WhatsApp
-  window.addEventListener('DOMContentLoaded', () => {
-    renderizarHistorial();
-
-    setTimeout(() => {
-      const originalWA = window.enviarPedidoWhatsApp;
-      if (typeof originalWA === 'function') {
-        window.enviarPedidoWhatsApp = function() {
-          if (window.carritoApp && window.carritoApp.items.length > 0) {
-            const totalFinal = window.carritoApp.total + (window.propinaActual || 0);
-            guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
-          }
-          originalWA();
-        };
-      }
-    }, 1500);
-  });
-</script>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: ANALÍTICA, PERSISTENCIA & ESTADOS -->
-<!-- ================================================= -->
-<style>
-  /* Panel de Historial Flotante */
-  .historial-drawer {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 300px; z-index: 9999999;
-    background: #0d0d0d; border-left: 1px solid var(--neon-green, #00E676);
-    box-shadow: -10px 0 40px rgba(0,0,0,0.9); padding: 20px; color: #fff;
-    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
-    display: flex; flex-direction: column;
-  }
-  .historial-drawer.active { transform: translateX(0); }
-
-  .btn-historial-flotante {
-    position: fixed; bottom: 160px; left: 15px; z-index: 10000;
-    background: #151515; border: 1px solid var(--neon-green, #00E676);
-    color: var(--neon-green, #00E676); width: 45px; height: 45px;
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 18px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-  }
-</style>
-
-<!-- BOTÓN FLOTANTE PARA ABRIR HISTORIAL -->
-<button class="btn-historial-flotante" onclick="toggleHistorialDrawer()" title="Historial de Pedidos">
-  📦
-</button>
-
-<!-- PANEL LATERAL DE HISTORIAL -->
-<div id="panel-historial" class="historial-drawer">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #222; padding-bottom:10px;">
-    <h3 style="font-size:15px; font-weight:900; color:var(--neon-green, #00E676);">📦 Tus Pedidos Recientes</h3>
-    <button onclick="toggleHistorialDrawer()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
-  </div>
-  
-  <div id="lista-historial-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-    <div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>
-  </div>
-
-  <button onclick="limpiarHistorialPedidos()" style="background:rgba(255,82,82,0.15); border:1px solid #ff5252; color:#ff5252; padding:10px; border-radius:12px; font-weight:bold; font-size:11px; cursor:pointer; margin-top:10px;">
-    🗑️ Limpiar Historial
-  </button>
-</div>
-
-<script>
-  // 1. Gestión de Historial Persistente con LocalStorage
-  function guardarPedidoEnHistorial(negocio, items, total) {
-    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-    const nuevoPedido = {
-      id: 'SD-' + Math.floor(1000 + Math.random() * 9000),
-      fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      negocio: negocio,
-      items: items,
-      total: total
-    };
-    
-    historial.unshift(nuevoPedido);
-    if (historial.length > 10) historial.pop(); // Mantener solo los últimos 10
-    
-    localStorage.setItem('convenience_historial_pedidos', JSON.stringify(historial));
-    renderizarHistorial();
-  }
-
-  function renderizarHistorial() {
-    const contenedor = document.getElementById('lista-historial-container');
-    if (!contenedor) return;
-
-    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-    
-    if (historial.length === 0) {
-      contenedor.innerHTML = `<div style="font-size:12px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>`;
-      return;
-    }
-
-    let html = '';
-    historial.forEach(p => {
-      html += `
-        <div style="background:#141414; border:1px solid #282828; border-radius:12px; padding:10px; font-size:11px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--neon-green, #00E676); margin-bottom:4px;">
-            <span>${p.negocio}</span>
-            <span>#${p.id}</span>
-          </div>
-          <div style="color:#aaa; font-size:10px; margin-bottom:6px;">🕒 ${p.fecha}</div>
-          <div style="color:#fff; font-weight:bold;">Total: RD$ ${p.total.toLocaleString()}</div>
-        </div>
-      `;
-    });
-    contenedor.innerHTML = html;
-  }
-
-  function toggleHistorialDrawer() {
-    document.getElementById('panel-historial').classList.toggle('active');
-  }
-
-  function limpiarHistorialPedidos() {
-    localStorage.removeItem('convenience_historial_pedidos');
-    renderizarHistorial();
-    if (typeof mostrarToast === 'function') mostrarToast("Historial borrado.", "🗑️");
-  }
-
-  // Enganchar el guardado automático cuando se envía el pedido por WhatsApp
-  window.addEventListener('DOMContentLoaded', () => {
-    renderizarHistorial();
-
-    setTimeout(() => {
-      const originalWA = window.enviarPedidoWhatsApp;
-      if (typeof originalWA === 'function') {
-        window.enviarPedidoWhatsApp = function() {
-          if (window.carritoApp && window.carritoApp.items.length > 0) {
-            const totalFinal = window.carritoApp.total + (window.propinaActual || 0);
-            guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
-          }
-          originalWA();
-        };
-      }
-    }, 1500);
-  });
-</script>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: RASTREO SATELITAL & ESTADOS    -->
-<!-- ================================================= -->
-<style>
-  /* Tarjeta Flotante de Rastreo Satelital GPS */
-  .gps-tracker-card {
-    position: fixed; top: 180px; right: 15px; z-index: 9999;
-    background: rgba(15, 15, 15, 0.95); border: 1px solid var(--neon-blue, #00b0ff);
-    border-radius: 16px; padding: 12px 16px; width: 230px;
-    backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    display: none; transform: translateX(120%); transition: transform 0.4s ease;
-  }
-  .gps-tracker-card.active { display: block; transform: translateX(0); }
-</style>
-
-<!-- WIDGET FLOTANTE DE RASTREO SATELITAL GPS -->
-<div id="widget-gps-repartidor" class="gps-tracker-card">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-    <span style="font-size:10px; font-weight:900; color:var(--neon-blue, #00b0ff);">🛵 RASTREO SATELITAL</span>
-    <span style="font-size:9px; color:var(--neon-green, #00E676); font-weight:bold;">En Ruta</span>
-  </div>
-  <div style="font-size:12px; font-weight:bold; margin-bottom:4px;" id="gps-repartidor-nombre">Motorizado: Carlos M.</div>
-  <div style="font-size:10px; color:#aaa; margin-bottom:8px;">Llegada estimada: <span id="gps-tiempo-est" style="color:#fff; font-weight:bold;">12 min</span></div>
-  <div style="background:#222; height:6px; border-radius:3px; overflow:hidden;">
-    <div id="gps-barra-progreso" style="background:var(--neon-blue, #00b0ff); width:20%; height:100%; transition: width 1s linear;"></div>
-  </div>
-</div>
-
-<script>
-  // Simulador de Rastreo GPS Satelital Activo al Hacer un Pedido
-  function activarRastreoGPSExtendido() {
-    const widget = document.getElementById('widget-gps-repartidor');
-    if (!widget) return;
-    
-    widget.classList.add('active');
-    if (typeof mostrarToast === 'function') {
-      mostrarToast("¡Motorizado asignado! Tu pedido va en camino.", "🛵");
-    }
-    
-    let progreso = 20;
-    const interval = setInterval(() => {
-      progreso += 15;
-      if (progreso > 100) progreso = 100;
-      
-      const barra = document.getElementById('gps-barra-progreso');
-      const tiempo = document.getElementById('gps-tiempo-est');
-      
-      if (barra) barra.style.width = `${progreso}%`;
-      if (tiempo) tiempo.innerText = `${Math.max(1, Math.round(15 * (1 - progreso/100)))} min`;
-
-      if (progreso === 100) {
-        if (tiempo) tiempo.innerText = "¡Entregado! 🎉";
-        clearInterval(interval);
-        if (typeof mostrarToast === 'function') {
-          mostrarToast("Pedido entregado con éxito. ¡Buen provecho!", "⭐");
-        }
-        setTimeout(() => widget.classList.remove('active'), 6000);
-      }
-    }, 2000);
-  }
-
-  // Enganchar el rastreo satelital automáticamente al confirmar el pedido por WhatsApp
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      const originalWA = window.enviarPedidoWhatsApp;
-      if (typeof originalWA === 'function') {
-        window.enviarPedidoWhatsApp = function() {
-          originalWA();
-          activarRastreoGPSExtendido();
-        };
-      }
-    }, 2000);
-  });
-</script>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: CALIFICACIÓN POST-ENTREGA & IA  -->
-<!-- ================================================= -->
-<style>
-  /* Modal de Calificación y Reseña */
-  .modal-calif-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999999;
-    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
-    display: flex; align-items: center; justify-content: center; padding: 20px;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-  }
-  .modal-calif-overlay.active { opacity: 1; pointer-events: auto; }
-
-  .modal-calif-box {
-    background: #141414; border: 1px solid var(--neon-green, #00E676); border-radius: 24px;
-    padding: 22px; width: 100%; max-width: 360px; text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 230, 118, 0.4); color: #fff;
-  }
-</style>
-
-<!-- MODAL DE CALIFICACIÓN POST-ENTREGA -->
-<div id="modal-calificacion-sd" class="modal-calif-overlay">
-  <div class="modal-calif-box">
-    <div style="font-size: 32px; margin-bottom: 6px;">⭐</div>
-    <h3 style="color: var(--neon-green, #00E676); font-size: 18px; font-weight: 900; margin-bottom: 4px;">¡Pedido Entregado con Éxito!</h3>
-    <p style="font-size: 11px; color: #ccc; margin-bottom: 14px;">¿Qué tal te pareció el servicio en Santo Domingo?</p>
-    
-    <div style="font-size: 24px; margin-bottom: 14px; cursor: pointer; color: #ffd700; letter-spacing: 4px;">
-      ★★★★★
-    </div>
-
-    <textarea id="txt-reseña-cliente" placeholder="Escribe tu opinión (la IA analizará la satisfacción)..." style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 12px; font-size: 11px; height: 70px; outline: none; margin-bottom: 14px; resize: none;"></textarea>
-
-    <button onclick="enviarCalificacionCliente()" style="background: var(--neon-green, #00E676); color: #000; border: none; width: 100%; padding: 12px; border-radius: 14px; font-weight: 900; font-size: 12px; cursor: pointer;">
-      Enviar Reseña y Ganar +15 Coins 🚀
-    </button>
-  </div>
-</div>
-
-<script>
-  // 1. Funciones de Apertura y Envío de Calificación
-  function abrirModalCalificacionSD() {
-    const modal = document.getElementById('modal-calificacion-sd');
-    if (modal) modal.classList.add('active');
-  }
-
-  function enviarCalificacionCliente() {
-    const modal = document.getElementById('modal-calificacion-sd');
-    if (modal) modal.classList.remove('active');
-    
-    // Acreditar Coins extra por la reseña
-    if (typeof window.coinsActuales !== 'undefined') {
-      window.coinsActuales += 15;
-      const lbl = document.getElementById('lbl-coins-usuario');
-      if (lbl) lbl.innerText = window.coinsActuales;
-    }
-
-    if (typeof mostrarToast === 'function') {
-      mostrarToast("¡Reseña registrada con éxito! +15 Coins acreditados.", "⭐");
-    }
-  }
-
-  // 2. Disparar el modal automáticamente al finalizar el rastreo satelital
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      const originalRastreo = window.activarRastreoGPSExtendido;
-      // Si existe el rastreo satelital, al completarse los 100% abre la calificación
-      if (typeof originalRastreo === 'function') {
-        // Se integra de forma fluida con el ciclo de vida del delivery
-      }
-    }, 2500);
-  });
-</script>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: FILTROS RÁPIDOS DE SECTORES   -->
-<!-- ================================================= -->
-<style>
-  /* Barra de Chips de Sectores Rápida */
-  .filtros-sectores-bar {
-    position: fixed; top: 125px; left: 15px; right: 15px; z-index: 997;
-    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;
-    scrollbar-width: none; /* Ocultar scroll en móviles */
-  }
-  .filtros-sectores-bar::-webkit-scrollbar { display: none; }
-
-  .chip-sector {
-    background: rgba(18, 18, 18, 0.92); border: 1px solid var(--neon-green, #00E676); color: var(--neon-green, #00E676);
-    padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800;
-    white-space: nowrap; cursor: pointer; backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6); transition: all 0.2s;
-  }
-  .chip-sector:hover, .chip-sector.active {
-    background: var(--neon-green, #00E676); color: #000;
-  }
-</style>
-
-<!-- BARRA DE FILTROS POR SECTOR EN VIVO -->
-<div class="filtros-sectores-bar">
-  <button class="chip-sector active" onclick="filtrarSectorMapa('TODOS', this)">⚡ Todos SD</button>
-  <button class="chip-sector" onclick="filtrarSectorMapa('Girasoles', this)">📍 Girasoles</button>
-  <button class="chip-sector" onclick="filtrarSectorMapa('Pantoja', this)">📍 Pantoja</button>
-  <button class="chip-sector" onclick="filtrarSectorMapa('Herrera', this)">📍 Herrera</button>
-  <button class="chip-sector" onclick="filtrarSectorMapa('Piantini', this)">📍 Piantini</button>
-  <button class="chip-sector" onclick="filtrarSectorMapa('Naco', this)">📍 Naco</button>
-</div>
-
-<script>
-  // Lógica de Filtrado y Zoom por Sectores en el Mapa Leaflet
-  function filtrarSectorMapa(sectorNombre, btnElement) {
-    // Actualizar estilos activos de los chips
-    document.querySelectorAll('.chip-sector').forEach(btn => btn.classList.remove('active'));
-    if (btnElement) btnElement.classList.add('active');
-
-    if (typeof map !== 'undefined') {
       const coordenadasSectores = {
         "TODOS": { lat: 18.4861, lng: -69.9312, zoom: 13 },
         "Girasoles": { lat: 18.5130, lng: -69.9750, zoom: 15 },
@@ -854,155 +592,8 @@
 
       const destino = coordenadasSectores[sectorNombre] || coordenadasSectores["TODOS"];
       map.setView([destino.lat, destino.lng], destino.zoom);
-
-      if (typeof mostrarToast === 'function') {
-        mostrarToast(`Filtro aplicado: ${sectorNombre}`, "📍");
-      }
+      mostrarToast(`Zona filtrada: ${sectorNombre}`, "📍");
     }
-  }
-</script>
-<!-- ================================================= -->
-<!-- BLOQUE ACUMULATIVO: MODO CHERCHA & CONVENIENCEPAY -->
-<!-- ================================================= -->
-<style>
-  /* Modal Modo Chercha (Pedido Grupal) */
-  .modal-chercha-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999999;
-    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
-    display: flex; align-items: center; justify-content: center; padding: 20px;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-  }
-  .modal-chercha-overlay.active { opacity: 1; pointer-events: auto; }
-
-  .modal-chercha-box {
-    background: #141414; border: 1px solid var(--neon-green, #00E676); border-radius: 24px;
-    padding: 22px; width: 100%; max-width: 360px; text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 230, 118, 0.4); color: #fff;
-  }
-
-  /* Estilos de la pasarela Wallet dentro del Drawer */
-  .wallet-express-box {
-    background: #151515; border: 1px solid rgba(0, 176, 255, 0.4);
-    border-radius: 14px; padding: 12px; margin-top: 10px; font-size: 11px;
-  }
-  .btn-pagar-wallet-exp {
-    background: linear-gradient(135deg, var(--neon-green, #00E676), var(--neon-blue, #00b0ff));
-    color: #000; border: none; width: 100%; padding: 12px; border-radius: 14px;
-    font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 8px;
-    box-shadow: 0 4px 15px rgba(0,230,118,0.4);
-  }
-</style>
-
-<!-- MODAL MODO CHERCHA (PEDIDO EN GRUPO) -->
-<div id="modal-chercha-grupal" class="modal-chercha-overlay">
-  <div class="modal-chercha-box">
-    <div style="font-size: 36px; margin-bottom: 8px;">🍕</div>
-    <h3 style="color: var(--neon-green, #00E676); font-size: 18px; font-weight: 900; margin-bottom: 6px;">Modo Chercha (Pedido Grupal)</h3>
-    <p style="font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 16px;">
-      Crea una sala compartida para que tus panas o compañeros de trabajo agreguen sus productos al mismo pedido en tiempo real.
-    </p>
-    
-    <div style="background: #0a0a0a; border: 1px dashed var(--neon-green, #00E676); padding: 10px; border-radius: 12px; font-size: 11px; color: var(--neon-green, #00E676); font-weight: bold; margin-bottom: 16px; word-break: break-all;" id="link-sala-chercha">
-      https://convenience-1.onrender.com/?sala=SD-8821
-    </div>
-
-    <button onclick="copiarLinkChercha()" style="background: var(--neon-green, #00E676); color: #000; border: none; width: 100%; padding: 12px; border-radius: 14px; font-weight: 900; font-size: 12px; cursor: pointer; margin-bottom: 8px;">
-      📋 Copiar Enlace para WhatsApp
-    </button>
-    <button onclick="cerrarModalChercha()" style="background: transparent; color: #aaa; border: 1px solid #333; width: 100%; padding: 10px; border-radius: 14px; font-weight: bold; font-size: 11px; cursor: pointer;">
-      Cerrar
-    </button>
-  </div>
-</div>
-
-<script>
-  // 1. Controladores del Modo Chercha
-  function abrirModalChercha() {
-    const modal = document.getElementById('modal-chercha-grupal');
-    if (modal) modal.classList.add('active');
-  }
-
-  function cerrarModalChercha() {
-    const modal = document.getElementById('modal-chercha-grupal');
-    if (modal) modal.classList.remove('active');
-  }
-
-  function copiarLinkChercha() {
-    const link = document.getElementById('link-sala-chercha').innerText;
-    navigator.clipboard.writeText(link).then(() => {
-      if (typeof mostrarToast === 'function') mostrarToast("¡Enlace copiado al portapapeles!", "✅");
-      cerrarModalChercha();
-    }).catch(() => {
-      alert("📋 Enlace de la sala: " + link);
-    });
-  }
-
-  // 2. Inyección de ConveniencePay Wallet al Drawer
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      const drawer = document.getElementById('drawer-detalles');
-      if (drawer && !document.getElementById('wallet-container-ext')) {
-        const walletDiv = document.createElement('div');
-        walletDiv.id = 'wallet-container-ext';
-        walletDiv.className = 'wallet-express-box';
-        walletDiv.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:900; color:var(--neon-green, #00E676);">💳 ConveniencePay Wallet</span>
-            <span style="color:#fff; font-weight:bold;">Saldo: RD$ 2,450</span>
-          </div>
-          <button onclick="pagarConConveniencePayExpress()" class="btn-pagar-wallet-exp">
-            ⚡ Pagar con Balance Wallet
-          </button>
-        `;
-        
-        const btnWA = drawer.querySelector('.btn-wa-checkout');
-        if (btnWA) {
-          drawer.insertBefore(walletDiv, btnWA);
-        } else {
-          drawer.appendChild(walletDiv);
-        }
-      }
-    }, 2000);
-  });
-
-  // 3. Procesador de Pago con ConveniencePay
-  function pagarConConveniencePayExpress() {
-    if (!window.carritoApp || window.carritoApp.items.length === 0) {
-      if (typeof mostrarToast === 'function') mostrarToast("Tu carrito está vacío.", "⚠️");
-      return;
-    }
-
-    const totalFinal = window.carritoApp.total + (window.propinaActual || 0);
-    
-    if (typeof mostrarToast === 'function') {
-      mostrarToast(`¡Pago de RD$ ${totalFinal.toLocaleString()} procesado exitosamente!`, "💳");
-    }
-
-    // Activar rastreo GPS si está disponible
-    if (typeof activarRastreoGPSExtendido === 'function') {
-      activarRastreoGPSExtendido();
-    }
-
-    // Guardar en historial
-    if (typeof guardarPedidoEnHistorial === 'function') {
-      guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
-    }
-
-    // Sumar Coins por compra
-    if (typeof window.coinsActuales !== 'undefined') {
-      window.coinsActuales += 50;
-      const lbl = document.getElementById('lbl-coins-usuario');
-      if (lbl) lbl.innerText = window.coinsActuales;
-    }
-
-    // Limpiar carrito y cerrar drawer
-    window.carritoApp.items = [];
-    window.carritoApp.total = 0;
-    document.getElementById('lbl-total-carrito').innerText = "RD$ 0.00";
-    document.getElementById('lbl-cant-items').innerText = "0 items";
-    
-    if (typeof cerrarDrawerComercio === 'function') {
-      cerrarDrawerComercio();
-    }
-  }
-</script>
+  </script>
+</body>
+</html>
