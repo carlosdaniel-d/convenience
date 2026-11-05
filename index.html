@@ -2175,3 +2175,167 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: INNOVACIÓN MUNDIAL     -->
+<!-- ========================================== -->
+<style>
+  /* Botón Flotante de Asistente de Voz IA */
+  .btn-voz-global {
+    position: fixed;
+    bottom: 365px;
+    left: 15px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #7c4dff, #651fff);
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+  }
+</style>
+
+<!-- Botón Flotante IA de Voz -->
+<button class="btn-voz-global" onclick="activarAsistenteVozGlobal()">🎙️ IA Voz SD</button>
+
+<script>
+  // 1. Asistente de Voz Inteligente Local
+  function activarAsistenteVozGlobal() {
+    alert("🎙️ [IA convenienceIA]: Escuchando comando en Santo Domingo...\n\n(Ejemplo detectado: 'Pedir café y hielo en Girasoles')\n✨ Procesando ruta óptima y buscando el colmado más cercano abierto...");
+  }
+
+  // 2. Módulo de Impacto Ecológico por Pedido
+  window.calcularHuellaEcologica = function(monto) {
+    const gramosCO2Ahorrados = Math.round(monto * 0.15);
+    return gramosCO2Ahorrados;
+  };
+
+  // 3. Inyección de Módulo Ecológico y Global en el Ticket Digital
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-factura .modal-box div');
+      if (modalBox && !document.getElementById('seccion-eco-injected')) {
+        const divEco = document.createElement('div');
+        divEco.id = 'seccion-eco-injected';
+        divEco.style.marginTop = "8px";
+        divEco.style.borderTop = "1px dashed #444";
+        divEco.style.paddingTop = "6px";
+        divEco.innerHTML = `
+          <span style="font-size:10px; color:#00E676;">🌱 Eco-Delivery Activo (Moto Verde)</span><br>
+          <span style="font-size:9px; color:#aaa;">Este pedido reduce aprox. <strong style="color:#fff;">120g de CO2</strong> en Santo Domingo. ¡Ganaste +10 Coins verdes! ♻️</span>
+        `;
+        modalBox.appendChild(divEco);
+      }
+    }, 2200);
+  });
+</script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: ASISTENTE IA WHATSAPP/IG-->
+<!-- ========================================== -->
+<style>
+  /* Botón Flotante del Asistente IA de Ventas */
+  .btn-ia-dueno {
+    position: fixed;
+    bottom: 420px;
+    left: 15px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #00E676, #00b0ff);
+    color: #000;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+  }
+
+  /* Estilos del Simulador del Bot IA para el Dueño */
+  .bot-chat-box {
+    background: #111;
+    border: 1px solid #00E676;
+    border-radius: 12px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 10px;
+    text-align: left;
+    margin: 10px 0;
+  }
+  .bot-msg-cliente {
+    color: #ccc;
+    background: #1f1f1f;
+    padding: 6px 8px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  .bot-msg-ia {
+    color: #00E676;
+    background: rgba(0, 230, 118, 0.1);
+    padding: 6px 8px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border-left: 2px solid #00E676;
+  }
+</style>
+
+<!-- Botón Flotante de Gestión IA para el Dueño -->
+<button class="btn-ia-dueno" onclick="abrirPanelDuenoIA()">🤖 IA Bot WhatsApp / IG</button>
+
+<!-- MODAL DEL ASISTENTE AUTÓNOMO -->
+<div id="modal-ia-dueno" class="custom-modal-overlay hidden">
+  <div class="custom-modal-card" style="max-width: 380px;">
+    <button onclick="cerrarPanelDuenoIA()" style="background:none;border:none;color:#aaa;float:right;font-size:18px;cursor:pointer;">&times;</button>
+    <div class="custom-modal-icon">🤖</div>
+    <div class="custom-modal-title">Asistente IA Autónomo (WhatsApp & IG)</div>
+    <div class="custom-modal-text">
+      Tu agente virtual responde automáticamente a los clientes, negocia descuentos y registra los pedidos en el mapa sin que pierdas un solo segundo.
+
+      <div class="bot-chat-box">
+        <div class="bot-msg-cliente">💬 <strong>Cliente (WhatsApp):</strong> "¿A cuánto el combo de pica pollo para Pantoja?"</div>
+        <div class="bot-msg-ia">🤖 <strong>IA convenienceIA:</strong> "¡Saludos! Cuesta RD$ 350 con refresco incluido 🥤. Si usas el cupón SD2026 te queda en RD$ 300. ¿Te lo mando de una vez a Pantoja?"</div>
+        <div class="bot-msg-cliente">💬 <strong>Cliente (WhatsApp):</strong> "¡Dale, mándamelo!"</div>
+        <div class="bot-msg-ia">🤖 <strong>IA convenienceIA:</strong> "¡Pedido anotado y asignado al motorizado más cercano! Llegará en 20 min 🛵✅"</div>
+      </div>
+    </div>
+
+    <button onclick="configurarAgenteIA()" class="custom-modal-btn" style="margin-bottom: 6px;">⚙️ Configurar Parámetros del Bot</button>
+    <button onclick="cerrarPanelDuenoIA()" class="custom-modal-btn" style="background:#222; color:#00E676; border:1px solid #00E676;">Cerrar Panel</button>
+  </div>
+</div>
+
+<script>
+  // 1. Controladores del Panel de la IA del Dueño
+  function abrirPanelDuenoIA() {
+    document.getElementById('modal-ia-dueno').classList.remove('hidden');
+  }
+
+  function cerrarPanelDuenoIA() {
+    document.getElementById('modal-ia-dueno').classList.add('hidden');
+  }
+
+  function configurarAgenteIA() {
+    const modoNegociacion = prompt("🤖 Selecciona el modo de negociación automática de tu IA:\n1. Moderado (Ofrece hasta 10% de descuento)\n2. Agresivo (Cierra ventas rápido con cupones)\n3. Estándar (Sin descuentos automáticos)\n\nElige 1, 2 o 3:", "1");
+    if (modoNegociacion) {
+      if (typeof lanzarNotificacionPush === 'function') {
+        lanzarNotificacionPush("🤖 ¡Agente IA de WhatsApp e Instagram actualizado y operando en piloto automático!");
+      } else {
+        alert("🤖 ¡Configuración de IA guardada con éxito!");
+      }
+    }
+  }
+
+  // 2. Integración automática en el botón "Soy Dueño" de la barra superior
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const btnDueno = document.querySelector('.top-bar button:last-child');
+      if (btnDueno) {
+        btnDueno.addEventListener('click', (e) => {
+          // Opcional: despliega opciones de gestión para el dueño
+        });
+      }
+    }, 2400);
+  });
+</script>
