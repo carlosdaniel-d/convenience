@@ -2057,3 +2057,121 @@ setTimeout(() => {
     alert("📲 Conectando con Soporte en Vivo convenienceIA Santo Domingo vía WhatsApp...");
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: PEDIDO EN GRUPO & FILTRO -->
+<!-- ========================================== -->
+<style>
+  /* Botón Flotante para Pedidos en Grupo */
+  .btn-grupo-chercha {
+    position: fixed;
+    bottom: 315px;
+    left: 15px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #00E676, #00b0ff);
+    color: #000;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4);
+  }
+
+  /* Modal de Pedido en Grupo */
+  .grupo-member-chip {
+    background: #222;
+    border: 1px solid #333;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+</style>
+
+<!-- Botón Flotante de Pedidos en Grupo -->
+<button class="btn-grupo-chercha" onclick="abrirModoGrupo()">🍕 Pedido en Grupo</button>
+
+<!-- MODAL DE PEDIDO COMPARTIDO -->
+<div id="modal-grupo" class="custom-modal-overlay hidden">
+  <div class="custom-modal-card" style="max-width: 360px;">
+    <button onclick="cerrarModoGrupo()" style="background:none;border:none;color:#aaa;float:right;font-size:18px;cursor:pointer;">&times;</button>
+    <div class="custom-modal-icon">🍕</div>
+    <div class="custom-modal-title">Modo Chercha (Pedido en Grupo)</div>
+    <div class="custom-modal-text">
+      ¡Crea una sala y comparte el enlace para que tus amigos añadan sus platos al mismo carrito!
+      
+      <div style="margin: 10px 0; text-align: left;">
+        <span style="font-size: 10px; color: #00E676;">👥 Integrantes en la sala (Código #SD-8821):</span>
+        <div class="grupo-member-chip"><span>👤 Tú (Anfitrión)</span><strong style="color:#00E676;">1 plato</strong></div>
+        <div class="grupo-member-chip"><span>👤 Maria (Herrera)</span><strong style="color:#00E676;">2 platos</strong></div>
+      </div>
+    </div>
+    
+    <button onclick="copiarLinkGrupo()" class="custom-modal-btn" style="margin-bottom:6px;">🔗 Copiar Enlace para WhatsApp</button>
+    <button onclick="cerrarModoGrupo(); abrirTicket();" class="custom-modal-btn" style="background:#222; color:#00E676; border:1px solid #00E676;">Ver Carrito Grupal 🛒</button>
+  </div>
+</div>
+
+<script>
+  // 1. Abrir/Cerrar Modal de Pedidos en Grupo
+  function abrirModoGrupo() {
+    document.getElementById('modal-grupo').classList.remove('hidden');
+  }
+
+  function cerrarModoGrupo() {
+    document.getElementById('modal-grupo').classList.add('hidden');
+  }
+
+  function copiarLinkGrupo() {
+    const linkSimulado = "https://convenience-1.onrender.com/join?room=SD-8821";
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(linkSimulado);
+      alert("📋 ¡Enlace de sala copiado! Compártelo con tu grupo.");
+    } else {
+      alert("Enlace generado: " + linkSimulado);
+    }
+  }
+
+  // 2. Inyección de Programador de Hora de Entrega dentro del Modal de Factura
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-factura .modal-box div');
+      if (modalBox && !document.getElementById('seccion-horario-injected')) {
+        const divHorario = document.createElement('div');
+        divHorario.id = 'seccion-horario-injected';
+        divHorario.style.marginTop = "8px";
+        divHorario.style.borderTop = "1px dashed #444";
+        divHorario.style.paddingTop = "6px";
+        divHorario.innerHTML = `
+          <span style="font-size:10px; color:#aaa;">📅 Horario de Entrega:</span>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <button class="dir-chip active" onclick="setHorarioEntrega('inmediato', this)">⚡ Ahora mismo</button>
+            <button class="dir-chip" onclick="setHorarioEntrega('programado', this)">⏰ Programar hora</button>
+          </div>
+        `;
+        modalBox.appendChild(divHorario);
+      }
+    }, 2000);
+  });
+
+  function setHorarioEntrega(tipo, btn) {
+    document.querySelectorAll('#seccion-horario-injected .dir-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    
+    if (tipo === 'programado') {
+      const hora = prompt("⏰ Ingresa la hora deseada de entrega (ej. 7:30 PM):", "8:00 PM");
+      if (hora) {
+        if (typeof lanzarNotificacionPush === 'function') {
+          lanzarNotificacionPush(`📅 Entrega agendada para las ${hora} en Santo Domingo.`);
+        }
+      }
+    } else {
+      if (typeof lanzarNotificacionPush === 'function') {
+        lanzarNotificacionPush("⚡ Entrega prioritaria inmediata activada.");
+      }
+    }
+  }
+</script>
