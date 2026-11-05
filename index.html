@@ -2431,3 +2431,75 @@
     }
   };
 </script>
+<script>
+  // Función 100% real conectada a tu servidor backend
+  async function enviarPedidoAlServidorReal() {
+    // 1. Validar que el carrito tenga items
+    if (!window.carritoApp || window.carritoApp.items.length === 0) {
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("El carrito está vacío.", "⚠️");
+      } else {
+        alert("El carrito está vacío.");
+      }
+      return;
+    }
+
+    // 2. Preparar el paquete de datos (Payload) del pedido
+    const payloadPedido = {
+      negocio: window.carritoApp.negocioActual || "Colmado Principal SD",
+      items: window.carritoApp.items,
+      total: window.carritoApp.total + (window.propinaActual || 0),
+      metodoPago: window.metodoPagoSeleccionado || "Efectivo",
+      direccionDestino: document.getElementById('lbl-dir-actual') ? document.getElementById('lbl-dir-actual').innerText : "Santo Domingo"
+    };
+
+    try {
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Enviando pedido al servidor cloud...", "⏳");
+      }
+
+      // ==========================================
+      // 3. AQUÍ VA LA URL REAL DE TU BACKEND EN RENDER
+      // ==========================================
+      const URL_DE_TU_SERVIDOR = 'https://tu-backend-en-render.onrender.com/api/pedidos';
+
+      const respuesta = await fetch(URL_DE_TU_SERVIDOR, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payloadPedido)
+      });
+
+      const resultado = await respuesta.json();
+
+      if (resultado.success) {
+        if (typeof mostrarToast === 'function') {
+          mostrarToast("¡Pedido registrado en el servidor con éxito! 🚀", "✅");
+        } else {
+          alert("¡Pedido registrado con éxito en el servidor!");
+        }
+
+        // Limpiar el carrito localmente tras el éxito
+        window.carritoApp.items = [];
+        window.carritoApp.total = 0;
+        
+        // Actualizar la interfaz del carrito
+        const lblTotal = document.getElementById('lbl-total-carrito');
+        if (lblTotal) lblTotal.innerText = "RD$ 0.00";
+        const lblCant = document.getElementById('lbl-cant-items');
+        if (lblCant) lblCant.innerText = "0 items";
+
+        if (typeof cerrarDrawerComercio === 'function') {
+          cerrarDrawerComercio();
+        }
+      } else {
+        alert("El servidor rechazó el pedido.");
+      }
+
+    } {
+      console.error("Error de conexión:", error);
+      alert("No se pudo conectar con el servidor backend. Verifica tu conexión a internet o la URL de Render.");
+    }
+  }
+</script>
