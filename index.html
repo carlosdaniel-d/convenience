@@ -1583,3 +1583,194 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: PINES REALES Y PANEL DE DETALLES -->
+<!-- ========================================== -->
+<style>
+  /* Estilo para los pines con iconos reales según categoría */
+  .pin-comercio-real {
+    background: #141414 !important;
+    border: 2px solid #00E676 !important;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.8) !important;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  /* Tarjeta Flotante Inferior de Detalles del Comercio */
+  .sheet-detalle-comercio {
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94%;
+    max-width: 440px;
+    background: #141414;
+    border: 1px solid #00E676;
+    border-radius: 24px 24px 0 0;
+    padding: 16px;
+    z-index: 99999;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+    transition: bottom 0.35s cubic-bezier(0.1, 1, 0.1, 1);
+    color: #fff;
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+  .sheet-detalle-comercio.active {
+    bottom: 0;
+  }
+
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .producto-chip-card {
+    background: #1f1f1f;
+    border: 1px solid #333;
+    padding: 8px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .comentarios-box {
+    background: #1a1a1a;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    color: #bbb;
+    margin-top: 8px;
+    border-left: 2px solid #00E676;
+  }
+</style>
+
+<!-- TARJETA INFERIOR DESPLEGABLE DE DETALLES -->
+<div id="sheet-comercio" class="sheet-detalle-comercio">
+  <div class="sheet-header">
+    <div>
+      <h3 id="det-nombre" style="color:#00E676; font-size:15px; font-weight:800;">Nombre del Local</h3>
+      <span id="det-cat" style="font-size:10px; color:#888;">Categoría • Abierto 24h</span>
+    </div>
+    <button onclick="cerrarDetalleComercio()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">&times;</button>
+  </div>
+
+  <div style="font-size:11px; color:#ddd; margin-bottom:10px;">
+    <p>🔥 <strong>Mejores Productos & Ofertas:</strong></p>
+    <div id="det-productos">
+      <!-- Se llena dinámicamente -->
+    </div>
+  </div>
+
+  <div style="font-size:11px; margin-bottom:10px;">
+    <p>💳 <strong>Métodos de Pago Aceptados:</strong> <span id="det-pagos" style="color:#00E676;">Efectivo, Tarjeta, Transferencia</span></p>
+  </div>
+
+  <div style="font-size:11px; margin-bottom:12px;">
+    <p>💬 <strong>Reseñas y Comentarios de Clientes:</strong></p>
+    <div class="comentarios-box">
+      "Excelente servicio en Santo Domingo, llegó súper rápido y caliente." <br>
+      <span style="color:#ffd700;">★★★★★</span> — Carlos M.
+    </div>
+  </div>
+
+  <button onclick="agregarAlCarritoDesdeDetalle()" class="btn-action-main" style="width:100%; background:#00E676; color:#000; text-align:center;">Pedir de este Comercio 🛵</button>
+</div>
+
+<script>
+  // Sobrescribir la función de renderizado de marcadores para usar iconos reales con emojis según categoría
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof renderizarMarcadores === 'function' && typeof listaNegocios !== 'undefined') {
+        
+        // Nueva versión de renderizado con iconos reales
+        window.renderizarMarcadores = function(datos) {
+          if (!marcadoresGroup) return;
+          marcadoresGroup.clearLayers();
+          
+          datos.forEach(n => {
+            let iconoEmoji = "📍";
+            if (n.cat === "Restaurante") iconoEmoji = "🍔";
+            else if (n.cat === "Farmacia") iconoEmoji = "💊";
+            else if (n.cat === "Supermercado") iconoEmoji = "🛒";
+            else if (n.cat === "Colmado") iconoEmoji = "🍺";
+
+            const customIcon = L.divIcon({
+              className: 'pin-comercio-real',
+              html: `<div>${iconoEmoji}</div>`,
+              iconSize: [38, 38],
+              iconAnchor: [19, 19]
+            });
+
+            const marker = L.marker([n.lat, n.lng], { icon: customIcon });
+            
+            // Al hacer clic, abre nuestra tarjeta inferior interactiva en lugar de un popup aburrido
+            marker.on('click', () => {
+              abrirDetalleComercio(n);
+            });
+
+            marcadoresGroup.addLayer(marker);
+          });
+        };
+
+        // Renderizar inmediatamente con los nuevos iconos
+        renderizarMarcadores(listaNegocios);
+      }
+    }, 800);
+  });
+
+  function abrirDetalleComercio(comercio) {
+    const sheet = document.getElementById('sheet-comercio');
+    document.getElementById('det-nombre').innerText = comercio.nombre;
+    document.getElementById('det-cat').innerText = `${comercio.cat} • Cobertura Santo Domingo`;
+    document.getElementById('det-pagos').innerText = comercio.pago || "Efectivo, Tarjeta, Banreservas, Popular";
+
+    // Generar productos destacados simulados basados en la categoría
+    const containerProd = document.getElementById('det-productos');
+    let htmlProd = '';
+    if (comercio.cat === 'Restaurante') {
+      htmlProd = `
+        <div class="producto-chip-card"><span>🍗 Combo Pica Pollo + Papas</span><strong style="color:#00E676;">RD$ 350</strong></div>
+        <div class="producto-chip-card"><span>🥤 Refresco 20oz Frío</span><strong style="color:#00E676;">RD$ 65</strong></div>
+      `;
+    } else if (comercio.cat === 'Farmacia') {
+      htmlProd = `
+        <div class="producto-chip-card"><span>💊 Acetaminofén 500mg (Caja)</span><strong style="color:#00E676;">RD$ 120</strong></div>
+        <div class="producto-chip-card"><span>🩺 Kit de Primeros Auxilios</span><strong style="color:#00E676;">RD$ 450</strong></div>
+      `;
+    } else {
+      htmlProd = `
+        <div class="producto-chip-card"><span>🍺 Colmado Pack (Cervezas + Hielo)</span><strong style="color:#00E676;">RD$ 550</strong></div>
+        <div class="producto-chip-card"><span>🧊 Bolsa de Hielo Grande</span><strong style="color:#00E676;">RD$ 90</strong></div>
+      `;
+    }
+    containerProd.innerHTML = htmlProd;
+
+    sheet.classList.add('active');
+  }
+
+  function cerrarDetalleComercio() {
+    document.getElementById('sheet-comercio').classList.remove('active');
+  }
+
+  function agregarAlCarritoDesdeDetalle() {
+    cerrarDetalleComercio();
+    if (typeof abrirTicket === 'function') {
+      abrirTicket();
+    }
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush("🛒 ¡Productos añadidos al carrito con éxito!");
+    }
+  }
+</script>
