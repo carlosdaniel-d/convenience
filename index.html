@@ -1456,3 +1456,130 @@ setTimeout(() => {
     }, 1500);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: MOTOR DE ALERTAS VIP   -->
+<!-- ========================================== -->
+<style>
+  /* Contenedor del Modal Custom Estilo Dark Neon */
+  .custom-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeInModal 0.25s ease-out;
+  }
+  .custom-modal-overlay.hidden {
+    display: none;
+  }
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .custom-modal-card {
+    background: #141414;
+    border: 1px solid #00E676;
+    box-shadow: 0 0 25px rgba(0, 230, 118, 0.25);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 340px;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+  }
+
+  .custom-modal-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .custom-modal-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #00E676;
+    margin-bottom: 8px;
+  }
+
+  .custom-modal-text {
+    font-size: 11px;
+    color: #ccc;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    white-space: pre-line;
+  }
+
+  .custom-modal-btn {
+    background: #00E676;
+    color: #000;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 11px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4);
+  }
+</style>
+
+<!-- Estructura HTML del Modal Único Global -->
+<div id="modal-custom-global" class="custom-modal-overlay hidden">
+  <div class="custom-modal-card">
+    <div id="custom-modal-icon" class="custom-modal-icon">✨</div>
+    <div id="custom-modal-title" class="custom-modal-title">convenienceIA Notificación</div>
+    <div id="custom-modal-text" class="custom-modal-text">Mensaje del sistema...</div>
+    <button class="custom-modal-btn" onclick="cerrarAlertaCustom()">Entendido 🚀</button>
+  </div>
+</div>
+
+<script>
+  // Reemplazar globalmente el alert tradicional por nuestro modal estético Dark Neon
+  window.alert = function(mensaje) {
+    const modal = document.getElementById('modal-custom-global');
+    const txtEl = document.getElementById('custom-modal-text');
+    const titleEl = document.getElementById('custom-modal-title');
+    const iconEl = document.getElementById('custom-modal-icon');
+
+    if (modal && txtEl) {
+      txtEl.innerText = mensaje;
+      
+      // Asignar iconos dinámicos según el contenido del mensaje
+      if (mensaje.includes('🏆') || mensaje.includes('Logros')) {
+        titleEl.innerText = "Logros & Recompensas VIP";
+        iconEl.innerText = "🏆";
+      } else if (mensaje.includes('🪙') || mensaje.includes('Coins')) {
+        titleEl.innerText = "ConvenienceCoins 🪙";
+        iconEl.innerText = "🪙";
+      } else if (mensaje.includes('🚦') || mensaje.includes('Tráfico')) {
+        titleEl.innerText = "Alerta de Tráfico SD";
+        iconEl.innerText = "🚦";
+      } else if (mensaje.includes('🛵') || mensaje.includes('repartidor')) {
+        titleEl.innerText = "Seguimiento de Envío";
+        iconEl.innerText = "🛵";
+      } else {
+        titleEl.innerText = "convenienceIA Santo Domingo";
+        iconEl.innerText = "⚡";
+      }
+
+      modal.classList.remove('hidden');
+      if (typeof reproducirAlertaAudio === 'function') {
+        reproducirAlertaAudio();
+      }
+    } else {
+      console.log(mensaje);
+    }
+  };
+
+  function cerrarAlertaCustom() {
+    const modal = document.getElementById('modal-custom-global');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+</script>
