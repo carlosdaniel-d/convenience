@@ -647,3 +647,38 @@
   <span>🔔</span>
   <span id="push-message">¡Bienvenido a convenienceIA Santo Domingo!</span>
 </div>
+// ==========================================
+// BLOQUE ACUMULATIVO: COINS & PUSH SYSTEM
+// ==========================================
+
+// 1. Mostrar Notificación Push Flotante
+window.lanzarNotificacionPush = function(mensaje) {
+  const toast = document.getElementById('push-notification');
+  const msgSpan = document.getElementById('push-message');
+  if (toast && msgSpan) {
+    msgSpan.innerText = mensaje;
+    toast.classList.add('visible');
+    if (typeof reproducirAlertaAudio === 'function') reproducirAlertaAudio();
+    setTimeout(() => {
+      toast.classList.remove('visible');
+    }, 4000);
+  }
+};
+
+// 2. Sistema de Cashback ConvenienceCoins
+window.calcularCashbackCoins = function(montoRD) {
+  const coinsGanadas = Math.floor(montoRD * 0.05);
+  let saldoActual = parseInt(localStorage.getItem('convenience_coins')) || 0;
+  saldoActual += coinsGanadas;
+  localStorage.setItem('convenience_coins', saldoActual);
+  
+  window.lanzarNotificacionPush(`🪙 ¡Ganaste ${coinsGanadas} ConvenienceCoins! Saldo: ${saldoActual} pts`);
+  return coinsGanadas;
+};
+
+// Disparar mensaje de bienvenida tras recargar
+setTimeout(() => {
+  if (typeof lanzarNotificacionPush === 'function') {
+    lanzarNotificacionPush("📍 Cobertura activa: Los Girasoles, Pantoja, Alcarrizos y Herrera.");
+  }
+}, 1500);
