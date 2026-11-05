@@ -2197,3 +2197,122 @@
     }, 1000);
   });
 </script>
+<!-- ================================================= -->
+<!-- BLOQUE 20: MÓDULOS DE UTILIDAD PERSONAL GLOBAL  -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Utilidades Personales */
+  .panel-personal-box {
+    background: #141414; border: 1px solid var(--neon-blue); border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .btn-personal-action {
+    background: rgba(0, 230, 255, 0.15); border: 1px solid var(--neon-blue); color: var(--neon-blue);
+    width: 100%; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 10px;
+    cursor: pointer; margin-top: 6px; text-align: left; display: flex; align-items: center; gap: 6px;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Inyectar Opciones Personales al Acordeón Maestro Lateral
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-personal-notas')) {
+        
+        // Separador visual de categoría personal
+        const lblSeccion = document.createElement('div');
+        lblSeccion.style.cssText = "font-size:10px; font-weight:900; color:var(--neon-blue); margin: 10px 0 4px 5px; text-transform: uppercase;";
+        lblSeccion.innerHTML = "👤 Utilidades Personales Globales";
+        acordeon.appendChild(lblSeccion);
+
+        // Bloc de Notas Personal
+        const btnNotas = document.createElement('button');
+        btnNotas.id = 'btn-personal-notas';
+        btnNotas.className = 'btn-opcion-acordeon';
+        btnNotas.innerHTML = '📝 Bloc de Notas Rápido (Cloud Local)';
+        btnNotas.onclick = () => {
+          abrirBlocNotasPersonal();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnNotas);
+
+        // Gestor de Tareas / To-Do Personal
+        const btnTareas = document.createElement('button');
+        btnTareas.id = 'btn-personal-tareas';
+        btnTareas.className = 'btn-opcion-acordeon';
+        btnTareas.innerHTML = '✅ Mis Tareas y Recordatorios';
+        btnTareas.onclick = () => {
+          gestionarTareasPersonales();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnTareas);
+
+        // Control de Presupuesto Personal / Gastos Diarios
+        const btnPresupuesto = document.createElement('button');
+        btnPresupuesto.id = 'btn-personal-presupuesto';
+        btnPresupuesto.className = 'btn-opcion-acordeon';
+        btnPresupuesto.innerHTML = '💰 Control de Gastos Personales';
+        btnPresupuesto.onclick = () => {
+          auditarGastosPersonalesApp();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnPresupuesto);
+      }
+    }, 9000);
+  });
+
+  // 1. Bloc de Notas Personal guardado en LocalStorage
+  function abrirBlocNotasPersonal() {
+    let notaActual = localStorage.getItem('convenience_nota_personal') || '';
+    const nuevaNota = prompt("📝 BLOC DE NOTAS PERSONAL\n\nEscribe o actualiza tus notas, recordatorios o pendientes importantes:", notaActual);
+    
+    if (nuevaNota !== null) {
+      localStorage.setItem('convenience_nota_personal', nuevaNota);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Nota personal guardada con éxito", "📝");
+      }
+    }
+  }
+
+  // 2. Gestor Rápido de Tareas Personales
+  function gestionarTareasPersonales() {
+    let tareas = JSON.parse(localStorage.getItem('convenience_tareas_personal') || '[]');
+    let menuTexto = `✅ TAREAS PENDIENTES (${tareas.length})\n\n`;
+    
+    tareas.forEach((t, i) => {
+      menuTexto += `${i + 1}. [${t.completada ? 'X' : ' '}] ${t.texto}\n`;
+    });
+    
+    menuTexto += `\n¿Qué deseas hacer?\n1. Agregar nueva tarea\n2. Borrar todas las tareas`;
+    
+    const opcion = prompt(menuTexto, "1");
+    if (opcion === "1") {
+      const nuevaT = prompt("Escribe la nueva tarea:");
+      if (nuevaT) {
+        tareas.push({ texto: nuevaT, completada: false });
+        localStorage.setItem('convenience_tareas_personal', JSON.stringify(tareas));
+        if (typeof mostrarToast === 'function') mostrarToast("Tarea añadida", "✅");
+      }
+    } else if (opcion === "2") {
+      localStorage.removeItem('convenience_tareas_personal');
+      if (typeof mostrarToast === 'function') mostrarToast("Lista de tareas limpiada", "🗑️");
+    }
+  }
+
+  // 3. Control de Presupuesto Personal
+  function auditarGastosPersonalesApp() {
+    let presupuestoTotal = parseFloat(localStorage.getItem('convenience_presupuesto_total') || '5000');
+    let gastosRegistrados = parseFloat(localStorage.getItem('convenience_gastos_personales') || '1250');
+    
+    const accion = prompt(`💰 CONTROL DE PRESUPUESTO PERSONAL\n\n- Presupuesto Asignado: $${presupuestoTotal.toLocaleString()}\n- Gastos Registrados: $${gastosRegistrados.toLocaleString()}\n- Disponible: $${(presupuestoTotal - gastosRegistrados).toLocaleString()}\n\n¿Deseas registrar un nuevo gasto? Ingresa el monto (o deja en blanco para salir):`, "");
+    
+    if (accion && !isNaN(parseFloat(accion))) {
+      gastosRegistrados += parseFloat(accion);
+      localStorage.setItem('convenience_gastos_personales', gastosRegistrados);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast(`Gasto de $${parseFloat(accion).toLocaleString()} registrado con éxito`, "💰");
+      }
+    }
+  }
+</script>
