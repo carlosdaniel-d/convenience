@@ -2775,3 +2775,259 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: 4 FUNCIONES + TODOS LOS SECTORES SD + ANIMACIONES NEÓN -->
+<!-- ========================================== -->
+<style>
+  /* ------------------------------------------ */
+  /* ANIMACIONES DE ALTA IMPACTO (VIDA NEÓN)    */
+  /* ------------------------------------------ */
+  @keyframes neonGlowPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 230, 118, 0.3), inset 0 0 5px rgba(0, 230, 118, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(0, 230, 118, 0.8), inset 0 0 12px rgba(0, 230, 118, 0.5); }
+    100% { box-shadow: 0 0 10px rgba(0, 230, 118, 0.3), inset 0 0 5px rgba(0, 230, 118, 0.2); }
+  }
+
+  @keyframes pinFloatBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-7px) scale(1.08); }
+  }
+
+  /* Animación viva a los pines del mapa */
+  .pin-comercio-real {
+    animation: pinFloatBounce 3s ease-in-out infinite, neonGlowPulse 2.5s infinite !important;
+  }
+
+  /* Animación sutil al presionar cualquier botón de la app */
+  button, .btn-opcion-acordeon, .pago-chip {
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+  }
+  button:active, .btn-opcion-acordeon:active {
+    transform: scale(0.94) !important;
+    filter: brightness(1.3);
+  }
+
+  /* ------------------------------------------ */
+  /* ESTILOS DE LAS 4 NUEVAS FUNCIONES        */
+  /* ------------------------------------------ */
+  
+  /* 1. Tarjeta de GPS en Vivo del Repartidor */
+  .gps-tracker-card {
+    background: rgba(18, 18, 18, 0.95);
+    border: 1px solid #00E676;
+    border-radius: 18px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    box-shadow: 0 0 20px rgba(0, 230, 118, 0.25);
+    font-size: 11px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: neonGlowPulse 3s infinite;
+  }
+
+  /* 2. ConveniencePay Card */
+  .pay-card-box {
+    background: linear-gradient(135deg, #111 0%, #1c2b22 100%);
+    border: 1px solid #00E676;
+    border-radius: 16px;
+    padding: 12px;
+    margin-top: 8px;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+
+  /* 3. Panel de Referidos */
+  .referral-badge {
+    background: rgba(0, 176, 255, 0.15);
+    border: 1px dashed #00b0ff;
+    color: #00b0ff;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+
+<!-- MODAL 4 EN 1: CONVENIENCE PAY, AFILIADOS E INVENTARIO -->
+<div id="modal-super-funciones" class="custom-modal-overlay hidden">
+  <div class="custom-modal-card" style="max-width: 400px; text-align: left;">
+    <button onclick="cerrarSuperFunciones()" style="background:none;border:none;color:#aaa;float:right;font-size:20px;cursor:pointer;">&times;</button>
+    <div style="font-size:16px; font-weight:800; color:#00E676; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+      ⚡ Ecosistema convenienceIA SD
+    </div>
+
+    <!-- 1. ConveniencePay -->
+    <div class="pay-card-box">
+      <div style="font-size:10px; color:#aaa; text-transform:uppercase;">💳 Monedero ConveniencePay</div>
+      <div style="font-size:20px; font-weight:900; color:#00E676; margin:4px 0;" id="lbl-balance-pay">RD$ 2,450.00</div>
+      <button onclick="recargarConveniencePay()" style="background:#00E676; color:#000; border:none; padding:5px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">+ Recargar Saldo</button>
+    </div>
+
+    <!-- 2. Programa de Embajadores de Sector -->
+    <div class="referral-badge">
+      🎁 <strong>Tu Código Embajador:</strong> <span style="color:#fff; font-weight:bold;">SD-GIRASOLES20</span><br>
+      <span style="font-size:9px; color:#bbb;">¡Gana 50 Coins por cada colmado o amigo que invites!</span>
+      <button onclick="copiarCodigoEmbajador()" style="display:block; margin:6px auto 0 auto; background:#00b0ff; color:#000; border:none; padding:4px 10px; border-radius:6px; font-weight:bold; font-size:9px; cursor:pointer;">Copiar Código 📋</button>
+    </div>
+
+    <!-- 3. Modo Inventario en Vivo Colmadero -->
+    <div style="margin-top:12px; border-top:1px dashed #333; padding-top:10px;">
+      <span style="font-size:11px; font-weight:bold; color:#fff;">🏪 Control de Inventario en Vivo (Modo Dueño):</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#181818; padding:6px 10px; border-radius:8px; margin-top:6px; font-size:10px;">
+        <span>🧊 Hielo Grande (Bolsa)</span>
+        <button onclick="toggleStock(this)" style="background:#00E676; color:#000; border:none; padding:3px 8px; border-radius:6px; font-weight:bold; font-size:9px;">EN STOCK ✅</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#181818; padding:6px 10px; border-radius:8px; margin-top:4px; font-size:10px;">
+        <span>🍺 Cerveza Fría (Pack)</span>
+        <button onclick="toggleStock(this)" style="background:#00E676; color:#000; border:none; padding:3px 8px; border-radius:6px; font-weight:bold; font-size:9px;">EN STOCK ✅</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 1. EXPANSION COMPLETA DE TODOS LOS SECTORES DE SANTO DOMINGO
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof listaNegocios !== 'undefined') {
+        const todosSectoresSD = [
+          // Santo Domingo Oeste y Alrededores
+          { nombre: "Los Girasoles", lat: 18.5130, lng: -69.9750 },
+          { nombre: "Pantoja", lat: 18.5265, lng: -69.9910 },
+          { nombre: "Los Alcarrizos", lat: 18.5380, lng: -70.0150 },
+          { nombre: "Herrera", lat: 18.4750, lng: -69.9650 },
+          { nombre: "Las Caobas", lat: 18.4710, lng: -69.9780 },
+          { nombre: "El Enriquillo", lat: 18.4630, lng: -69.9710 },
+          { nombre: "Buenos Aires de Herrera", lat: 18.4810, lng: -69.9730 },
+          
+          // Distrito Nacional (Centro y Sur)
+          { nombre: "Piantini", lat: 18.4710, lng: -69.9310 },
+          { nombre: "Naco", lat: 18.4750, lng: -69.9230 },
+          { nombre: "Bella Vista", lat: 18.4550, lng: -69.9450 },
+          { nombre: "Evaristo Morales", lat: 18.4680, lng: -69.9370 },
+          { nombre: "Mirador Norte / Sur", lat: 18.4490, lng: -69.9410 },
+          { nombre: "Los Cacicazgos", lat: 18.4480, lng: -69.9590 },
+          { nombre: "Gazcue", lat: 18.4670, lng: -69.8970 },
+          { nombre: "Zona Colonial", lat: 18.4730, lng: -69.8860 },
+          { nombre: "El Millón", lat: 18.4660, lng: -69.9490 },
+          { nombre: "Los Prados", lat: 18.4770, lng: -69.9430 },
+          
+          // Santo Domingo Norte
+          { nombre: "Villa Mella", lat: 18.5450, lng: -69.9020 },
+          { nombre: "Sabana Perdida", lat: 18.5310, lng: -69.8680 },
+          { nombre: "Guaricanos", lat: 18.5410, lng: -69.9210 },
+          
+          // Santo Domingo Este
+          { nombre: "Ensanche Ozama", lat: 18.4850, lng: -69.8690 },
+          { nombre: "Alma Rosa I y II", lat: 18.4880, lng: -69.8550 },
+          { nombre: "San Isidro", lat: 18.5020, lng: -69.8050 },
+          { nombre: "Los Mameyes", lat: 18.4690, lng: -69.8610 }
+        ];
+
+        // Rellenar dinámicamente comercios repartidos en TODOS los sectores
+        todosSectoresSD.forEach((sec, idx) => {
+          listaNegocios.push({
+            id: 201 + idx,
+            nombre: `Centro de Distribución SD (${sec.nombre})`,
+            cat: "Supermercado",
+            lat: sec.lat,
+            lng: sec.lng,
+            pago: "Efectivo, Tarjeta, ConveniencePay",
+            abierto: true,
+            telefono: "809-555-0100"
+          });
+        });
+
+        if (typeof renderizarMarcadores === 'function') {
+          renderizarMarcadores(listaNegocios);
+        }
+      }
+    }, 1400);
+  });
+
+  // 2. SISTEMA DE RASTREO GPS EN TIEMPO REAL DEL REPARTIDOR (SIMULACIÓN SATELITAL)
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalFactura = document.querySelector('#modal-factura .modal-box div');
+      if (modalFactura && !document.getElementById('gps-tracker-injected')) {
+        const divGps = document.createElement('div');
+        divGps.id = 'gps-tracker-injected';
+        divGps.className = 'gps-tracker-card';
+        divGps.innerHTML = `
+          <div>
+            <div style="color:#00E676; font-weight:bold;">🛵 Repartidor en Camino (GPS)</div>
+            <div style="font-size:9px; color:#aaa;" id="txt-gps-status">Ruta: Piantini ➔ Tu Ubicación</div>
+          </div>
+          <div style="text-align:right;">
+            <strong style="color:#ffd700; font-size:13px;" id="txt-gps-timer">14 min</strong>
+          </div>
+        `;
+        modalFactura.appendChild(divGps);
+
+        // Simulador de contador GPS regresivo en tiempo real
+        let mins = 14;
+        setInterval(() => {
+          if (mins > 1) {
+            mins--;
+            const timerEl = document.getElementById('txt-gps-timer');
+            if (timerEl) timerEl.innerText = `${mins} min`;
+          }
+        }, 12000);
+      }
+    }, 2500);
+  });
+
+  // 3. INTEGRACIÓN EN EL MENÚ ACORDEÓN MAESTRO
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-super-func-injected')) {
+        const btnSuper = document.createElement('button');
+        btnSuper.id = 'btn-super-func-injected';
+        btnSuper.className = 'btn-opcion-acordeon';
+        btnSuper.style.borderColor = '#00E676';
+        btnSuper.innerHTML = `💳 ConveniencePay & Inv.`;
+        btnSuper.onclick = () => {
+          document.getElementById('modal-super-funciones').classList.remove('hidden');
+          if (typeof toggleMenuLateralMaster === 'function') toggleMenuLateralMaster();
+        };
+        acordeon.appendChild(btnSuper);
+      }
+    }, 2200);
+  });
+
+  function cerrarSuperFunciones() {
+    document.getElementById('modal-super-funciones').classList.add('hidden');
+  }
+
+  function recargarConveniencePay() {
+    const monto = prompt("💳 Ingresa el monto a recargar en ConveniencePay (RD$):", "1000");
+    if (monto) {
+      alert(`✅ ¡Recarga de RD$ ${monto} completada mediante Banreservas / Popular! Saldo disponible actualizado.`);
+    }
+  }
+
+  function copiarCodigoEmbajador() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText("SD-GIRASOLES20");
+      alert("📋 ¡Código de embajador copiado! Compártelo en WhatsApp.");
+    }
+  }
+
+  function toggleStock(btn) {
+    if (btn.innerText.includes('EN STOCK')) {
+      btn.innerText = 'AGOTADO ❌';
+      btn.style.background = 'rgba(255,82,82,0.2)';
+      btn.style.color = '#ff5252';
+      btn.style.border = '1px solid #ff5252';
+    } else {
+      btn.innerText = 'EN STOCK ✅';
+      btn.style.background = '#00E676';
+      btn.style.color = '#000';
+      btn.style.border = 'none';
+    }
+  }
+</script>
