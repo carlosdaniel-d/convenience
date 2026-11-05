@@ -3031,3 +3031,72 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: RESTAURACIÓN DE ICONOS  -->
+<!-- ========================================== -->
+<style>
+  /* Fuerza bruta para asegurar la visualización de los iconos reales neón */
+  .leaflet-marker-icon.pin-comercio-real, 
+  .pin-comercio-real {
+    background: #141414 !important;
+    border: 2px solid #00E676 !important;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.9), inset 0 0 5px rgba(0, 230, 118, 0.4) !important;
+    border-radius: 50% !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    z-index: 1000 !important;
+    animation: pinFloatBounce 3s ease-in-out infinite, neonGlowPulse 2.5s infinite !important;
+  }
+</style>
+
+<script>
+  // Forzar el re-renderizado inmediato de los iconos reales en el mapa
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof listaNegocios !== 'undefined' && typeof L !== 'undefined') {
+        
+        window.renderizarMarcadores = function(datos) {
+          if (typeof marcadoresGroup !== 'undefined' && marcadoresGroup) {
+            marcadoresGroup.clearLayers();
+          } else if (typeof map !== 'undefined' && map) {
+            window.marcadoresGroup = L.layerGroup().addTo(map);
+          } else {
+            return;
+          }
+          
+          datos.forEach(n => {
+            let iconoEmoji = "📍";
+            if (n.cat === "Restaurante" || n.nombre.includes("Pica Pollo") || n.nombre.includes("Comedor") || n.nombre.includes("Burger")) iconoEmoji = "🍔";
+            else if (n.cat === "Farmacia" || n.nombre.includes("Farmacia")) iconoEmoji = "💊";
+            else if (n.cat === "Supermercado" || n.nombre.includes("Super") || n.nombre.includes("Minimarket")) iconoEmoji = "🛒";
+            else if (n.cat === "Colmado" || n.nombre.includes("Colmado") || n.nombre.includes("Bebidas")) iconoEmoji = "🍺";
+
+            const customIcon = L.divIcon({
+              className: 'pin-comercio-real',
+              html: `<div style="line-height:1; display:flex; align-items:center; justify-content:center;">${iconoEmoji}</div>`,
+              iconSize: [38, 38],
+              iconAnchor: [19, 19]
+            });
+
+            const marker = L.marker([n.lat, n.lng], { icon: customIcon });
+            
+            marker.on('click', () => {
+              if (typeof abrirDetalleComercio === 'function') {
+                abrirDetalleComercio(n);
+              }
+            });
+
+            marcadoresGroup.addLayer(marker);
+          });
+        };
+
+        // Ejecutar la restauración
+        renderizarMarcadores(listaNegocios);
+      }
+    }, 1800);
+  });
+</script>
