@@ -682,3 +682,58 @@ setTimeout(() => {
     lanzarNotificacionPush("📍 Cobertura activa: Los Girasoles, Pantoja, Alcarrizos y Herrera.");
   }
 }, 1500);
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: UI DE CONVENIENCE COINS-->
+<!-- ========================================== -->
+<style>
+  /* Botón e indicador visual de Coins en la barra lateral flotante */
+  .coins-badge {
+    background: rgba(24, 24, 24, 0.95);
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+</style>
+
+<!-- Añadimos el botón de Coins a la barra lateral flotante izquierda existente -->
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const sidebar = document.querySelector('.floating-sidebar');
+      if (sidebar) {
+        const btnCoins = document.createElement('button');
+        btnCoins.className = 'coins-badge';
+        btnCoins.innerHTML = `🪙 Coins: <span id="coins-count">0</span> pts`;
+        btnCoins.onclick = abrirModalCoins;
+        sidebar.appendChild(btnCoins);
+        actualizarDisplayCoins();
+      }
+    }, 500);
+  });
+
+  function actualizarDisplayCoins() {
+    const saldo = localStorage.getItem('convenience_coins') || '0';
+    const span = document.getElementById('coins-count');
+    if (span) span.innerText = saldo;
+  }
+
+  function abrirModalCoins() {
+    const saldo = localStorage.getItem('convenience_coins') || '0';
+    alert(`🪙 Tienes acumulados ${saldo} ConvenienceCoins en Santo Domingo.\n¡Canjéalos por descuentos en tus próximos pedidos!`);
+    // Simular ganar 50 coins de regalo por abrir el panel
+    let actual = parseInt(saldo) + 50;
+    localStorage.setItem('convenience_coins', actual);
+    actualizarDisplayCoins();
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(`🎁 ¡Recibiste 50 ConvenienceCoins de bonificación! Saldo: ${actual} pts`);
+    }
+  }
+</script>
