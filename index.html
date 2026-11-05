@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>convenienceIA - Santo Domingo (Master UI)</title>
+  <title>convenienceIA - Santo Domingo (Base Master)</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -13,7 +13,7 @@
       --bg-dark: #050505;
       --neon-green: #00E676;
       --neon-blue: #00b0ff;
-      --card-bg: rgba(12, 12, 12, 0.94);
+      --card-bg: rgba(12, 12, 12, 0.95);
       --border-color: rgba(0, 230, 118, 0.35);
     }
 
@@ -22,9 +22,7 @@
 
     #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
 
-    /* ================================================= */
-    /* HEADER MAESTRO UNIFICADO (Cero solapamientos)     */
-    /* ================================================= */
+    /* Header Maestro Unificado */
     .master-header {
       position: fixed; top: 12px; left: 12px; right: 12px; z-index: 1000;
       background: var(--card-bg); backdrop-filter: blur(18px);
@@ -33,14 +31,10 @@
       display: flex; flex-direction: column; gap: 8px;
     }
 
-    .header-top-row {
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .header-top-row { display: flex; justify-content: space-between; align-items: center; }
     .brand { font-weight: 900; font-size: 15px; color: var(--neon-green); display: flex; align-items: center; gap: 6px; }
     
-    .header-badges-right {
-      display: flex; align-items: center; gap: 6px;
-    }
+    .header-badges-right { display: flex; align-items: center; gap: 6px; }
     
     .badge-pill {
       background: rgba(20, 20, 20, 0.9); border: 1px solid #333; padding: 4px 10px;
@@ -55,7 +49,7 @@
       padding: 6px 10px; border-radius: 10px; font-size: 10px; color: #aaa;
     }
 
-    /* Barra de Filtros por Sector (Diseño limpio y deslizable) */
+    /* Filtros por Sector */
     .filtros-sectores-bar {
       display: flex; gap: 6px; overflow-x: auto; padding-top: 2px; scrollbar-width: none;
     }
@@ -69,90 +63,13 @@
       background: var(--neon-green); border-color: var(--neon-green); color: #000;
     }
 
-    /* Menú Maestro Acordeón */
-    .menu-master-flotante {
-      position: fixed; bottom: 25px; left: 15px; z-index: 10000;
-      background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
-      color: #000; border: none; padding: 12px 20px; border-radius: 24px;
-      font-size: 12px; font-weight: 900; cursor: pointer;
-      box-shadow: 0 6px 25px rgba(0, 230, 118, 0.6);
-      display: flex; align-items: center; gap: 8px;
-    }
-
-    .acordeon-lateral-box {
-      position: fixed; bottom: 85px; left: 15px; z-index: 9999;
-      background: var(--card-bg); border: 1px solid var(--neon-green);
-      backdrop-filter: blur(16px); border-radius: 18px; padding: 12px; width: 230px;
-      display: flex; flex-direction: column; gap: 6px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.95);
-      transform: translateY(20px); opacity: 0; pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.1, 1, 0.1, 1);
-    }
-    .acordeon-lateral-box.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
-
-    .btn-opcion-acordeon {
-      background: #121212; border: 1px solid #282828; color: #fff;
-      padding: 8px 10px; border-radius: 10px; font-size: 10px; font-weight: bold;
-      text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px;
-    }
-    .btn-opcion-acordeon:hover { background: #1a1a1a; border-color: var(--neon-green); color: var(--neon-green); }
-
-    /* Pines Masivos Neón */
+    /* Pines Neón */
     .pin-masivo-neon {
       background: #0f0f0f !important; border: 2px solid var(--neon-green) !important;
       border-radius: 50% !important; width: 38px !important; height: 38px !important;
       display: flex !important; align-items: center !important; justify-content: center !important;
       font-size: 16px !important; z-index: 9999 !important;
       box-shadow: 0 0 12px rgba(0, 230, 118, 0.7) !important;
-    }
-
-    /* Drawer de Comercio y Carrito */
-    .drawer-comercio {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 999999;
-      background: #121212; border-top: 2px solid var(--neon-green);
-      border-radius: 22px 22px 0 0; padding: 18px;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
-      transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
-      max-height: 85vh; overflow-y: auto; color: #fff;
-    }
-    .drawer-comercio.active { transform: translateY(0); }
-
-    .producto-item-card {
-      background: #181818; border: 1px solid #282828; border-radius: 12px;
-      padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .btn-wa-checkout {
-      background: #25D366; color: #000; border: none; width: 100%;
-      padding: 12px; border-radius: 14px; font-weight: 900; font-size: 13px;
-      cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
-      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-    }
-
-    /* Panel de Historial Lateral */
-    .historial-drawer {
-      position: fixed; top: 0; right: 0; bottom: 0; width: 280px; z-index: 9999999;
-      background: #0d0d0d; border-left: 1px solid var(--neon-green);
-      box-shadow: -10px 0 40px rgba(0,0,0,0.9); padding: 18px; color: #fff;
-      transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
-      display: flex; flex-direction: column;
-    }
-    .historial-drawer.active { transform: translateX(0); }
-
-    .btn-historial-flotante {
-      position: fixed; bottom: 145px; left: 15px; z-index: 10000;
-      background: #151515; border: 1px solid var(--neon-green);
-      color: var(--neon-green); width: 40px; height: 40px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-    }
-
-    /* Botón Flotante de Soporte WhatsApp */
-    .btn-soporte-flotante {
-      position: fixed; bottom: 90px; right: 15px; z-index: 99999;
-      background: #25D366; color: #000; border: none; width: 44px; height: 44px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 22px; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.6); cursor: pointer;
     }
 
     /* Toast Container */
@@ -168,34 +85,14 @@
       max-width: 260px; display: flex; align-items: center; gap: 8px;
     }
     .toast-notification.active { transform: translateX(0); }
-
-    /* Splash Screen */
-    .splash-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #040404; z-index: 9999999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-    .splash-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
   </style>
 </head>
 <body>
 
-  <!-- Splash Screen -->
-  <div id="splash-bienvenida" class="splash-overlay">
-    <div style="width: 85px; height: 85px; background: rgba(0,230,118,0.18); border: 2px solid var(--neon-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 16px; box-shadow: 0 0 35px rgba(0,230,118,0.6);">⚡</div>
-    <h1 style="color: var(--neon-green); font-size: 24px; font-weight: 900; margin-bottom: 8px;">convenienceIA SD</h1>
-    <p style="font-size: 12px; color: #ddd; max-width: 320px; line-height: 1.5; margin-bottom: 22px;">
-      Ecosistema comercial en Santo Domingo. Cobertura total en Girasoles, Pantoja, Herrera, Piantini y Naco.
-    </p>
-    <button onclick="cerrarSplash()" style="background:var(--neon-green); color:#000; border:none; padding:12px 28px; border-radius:16px; font-weight:900; font-size:12px; cursor:pointer; box-shadow: 0 6px 20px rgba(0,230,118,0.5);">Iniciar Experiencia 🚀</button>
-  </div>
-
-  <!-- Contenedor del Mapa -->
+  <!-- Mapa -->
   <div id="map"></div>
 
-  <!-- ================================================= -->
-  <!-- HEADER MAESTRO UNIFICADO (Ordenado y sin choques) -->
-  <!-- ================================================= -->
+  <!-- Header Maestro Unificado -->
   <header class="master-header">
     <div class="header-top-row">
       <div class="brand">🟢 convenienceIA</div>
@@ -220,100 +117,14 @@
     </div>
   </header>
 
-  <!-- Botón Flotante Historial -->
-  <button class="btn-historial-flotante" onclick="toggleHistorialDrawer()" title="Historial de Pedidos">📦</button>
-
-  <!-- Panel Lateral de Historial Persistente -->
-  <div id="panel-historial" class="historial-drawer">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #222; padding-bottom:8px;">
-      <h3 style="font-size:14px; font-weight:900; color:var(--neon-green);">📦 Tus Pedidos Recientes</h3>
-      <button onclick="toggleHistorialDrawer()" style="background:none; border:none; color:#aaa; font-size:20px; cursor:pointer;">&times;</button>
-    </div>
-    <div id="lista-historial-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
-      <div style="font-size:11px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>
-    </div>
-    <button onclick="limpiarHistorialPedidos()" style="background:rgba(255,82,82,0.15); border:1px solid #ff5252; color:#ff5252; padding:8px; border-radius:10px; font-weight:bold; font-size:10px; cursor:pointer; margin-top:8px;">🗑️ Limpiar Historial</button>
-  </div>
-
-  <!-- Menú Maestro Acordeón -->
-  <button class="menu-master-flotante" onclick="toggleMenuMaster()">⚡ Menú Rápido SD</button>
-  <div id="acordeon-lateral" class="acordeon-lateral-box">
-    <span style="font-size:9px; color:#888; font-weight:bold; text-transform:uppercase; border-bottom:1px solid #282828; padding-bottom:4px;">Utilidades Enterprise</span>
-    <button class="btn-opcion-acordeon" onclick="abrirSoporteIAWhatsApp()">💬 Soporte IA WhatsApp</button>
-    <button class="btn-opcion-acordeon" onclick="copiarLinkCherchaModal()">🍕 Modo Chercha (Grupal)</button>
-    <button class="btn-opcion-acordeon" onclick="mostrarToast('Tráfico fluido en Kennedy y 27 de Febrero', '🚦')">🚦 Estado Tráfico SD</button>
-  </div>
-
-  <!-- Botón Flotante Soporte -->
-  <button onclick="abrirSoporteIAWhatsApp()" class="btn-soporte-flotante">💬</button>
-
   <!-- Toast Container -->
   <div id="toast-container" class="toast-container-app"></div>
-
-  <!-- Drawer de Comercio y Carrito -->
-  <div id="drawer-detalles" class="drawer-comercio">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <div>
-        <div id="drawer-titulo-negocio" style="font-size:16px; font-weight:900; color:var(--neon-green);">Comercio SD</div>
-        <div id="drawer-sub-negocio" style="font-size:10px; color:#aaa;">📍 Santo Domingo • Abierto 24/7</div>
-      </div>
-      <button onclick="cerrarDrawerComercio()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
-    </div>
-
-    <div style="font-size:11px; font-weight:bold; color:#fff; margin-bottom:6px;">⚡ Menú Exprés:</div>
-    
-    <div class="producto-item-card">
-      <div>
-        <div style="font-weight:bold; font-size:12px;">🍺 Pack Presidente (6 Uds)</div>
-        <div style="font-size:10px; color:var(--neon-green); font-weight:bold;">RD$ 550.00</div>
-      </div>
-      <button onclick="agregarAlCarro('Pack Presidente', 550)" style="background:var(--neon-green); color:#000; border:none; padding:5px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">+ Añadir</button>
-    </div>
-
-    <div class="producto-item-card">
-      <div>
-        <div style="font-weight:bold; font-size:12px;">🧊 Bolsa de Hielo Grande</div>
-        <div style="font-size:10px; color:var(--neon-green); font-weight:bold;">RD$ 120.00</div>
-      </div>
-      <button onclick="agregarAlCarro('Bolsa de Hielo Grande', 120)" style="background:var(--neon-green); color:#000; border:none; padding:5px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">+ Añadir</button>
-    </div>
-
-    <!-- Módulo de Propinas, Cupones y Horarios -->
-    <div style="background:#151515; border:1px solid #282828; border-radius:12px; padding:10px; margin-top:8px; font-size:11px;">
-      <div style="font-weight: bold; color: var(--neon-green); margin-bottom: 4px;">🛵 Propina Voluntaria:</div>
-      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-        <button onclick="seleccionarPropina(0, this)" style="background:#1e1e1e; border:1px solid #333; color:#fff; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">0</button>
-        <button onclick="seleccionarPropina(50, this)" style="background:var(--neon-green); border:1px solid var(--neon-green); color:#000; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 50</button>
-        <button onclick="seleccionarPropina(100, this)" style="background:#1e1e1e; border:1px solid #333; color:#fff; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 100</button>
-      </div>
-
-      <div style="font-weight: bold; color: #ccc; margin-bottom: 4px;">⏱️ Tiempo de Entrega:</div>
-      <select id="select-tiempo-entrega" style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 6px; border-radius: 8px; font-size: 11px; outline: none; margin-bottom: 8px;">
-        <option value="Exprés (15 - 20 min)">🚀 Exprés (15 - 20 minutos)</option>
-        <option value="Programado">📅 Programar para más tarde</option>
-      </select>
-      
-      <div style="display:flex; gap:6px;">
-        <input type="text" id="input-cupon-promo" placeholder="Cupón (ej. SD2026)" style="background:#0a0a0a; border:1px solid #333; color:#fff; padding:6px; border-radius:8px; font-size:11px; flex:1; outline:none;">
-        <button onclick="aplicarCuponeDescuento()" style="background:#222; border:1px solid var(--neon-green); color:var(--neon-green); padding:6px 10px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">Aplicar</button>
-      </div>
-    </div>
-
-    <div style="background:#181818; padding:8px 12px; border-radius:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-size:11px; font-weight:bold;">Total Carrito: <span id="lbl-total-carrito" style="color:var(--neon-green);">RD$ 0.00</span></span>
-      <span style="font-size:10px; color:#aaa;" id="lbl-cant-items">0 items</span>
-    </div>
-
-    <button onclick="enviarPedidoWhatsApp()" class="btn-wa-checkout">
-      💬 Enviar Pedido por WhatsApp 🚀
-    </button>
-  </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
   <script>
-    // 1. Inicialización de Mapa Centrado en Santo Domingo
+    // Inicializar Mapa en Santo Domingo
     const map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 13);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -322,18 +133,13 @@
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // 2. Base de Datos Completa de 200+ Comercios en SD
+    // Pines de Comercios SD
     const sectoresSD = [
       { nombre: "Girasoles", lat: 18.5130, lng: -69.9750 },
       { nombre: "Pantoja", lat: 18.5265, lng: -69.9910 },
-      { nombre: "Los Alcarrizos", lat: 18.5380, lng: -70.0150 },
       { nombre: "Herrera", lat: 18.4750, lng: -69.9650 },
       { nombre: "Piantini", lat: 18.4710, lng: -69.9310 },
-      { nombre: "Naco", lat: 18.4750, lng: -69.9230 },
-      { nombre: "Bella Vista", lat: 18.4550, lng: -69.9450 },
-      { nombre: "Gazcue", lat: 18.4670, lng: -69.8970 },
-      { nombre: "Zona Colonial", lat: 18.4730, lng: -69.8860 },
-      { nombre: "Villa Mella", lat: 18.5450, lng: -69.9020 }
+      { nombre: "Naco", lat: 18.4750, lng: -69.9230 }
     ];
 
     const tipos = [
@@ -345,7 +151,7 @@
 
     const grupoPines = L.layerGroup().addTo(map);
 
-    for (let i = 1; i <= 200; i++) {
+    for (let i = 1; i <= 100; i++) {
       const sec = sectoresSD[i % sectoresSD.length];
       const tipo = tipos[i % tipos.length];
       
@@ -361,172 +167,12 @@
 
       const marker = L.marker([latVar, lngVar], { icon: iconoCustom });
       marker.on('click', () => {
-        abrirDrawerComercio({ nombre: `${tipo.nombre} #${i}`, cat: tipo.cat, sector: sec.nombre });
+        mostrarToast(`Seleccionado: ${tipo.nombre} en ${sec.nombre}`, "📍");
       });
       grupoPines.addLayer(marker);
     }
 
-    // 3. Estado del Carrito y LocalStorage
-    window.carritoApp = { items: [], total: 0, negocioActual: "Comercio SD" };
-    window.propinaActual = 50;
-    window.coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250');
-    document.getElementById('lbl-coins-usuario').innerText = window.coinsActuales;
-
-    function abrirDrawerComercio(negocio) {
-      window.carritoApp.negocioActual = negocio.nombre;
-      document.getElementById('drawer-titulo-negocio').innerText = negocio.nombre;
-      document.getElementById('drawer-sub-negocio').innerText = `📍 ${negocio.sector || 'Santo Domingo'} • Abierto 24/7`;
-      document.getElementById('drawer-detalles').classList.add('active');
-    }
-
-    function cerrarDrawerComercio() {
-      document.getElementById('drawer-detalles').classList.remove('active');
-    }
-
-    function agregarAlCarro(nombreProd, precio) {
-      window.carritoApp.items.push({ nombre: nombreProd, precio: precio });
-      window.carritoApp.total += precio;
-      
-      document.getElementById('lbl-total-carrito').innerText = `RD$ ${(window.carritoApp.total + window.propinaActual).toLocaleString()}`;
-      document.getElementById('lbl-cant-items').innerText = `${window.carritoApp.items.length} items`;
-      
-      mostrarToast(`Añadido: ${nombreProd}`, "✅");
-    }
-
-    function seleccionarPropina(monto, btn) {
-      window.propinaActual = monto;
-      const totalConPropina = window.carritoApp.total + window.propinaActual;
-      document.getElementById('lbl-total-carrito').innerText = `RD$ ${totalConPropina.toLocaleString()}`;
-      mostrarToast(`Propina ajustada a RD$ ${monto}`, "🛵");
-    }
-
-    function aplicarCuponeDescuento() {
-      const codigo = document.getElementById('input-cupon-promo').value.trim().toUpperCase();
-      if (codigo === "SD2026" || codigo === "GIRASOLES20") {
-        mostrarToast("¡Cupón aplicado! 15% de descuento.", "🎉");
-        if (window.carritoApp.total > 0) {
-          window.carritoApp.total = Math.round(window.carritoApp.total * 0.85);
-          document.getElementById('lbl-total-carrito').innerText = `RD$ ${(window.carritoApp.total + window.propinaActual).toLocaleString()}`;
-        }
-      } else {
-        mostrarToast("Código de cupón inválido.", "❌");
-      }
-    }
-
-    // 4. Persistencia LocalStorage para Historial de Pedidos
-    function guardarPedidoEnHistorial(negocio, items, total) {
-      let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-      const nuevoPedido = {
-        id: 'SD-' + Math.floor(1000 + Math.random() * 9000),
-        fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        negocio: negocio,
-        items: items,
-        total: total
-      };
-      historial.unshift(nuevoPedido);
-      if (historial.length > 10) historial.pop();
-      localStorage.setItem('convenience_historial_pedidos', JSON.stringify(historial));
-      renderizarHistorial();
-    }
-
-    function renderizarHistorial() {
-      const contenedor = document.getElementById('lista-historial-container');
-      if (!contenedor) return;
-      let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
-      if (historial.length === 0) {
-        contenedor.innerHTML = `<div style="font-size:11px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>`;
-        return;
-      }
-      let html = '';
-      historial.forEach(p => {
-        html += `
-          <div style="background:#141414; border:1px solid #282828; border-radius:10px; padding:8px; font-size:10px;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--neon-green); margin-bottom:2px;">
-              <span>${p.negocio}</span>
-              <span>#${p.id}</span>
-            </div>
-            <div style="color:#aaa; font-size:9px; margin-bottom:4px;">🕒 ${p.fecha}</div>
-            <div style="color:#fff; font-weight:bold;">Total: RD$ ${p.total.toLocaleString()}</div>
-          </div>
-        `;
-      });
-      contenedor.innerHTML = html;
-    }
-
-    function toggleHistorialDrawer() {
-      document.getElementById('panel-historial').classList.toggle('active');
-    }
-
-    function limpiarHistorialPedidos() {
-      localStorage.removeItem('convenience_historial_pedidos');
-      renderizarHistorial();
-      mostrarToast("Historial borrado.", "🗑️");
-    }
-
-    // 5. Checkout Real por WhatsApp
-    function enviarPedidoWhatsApp() {
-      if (window.carritoApp.items.length === 0) {
-        mostrarToast("Tu carrito está vacío.", "⚠️");
-        return;
-      }
-
-      let detalleTexto = `*¡Nuevo Pedido desde convenienceIA SD!* 🚀%0A`;
-      detalleTexto += `🏪 *Comercio:* ${window.carritoApp.negocioActual}%0A%0A`;
-      detalleTexto += `🛒 *Productos:*%0A`;
-      
-      window.carritoApp.items.forEach((item, idx) => {
-        detalleTexto += `${idx + 1}. ${item.nombre} - RD$ ${item.precio}%0A`;
-      });
-
-      const totalFinal = window.carritoApp.total + window.propinaActual;
-      const tiempoEntrega = document.getElementById('select-tiempo-entrega').value;
-
-      detalleTexto += `%0A⏱️ *Tipo de Entrega:* ${tiempoEntrega}%0A`;
-      detalleTexto += `🛵 *Propina:* RD$ ${window.propinaActual}%0A`;
-      detalleTexto += `💰 *Total Final:* RD$ ${totalFinal.toLocaleString()}%0A`;
-      detalleTexto += `📍 *Destino:* ${document.getElementById('lbl-dir-actual').innerText}%0A`;
-
-      guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
-
-      window.coinsActuales += 50;
-      localStorage.setItem('convenience_coins', window.coinsActuales);
-      document.getElementById('lbl-coins-usuario').innerText = window.coinsActuales;
-
-      const urlWa = `https://wa.me/18095550199?text=${detalleTexto}`;
-      window.open(urlWa, '_blank');
-      
-      cerrarDrawerComercio();
-      window.carritoApp.items = [];
-      window.carritoApp.total = 0;
-      document.getElementById('lbl-total-carrito').innerText = "RD$ 0.00";
-      document.getElementById('lbl-cant-items').innerText = "0 items";
-      
-      mostrarToast("¡Pedido generado! +50 Coins acreditados.", "🪙");
-    }
-
-    // 6. Geolocalización GPS Real
-    function obtenerUbicacionGPSReal() {
-      if (!navigator.geolocation) {
-        mostrarToast("Tu navegador no soporta geolocalización.", "❌");
-        return;
-      }
-      mostrarToast("Obteniendo tu ubicación satelital GPS...", "📍");
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          map.setView([lat, lng], 16);
-          document.getElementById('lbl-dir-actual').innerText = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)} (GPS Activo)`;
-          mostrarToast("¡Ubicación GPS sincronizada con éxito!", "✅");
-        },
-        (error) => {
-          mostrarToast("No se pudo obtener el GPS. Verifica permisos.", "⚠️");
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    }
-
-    // 7. Utilidades de UI
+    // Utilidad Toast
     function mostrarToast(mensaje, icono = "⚡") {
       const contenedor = document.getElementById('toast-container');
       if (!contenedor) return;
@@ -541,44 +187,33 @@
       }, 4000);
     }
 
-    function toggleMenuMaster() {
-      document.getElementById('acordeon-lateral').classList.toggle('active');
-    }
-
-    function cerrarSplash() {
-      document.getElementById('splash-bienvenida').classList.add('hidden');
-      mostrarToast("¡200+ comercios sincronizados en SD!", "📍");
-      renderizarHistorial();
+    // GPS Real
+    function obtenerUbicacionGPSReal() {
+      if (!navigator.geolocation) {
+        mostrarToast("Geolocalización no soportada.", "❌");
+        return;
+      }
+      mostrarToast("Buscando ubicación GPS...", "📍");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+          document.getElementById('lbl-dir-actual').innerText = `GPS Activo (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
+          mostrarToast("¡Ubicación GPS sincronizada!", "✅");
+        },
+        () => { mostrarToast("Error al obtener GPS.", "⚠️"); },
+        { enableHighAccuracy: true }
+      );
     }
 
     function cambiarDireccionPrompt() {
-      const nuevaDir = prompt("Ingresa tu dirección exacta en Santo Domingo:", "Piantini, Torre Empresarial");
-      if (nuevaDir && nuevaDir.trim() !== "") {
-        document.getElementById('lbl-dir-actual').innerText = nuevaDir;
-        mostrarToast("Dirección actualizada correctamente.", "📍");
-      }
+      const nueva = prompt("Ingresa tu dirección exacta en Santo Domingo:", "Piantini");
+      if (nueva) document.getElementById('lbl-dir-actual').innerText = nueva;
     }
 
-    function abrirSoporteIAWhatsApp() {
-      const mensaje = encodeURIComponent("¡Hola! Necesito asistencia con un pedido en convenienceIA Santo Domingo.");
-      window.open(`https://wa.me/18095550199?text=${mensaje}`, '_blank');
-    }
-
-    function copiarLinkCherchaModal() {
-      const link = "https://convenience-1.onrender.com/?sala=SD-" + Math.floor(1000 + Math.random() * 9000);
-      navigator.clipboard.writeText(link).then(() => {
-        mostrarToast("¡Enlace de Sala Grupal copiado!", "✅");
-      }).catch(() => {
-        alert("Enlace de sala: " + link);
-      });
-      document.getElementById('acordeon-lateral').classList.remove('active');
-    }
-
-    function filtrarSectorMapa(sectorNombre, btnElement) {
-      document.querySelectorAll('.chip-sector').forEach(btn => btn.classList.remove('active'));
-      if (btnElement) btnElement.classList.add('active');
-
-      const coordenadasSectores = {
+    function filtrarSectorMapa(sectorNombre, btn) {
+      document.querySelectorAll('.chip-sector').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const coords = {
         "TODOS": { lat: 18.4861, lng: -69.9312, zoom: 13 },
         "Girasoles": { lat: 18.5130, lng: -69.9750, zoom: 15 },
         "Pantoja": { lat: 18.5265, lng: -69.9910, zoom: 15 },
@@ -586,10 +221,9 @@
         "Piantini": { lat: 18.4710, lng: -69.9310, zoom: 16 },
         "Naco": { lat: 18.4750, lng: -69.9230, zoom: 16 }
       };
-
-      const destino = coordenadasSectores[sectorNombre] || coordenadasSectores["TODOS"];
-      map.setView([destino.lat, destino.lng], destino.zoom);
-      mostrarToast(`Zona filtrada: ${sectorNombre}`, "📍");
+      const d = coords[sectorNombre] || coords["TODOS"];
+      map.setView([d.lat, d.lng], d.zoom);
+      mostrarToast(`Zona: ${sectorNombre}`, "📍");
     }
   </script>
 </body>
