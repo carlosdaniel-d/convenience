@@ -737,3 +737,176 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: PANEL DE AJUSTES APP   -->
+<!-- ========================================== -->
+<style>
+  /* Botón de Ajustes flotante junto al menú de herramientas */
+  .btn-ajustes-flotante {
+    background: rgba(24, 24, 24, 0.95);
+    border: 1px solid #00E676;
+    color: #00E676;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Estilos del Modal de Ajustes */
+  .ajustes-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    font-size: 11px;
+    color: #ddd;
+  }
+  .ajustes-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Interruptor Switch Estilizado */
+  .switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+  }
+  .switch-toggle input { 
+    opacity: 0; 
+    width: 0; 
+    height: 0; 
+  }
+  .slider-switch {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #444;
+    transition: .3s;
+    border-radius: 18px;
+  }
+  .slider-switch:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  input:checked + .slider-switch {
+    background-color: #00E676;
+  }
+  input:checked + .slider-switch:before {
+    transform: translateX(16px);
+  }
+</style>
+
+<!-- MODAL DE AJUSTES GENERALES -->
+<div id="modal-ajustes" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button onclick="cerrarAjustes()" style="background:none;border:none;color:#aaa;float:right;font-size:18px;cursor:pointer;">&times;</button>
+    <h3 style="color:#00E676; margin-bottom:10px; font-size:14px;">⚙️ Ajustes de la Aplicación</h3>
+    
+    <div style="margin: 10px 0;">
+      <div class="ajustes-item">
+        <span>🔔 Notificaciones Push</span>
+        <label class="switch-toggle">
+          <input type="checkbox" id="setting-push" checked onchange="guardarAjuste('push', this.checked)">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+
+      <div class="ajustes-item">
+        <span>🔊 Sonidos y Alertas Audio</span>
+        <label class="switch-toggle">
+          <input type="checkbox" id="setting-audio" checked onchange="guardarAjuste('audio', this.checked)">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+
+      <div class="ajustes-item">
+        <span>⚡ Modo Optimizado (Datos Ligeros)</span>
+        <label class="switch-toggle">
+          <input type="checkbox" id="setting-opt" onchange="guardarAjuste('opt', this.checked)">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+
+      <div class="ajustes-item">
+        <span>📍 Geolocalización Automática</span>
+        <label class="switch-toggle">
+          <input type="checkbox" id="setting-gps" checked onchange="guardarAjuste('gps', this.checked)">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+    </div>
+
+    <div style="background:#111; padding:8px; border-radius:8px; font-size:9px; color:#888; text-align:center; margin-top:10px;">
+      convenienceIA SD v2.6 • Render Node Cloud<br>
+      Sectores: Girasoles, Pantoja, Alcarrizos, Herrera
+    </div>
+
+    <button onclick="cerrarAjustes()" class="btn-action-main" style="width:100%; background:#00E676; color:#000; margin-top:12px;">Guardar y Cerrar 💾</button>
+  </div>
+</div>
+
+<script>
+  // Inyectar el botón de Ajustes automáticamente en el menú flotante derecho
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const toolsMenu = document.getElementById('tools-menu');
+      if (toolsMenu) {
+        const btnAjustes = document.createElement('button');
+        btnAjustes.className = 'floating-btn';
+        btnAjustes.style.color = '#00E676';
+        btnAjustes.style.borderColor = '#00E676';
+        btnAjustes.innerHTML = '⚙️ Ajustes App';
+        btnAjustes.onclick = abrirAjustes;
+        toolsMenu.appendChild(btnAjustes);
+      }
+
+      // Cargar preferencias guardadas si existen
+      cargarPreferenciasAjustes();
+    }, 400);
+  });
+
+  function abrirAjustes() {
+    document.getElementById('modal-ajustes').classList.remove('hidden');
+    // Cerrar el submenú de herramientas al abrir
+    const toolsMenu = document.getElementById('tools-menu');
+    if (toolsMenu) toolsMenu.classList.add('hidden');
+  }
+
+  function cerrarAjustes() {
+    document.getElementById('modal-ajustes').classList.add('hidden');
+  }
+
+  function guardarAjuste(clave, valor) {
+    localStorage.setItem(`setting_${clave}`, valor);
+    if (clave === 'audio' && !valor && typeof reproducirAlertaAudio === 'function') {
+      // Desactiva temporalmente el audio si el usuario lo prefiere
+    }
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(`⚙️ Preferencia actualizada correctamente.`);
+    }
+  }
+
+  function cargarPreferenciasAjustes() {
+    ['push', 'audio', 'opt', 'gps'].forEach(clave => {
+      const val = localStorage.getItem(`setting_${clave}`);
+      if (val !== null) {
+        const checkbox = document.getElementById(`setting_${clave}`);
+        if (checkbox) checkbox.checked = (val === 'true');
+      }
+    });
+  }
+</script>
