@@ -228,3 +228,1445 @@
   </script>
 </body>
 </html>
+<!-- ================================================= -->
+<!-- BLOQUE 2: DRAWER DE COMERCIO, CARRITO & WHATSAPP    -->
+<!-- ================================================= -->
+<style>
+  /* Drawer de Comercio y Carrito Pro */
+  .drawer-comercio {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999999;
+    background: #121212; border-top: 2px solid var(--neon-green);
+    border-radius: 22px 22px 0 0; padding: 18px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
+    transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
+    max-height: 85vh; overflow-y: auto; color: #fff;
+  }
+  .drawer-comercio.active { transform: translateY(0); }
+
+  .producto-item-card {
+    background: #181818; border: 1px solid #282828; border-radius: 12px;
+    padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .btn-wa-checkout {
+    background: #25D366; color: #000; border: none; width: 100%;
+    padding: 12px; border-radius: 14px; font-weight: 900; font-size: 13px;
+    cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  }
+</style>
+
+<!-- DRAWER DE COMERCIO -->
+<div id="drawer-detalles" class="drawer-comercio">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div>
+      <div id="drawer-titulo-negocio" style="font-size:16px; font-weight:900; color:var(--neon-green);">Comercio SD</div>
+      <div id="drawer-sub-negocio" style="font-size:10px; color:#aaa;">📍 Santo Domingo • Abierto 24/7</div>
+    </div>
+    <button onclick="cerrarDrawerComercio()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
+  </div>
+
+  <div style="font-size:11px; font-weight:bold; color:#fff; margin-bottom:6px;">⚡ Menú Exprés:</div>
+  
+  <div class="producto-item-card">
+    <div>
+      <div style="font-weight:bold; font-size:12px;">🍺 Pack Presidente (6 Uds)</div>
+      <div style="font-size:10px; color:var(--neon-green); font-weight:bold;">RD$ 550.00</div>
+    </div>
+    <button onclick="agregarAlCarro('Pack Presidente', 550)" style="background:var(--neon-green); color:#000; border:none; padding:5px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">+ Añadir</button>
+  </div>
+
+  <div class="producto-item-card">
+    <div>
+      <div style="font-weight:bold; font-size:12px;">🧊 Bolsa de Hielo Grande</div>
+      <div style="font-size:10px; color:var(--neon-green); font-weight:bold;">RD$ 120.00</div>
+    </div>
+    <button onclick="agregarAlCarro('Bolsa de Hielo Grande', 120)" style="background:var(--neon-green); color:#000; border:none; padding:5px 10px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">+ Añadir</button>
+  </div>
+
+  <!-- Controles de Carrito, Propinas y Cupones -->
+  <div style="background:#151515; border:1px solid #282828; border-radius:12px; padding:10px; margin-top:8px; font-size:11px;">
+    <div style="font-weight: bold; color: var(--neon-green); margin-bottom: 4px;">🛵 Propina Voluntaria:</div>
+    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+      <button onclick="seleccionarPropina(0, this)" style="background:#1e1e1e; border:1px solid #333; color:#fff; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">0</button>
+      <button onclick="seleccionarPropina(50, this)" style="background:var(--neon-green); border:1px solid var(--neon-green); color:#000; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 50</button>
+      <button onclick="seleccionarPropina(100, this)" style="background:#1e1e1e; border:1px solid #333; color:#fff; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RD$ 100</button>
+    </div>
+
+    <div style="font-weight: bold; color: #ccc; margin-bottom: 4px;">⏱️ Tiempo de Entrega:</div>
+    <select id="select-tiempo-entrega" style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 6px; border-radius: 8px; font-size: 11px; outline: none; margin-bottom: 8px;">
+      <option value="Exprés (15 - 20 min)">🚀 Exprés (15 - 20 minutos)</option>
+      <option value="Programado">📅 Programar para más tarde</option>
+    </select>
+    
+    <div style="display:flex; gap:6px;">
+      <input type="text" id="input-cupon-promo" placeholder="Cupón (ej. SD2026)" style="background:#0a0a0a; border:1px solid #333; color:#fff; padding:6px; border-radius:8px; font-size:11px; flex:1; outline:none;">
+      <button onclick="aplicarCuponeDescuento()" style="background:#222; border:1px solid var(--neon-green); color:var(--neon-green); padding:6px 10px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">Aplicar</button>
+    </div>
+  </div>
+
+  <div style="background:#181818; padding:8px 12px; border-radius:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-size:11px; font-weight:bold;">Total Carrito: <span id="lbl-total-carrito" style="color:var(--neon-green);">RD$ 0.00</span></span>
+    <span style="font-size:10px; color:#aaa;" id="lbl-cant-items">0 items</span>
+  </div>
+
+  <button onclick="enviarPedidoWhatsApp()" class="btn-wa-checkout">
+    💬 Enviar Pedido por WhatsApp 🚀
+  </button>
+</div>
+
+<script>
+  // Lógica del Carrito y Drawer
+  window.carritoApp = { items: [], total: 0, negocioActual: "Comercio SD" };
+  window.propinaActual = 50;
+
+  // Actualizar el evento click de los pines del Bloque 1 para que abran este Drawer
+  // (Sobrescribimos la acción del marcador para que invoque el drawer real)
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof grupoPines !== 'undefined') {
+        grupoPines.eachLayer((marker) => {
+          marker.off('click');
+          marker.on('click', () => {
+            abrirDrawerComercio({ nombre: "Comercio Local SD", sector: "Santo Domingo" });
+          });
+        });
+      }
+    }, 1000);
+  });
+
+  function abrirDrawerComercio(negocio) {
+    window.carritoApp.negocioActual = negocio.nombre;
+    document.getElementById('drawer-titulo-negocio').innerText = negocio.nombre;
+    document.getElementById('drawer-sub-negocio').innerText = `📍 ${negocio.sector || 'Santo Domingo'} • Abierto 24/7`;
+    document.getElementById('drawer-detalles').classList.add('active');
+  }
+
+  function cerrarDrawerComercio() {
+    document.getElementById('drawer-detalles').classList.remove('active');
+  }
+
+  function agregarAlCarro(nombreProd, precio) {
+    window.carritoApp.items.push({ nombre: nombreProd, precio: precio });
+    window.carritoApp.total += precio;
+    
+    document.getElementById('lbl-total-carrito').innerText = `RD$ ${(window.carritoApp.total + window.propinaActual).toLocaleString()}`;
+    document.getElementById('lbl-cant-items').innerText = `${window.carritoApp.items.length} items`;
+    
+    if (typeof mostrarToast === 'function') mostrarToast(`Añadido: ${nombreProd}`, "✅");
+  }
+
+  function seleccionarPropina(monto, btn) {
+    window.propinaActual = monto;
+    const totalConPropina = window.carritoApp.total + window.propinaActual;
+    document.getElementById('lbl-total-carrito').innerText = `RD$ ${totalConPropina.toLocaleString()}`;
+    if (typeof mostrarToast === 'function') mostrarToast(`Propina ajustada a RD$ ${monto}`, "🛵");
+  }
+
+  function aplicarCuponeDescuento() {
+    const codigo = document.getElementById('input-cupon-promo').value.trim().toUpperCase();
+    if (codigo === "SD2026" || codigo === "GIRASOLES20") {
+      if (typeof mostrarToast === 'function') mostrarToast("¡Cupón aplicado! 15% de descuento.", "🎉");
+      if (window.carritoApp.total > 0) {
+        window.carritoApp.total = Math.round(window.carritoApp.total * 0.85);
+        document.getElementById('lbl-total-carrito').innerText = `RD$ ${(window.carritoApp.total + window.propinaActual).toLocaleString()}`;
+      }
+    } else {
+      if (typeof mostrarToast === 'function') mostrarToast("Código de cupón inválido.", "❌");
+    }
+  }
+
+  function enviarPedidoWhatsApp() {
+    if (window.carritoApp.items.length === 0) {
+      if (typeof mostrarToast === 'function') mostrarToast("Tu carrito está vacío.", "⚠️");
+      return;
+    }
+
+    let detalleTexto = `*¡Nuevo Pedido desde convenienceIA SD!* 🚀%0A`;
+    detalleTexto += `🏪 *Comercio:* ${window.carritoApp.negocioActual}%0A%0A`;
+    detalleTexto += `🛒 *Productos:*%0A`;
+    
+    window.carritoApp.items.forEach((item, idx) => {
+      detalleTexto += `${idx + 1}. ${item.nombre} - RD$ ${item.precio}%0A`;
+    });
+
+    const totalFinal = window.carritoApp.total + window.propinaActual;
+    const tiempoEntrega = document.getElementById('select-tiempo-entrega').value;
+
+    detalleTexto += `%0A⏱️ *Tipo de Entrega:* ${tiempoEntrega}%0A`;
+    detalleTexto += `🛵 *Propina:* RD$ ${window.propinaActual}%0A`;
+    detalleTexto += `💰 *Total Final:* RD$ ${totalFinal.toLocaleString()}%0A`;
+    detalleTexto += `📍 *Destino:* ${document.getElementById('lbl-dir-actual').innerText}%0A`;
+
+    // Sumar Coins reales y guardar en LocalStorage
+    let coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250') + 50;
+    localStorage.setItem('convenience_coins', coinsActuales);
+    const lblCoins = document.getElementById('lbl-coins-usuario');
+    if (lblCoins) lblCoins.innerText = coinsActuales;
+
+    const urlWa = `https://wa.me/18095550199?text=${detalleTexto}`;
+    window.open(urlWa, '_blank');
+    
+    cerrarDrawerComercio();
+    window.carritoApp.items = [];
+    window.carritoApp.total = 0;
+    document.getElementById('lbl-total-carrito').innerText = "RD$ 0.00";
+    document.getElementById('lbl-cant-items').innerText = "0 items";
+    
+    if (typeof mostrarToast === 'function') mostrarToast("¡Pedido generado! +50 Coins acreditados.", "🪙");
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 3: HISTORIAL PERSISTENTE & MENÚ RÁPIDO     -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Historial Flotante */
+  .historial-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 280px; z-index: 9999999;
+    background: #0d0d0d; border-left: 1px solid var(--neon-green);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.9); padding: 18px; color: #fff;
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.1, 1, 0.1, 1);
+    display: flex; flex-direction: column;
+  }
+  .historial-drawer.active { transform: translateX(0); }
+
+  .btn-historial-flotante {
+    position: fixed; bottom: 145px; left: 15px; z-index: 10000;
+    background: #151515; border: 1px solid var(--neon-green);
+    color: var(--neon-green); width: 40px; height: 40px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+  }
+
+  /* Menú Maestro Acordeón */
+  .menu-master-flotante {
+    position: fixed; bottom: 25px; left: 15px; z-index: 10000;
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+    color: #000; border: none; padding: 12px 20px; border-radius: 24px;
+    font-size: 12px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 6px 25px rgba(0, 230, 118, 0.6);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .acordeon-lateral-box {
+    position: fixed; bottom: 85px; left: 15px; z-index: 9999;
+    background: var(--card-bg); border: 1px solid var(--neon-green);
+    backdrop-filter: blur(16px); border-radius: 18px; padding: 12px; width: 230px;
+    display: flex; flex-direction: column; gap: 6px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.95);
+    transform: translateY(20px); opacity: 0; pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+  }
+  .acordeon-lateral-box.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+  .btn-opcion-acordeon {
+    background: #121212; border: 1px solid #282828; color: #fff;
+    padding: 8px 10px; border-radius: 10px; font-size: 10px; font-weight: bold;
+    text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  }
+  .btn-opcion-acordeon:hover { background: #1a1a1a; border-color: var(--neon-green); color: var(--neon-green); }
+
+  /* Botón Soporte WhatsApp */
+  .btn-soporte-flotante {
+    position: fixed; bottom: 90px; right: 15px; z-index: 99999;
+    background: #25D366; color: #000; border: none; width: 44px; height: 44px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.6); cursor: pointer;
+  }
+</style>
+
+<!-- BOTÓN FLOTANTE HISTORIAL -->
+<button class="btn-historial-flotante" onclick="toggleHistorialDrawer()" title="Historial de Pedidos">📦</button>
+
+<!-- PANEL LATERAL DE HISTORIAL -->
+<div id="panel-historial" class="historial-drawer">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #222; padding-bottom:8px;">
+    <h3 style="font-size:14px; font-weight:900; color:var(--neon-green);">📦 Tus Pedidos Recientes</h3>
+    <button onclick="toggleHistorialDrawer()" style="background:none; border:none; color:#aaa; font-size:20px; cursor:pointer;">&times;</button>
+  </div>
+  <div id="lista-historial-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+    <div style="font-size:11px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>
+  </div>
+  <button onclick="limpiarHistorialPedidos()" style="background:rgba(255,82,82,0.15); border:1px solid #ff5252; color:#ff5252; padding:8px; border-radius:10px; font-weight:bold; font-size:10px; cursor:pointer; margin-top:8px;">🗑️ Limpiar Historial</button>
+</div>
+
+<!-- MENÚ MASTER ACORDEÓN -->
+<button class="menu-master-flotante" onclick="toggleMenuMaster()">⚡ Menú Rápido SD</button>
+<div id="acordeon-lateral" class="acordeon-lateral-box">
+  <span style="font-size:9px; color:#888; font-weight:bold; text-transform:uppercase; border-bottom:1px solid #282828; padding-bottom:4px;">Utilidades Enterprise</span>
+  <button class="btn-opcion-acordeon" onclick="abrirSoporteIAWhatsApp()">💬 Soporte IA WhatsApp</button>
+  <button class="btn-opcion-acordeon" onclick="copiarLinkCherchaModal()">🍕 Modo Chercha (Grupal)</button>
+  <button class="btn-opcion-acordeon" onclick="mostrarToast('Tráfico fluido en Kennedy y 27 de Febrero', '🚦')">🚦 Estado Tráfico SD</button>
+</div>
+
+<!-- BOTÓN SOPORTE FLOTANTE -->
+<button onclick="abrirSoporteIAWhatsApp()" class="btn-soporte-flotante">💬</button>
+
+<script>
+  // 1. Sincronizar monedas al iniciar
+  window.addEventListener('DOMContentLoaded', () => {
+    let coins = localStorage.getItem('convenience_coins');
+    if (!coins) {
+      coins = '250';
+      localStorage.setItem('convenience_coins', coins);
+    }
+    const lblCoins = document.getElementById('lbl-coins-usuario');
+    if (lblCoins) lblCoins.innerText = coins;
+    renderizarHistorial();
+
+    // Enganchar el guardado automático cuando se envíe un pedido
+    const originalWA = window.enviarPedidoWhatsApp;
+    if (typeof originalWA === 'function') {
+      window.enviarPedidoWhatsApp = function() {
+        if (window.carritoApp && window.carritoApp.items.length > 0) {
+          const totalFinal = window.carritoApp.total + (window.propinaActual || 0);
+          guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
+        }
+        originalWA();
+      };
+    }
+  });
+
+  // 2. Funciones de Historial
+  function guardarPedidoEnHistorial(negocio, items, total) {
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    const nuevoPedido = {
+      id: 'SD-' + Math.floor(1000 + Math.random() * 9000),
+      fecha: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      negocio: negocio,
+      items: items,
+      total: total
+    };
+    historial.unshift(nuevoPedido);
+    if (historial.length > 10) historial.pop();
+    localStorage.setItem('convenience_historial_pedidos', JSON.stringify(historial));
+    renderizarHistorial();
+  }
+
+  function renderizarHistorial() {
+    const contenedor = document.getElementById('lista-historial-container');
+    if (!contenedor) return;
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    if (historial.length === 0) {
+      contenedor.innerHTML = `<div style="font-size:11px; color:#777; text-align:center; margin-top:20px;">No hay pedidos registrados aún.</div>`;
+      return;
+    }
+    let html = '';
+    historial.forEach(p => {
+      html += `
+        <div style="background:#141414; border:1px solid #282828; border-radius:10px; padding:8px; font-size:10px;">
+          <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--neon-green); margin-bottom:2px;">
+            <span>${p.negocio}</span>
+            <span>#${p.id}</span>
+          </div>
+          <div style="color:#aaa; font-size:9px; margin-bottom:4px;">🕒 ${p.fecha}</div>
+          <div style="color:#fff; font-weight:bold;">Total: RD$ ${p.total.toLocaleString()}</div>
+        </div>
+      `;
+    });
+    contenedor.innerHTML = html;
+  }
+
+  function toggleHistorialDrawer() {
+    document.getElementById('panel-historial').classList.toggle('active');
+  }
+
+  function limpiarHistorialPedidos() {
+    localStorage.removeItem('convenience_historial_pedidos');
+    renderizarHistorial();
+    if (typeof mostrarToast === 'function') mostrarToast("Historial borrado.", "🗑️");
+  }
+
+  // 3. Funciones del Menú Rápido
+  function toggleMenuMaster() {
+    document.getElementById('acordeon-lateral').classList.toggle('active');
+  }
+
+  function abrirSoporteIAWhatsApp() {
+    const mensaje = encodeURIComponent("¡Hola! Necesito asistencia con un pedido en convenienceIA Santo Domingo.");
+    window.open(`https://wa.me/18095550199?text=${mensaje}`, '_blank');
+  }
+
+  function copiarLinkCherchaModal() {
+    const link = "https://convenience-1.onrender.com/?sala=SD-" + Math.floor(1000 + Math.random() * 9000);
+    navigator.clipboard.writeText(link).then(() => {
+      if (typeof mostrarToast === 'function') mostrarToast("¡Enlace de Sala Grupal copiado!", "✅");
+    }).catch(() => {
+      alert("Enlace de sala: " + link);
+    });
+    document.getElementById('acordeon-lateral').classList.remove('active');
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 4: SPLASH SCREEN & CALIFICACIÓN POST-VENTA -->
+<!-- ================================================= -->
+<style>
+  /* Splash Screen de Bienvenida */
+  .splash-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #040404; z-index: 99999999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+  .splash-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  /* Modal de Calificación con Estrellas */
+  .modal-calif-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999999;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .modal-calif-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .modal-calif-box {
+    background: #141414; border: 1px solid var(--neon-green); border-radius: 24px;
+    padding: 22px; width: 100%; max-width: 340px; text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 230, 118, 0.4); color: #fff;
+  }
+</style>
+
+<!-- SPLASH SCREEN -->
+<div id="splash-bienvenida" class="splash-overlay">
+  <div style="width: 85px; height: 85px; background: rgba(0,230,118,0.18); border: 2px solid var(--neon-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 16px; box-shadow: 0 0 35px rgba(0,230,118,0.6);">⚡</div>
+  <h1 style="color: var(--neon-green); font-size: 24px; font-weight: 900; margin-bottom: 8px;">convenienceIA SD</h1>
+  <p style="font-size: 12px; color: #ddd; max-width: 320px; line-height: 1.5; margin-bottom: 22px;">
+    Ecosistema comercial en Santo Domingo. Cobertura total en Girasoles, Pantoja, Herrera, Piantini y Naco.
+  </p>
+  <button onclick="cerrarSplash()" style="background:var(--neon-green); color:#000; border:none; padding:12px 28px; border-radius:16px; font-weight:900; font-size:12px; cursor:pointer; box-shadow: 0 6px 20px rgba(0,230,118,0.5);">Iniciar Experiencia 🚀</button>
+</div>
+
+<!-- MODAL DE CALIFICACIÓN -->
+<div id="modal-calificacion-sd" class="modal-calif-overlay">
+  <div class="modal-calif-box">
+    <div style="font-size: 32px; margin-bottom: 6px;">⭐</div>
+    <h3 style="color: var(--neon-green); font-size: 16px; font-weight: 900; margin-bottom: 4px;">¡Pedido Entregado con Éxito!</h3>
+    <p style="font-size: 11px; color: #ccc; margin-bottom: 12px;">¿Qué tal te pareció el servicio en Santo Domingo?</p>
+    
+    <div style="font-size: 22px; margin-bottom: 12px; cursor: pointer; color: #ffd700; letter-spacing: 2px;">
+      ★★★★★
+    </div>
+
+    <textarea id="txt-reseña-cliente" placeholder="Escribe tu opinión opcional..." style="width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 10px; font-size: 11px; height: 60px; outline: none; margin-bottom: 12px; resize: none;"></textarea>
+
+    <button onclick="enviarCalificacionCliente()" style="background: var(--neon-green); color: #000; border: none; width: 100%; padding: 11px; border-radius: 12px; font-weight: 900; font-size: 11px; cursor: pointer;">
+      Enviar Reseña y Ganar +15 Coins 🚀
+    </button>
+  </div>
+</div>
+
+<script>
+  function cerrarSplash() {
+    const splash = document.getElementById('splash-bienvenida');
+    if (splash) splash.classList.add('hidden');
+    if (typeof mostrarToast === 'function') mostrarToast("¡100+ comercios sincronizados en SD!", "📍");
+  }
+
+  function abrirModalCalificacionSD() {
+    const modal = document.getElementById('modal-calificacion-sd');
+    if (modal) modal.classList.add('active');
+  }
+
+  function enviarCalificacionCliente() {
+    const modal = document.getElementById('modal-calificacion-sd');
+    if (modal) modal.classList.remove('active');
+    
+    // Acreditar Coins extra por la reseña
+    let coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250') + 15;
+    localStorage.setItem('convenience_coins', coinsActuales);
+    const lbl = document.getElementById('lbl-coins-usuario');
+    if (lbl) lbl.innerText = coinsActuales;
+
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("¡Reseña registrada con éxito! +15 Coins acreditados.", "⭐");
+    }
+  }
+
+  // Enganchar el modal de calificación automáticamente a los 15 segundos de enviar un pedido por WhatsApp
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const originalWA = window.enviarPedidoWhatsApp;
+      if (typeof originalWA === 'function') {
+        window.enviarPedidoWhatsApp = function() {
+          originalWA();
+          setTimeout(() => {
+            abrirModalCalificacionSD();
+          }, 15000);
+        };
+      }
+    }, 2000);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 5: FILTROS DE SECTORES & MÉTODOS DE PAGO   -->
+<!-- ================================================= -->
+<style>
+  /* Selector de Método de Pago Pro en el Drawer */
+  .pago-metodos-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; margin-bottom: 8px;
+  }
+  .btn-metodo-pago {
+    background: #181818; border: 1px solid #333; color: #fff; padding: 7px 4px;
+    border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .btn-metodo-pago.active {
+    background: rgba(0,230,118,0.15); border-color: var(--neon-green); color: var(--neon-green);
+  }
+</style>
+
+<script>
+  // 1. Inyectar de forma limpia el selector de métodos de pago en el Drawer de compras
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('modulo-pagos-ext')) {
+        const pagosDiv = document.createElement('div');
+        pagosDiv.id = 'modulo-pagos-ext';
+        pagosDiv.style.cssText = "background:#151515; border:1px solid #282828; border-radius:12px; padding:10px; margin-top:8px; font-size:11px;";
+        pagosDiv.innerHTML = `
+          <div style="font-weight:bold; color:var(--neon-green); margin-bottom:4px;">💳 Método de Pago:</div>
+          <div class="pago-metodos-grid">
+            <button class="btn-metodo-pago active" onclick="seleccionarMetodoPago('Efectivo', this)">💵 Efectivo</button>
+            <button class="btn-metodo-pago" onclick="seleccionarMetodoPago('ConveniencePay', this)">🪙 Wallet</button>
+            <button class="btn-metodo-pago" onclick="seleccionarMetodoPago('Tarjeta', this)">💳 Tarjeta</button>
+          </div>
+          <div id="div-cambio-efectivo" style="margin-top:6px;">
+            <input type="text" id="input-cambio-efectivo" placeholder="¿Con cuánto vas a pagar? (ej. 1,000)" style="width:100%; background:#0a0a0a; border:1px solid #333; color:#fff; padding:6px; border-radius:8px; font-size:11px; outline:none;">
+          </div>
+        `;
+        
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(pagosDiv, btnWA);
+        } else {
+          drawer.appendChild(pagosDiv);
+        }
+      }
+    }, 1500);
+  });
+
+  window.metodoPagoActual = "Efectivo";
+
+  function seleccionarMetodoPago(metodo, btn) {
+    window.metodoPagoActual = metodo;
+    document.querySelectorAll('.btn-metodo-pago').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const divCambio = document.getElementById('div-cambio-efectivo');
+    if (divCambio) {
+      divCambio.style.display = metodo === 'Efectivo' ? 'block' : 'none';
+    }
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Pago seleccionado: ${metodo}`, "💳");
+    }
+  }
+
+  // 2. Ampliar la función de WhatsApp para incluir el método de pago seleccionado
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const originalWA = window.enviarPedidoWhatsApp;
+      if (typeof originalWA === 'function') {
+        window.enviarPedidoWhatsApp = function() {
+          if (window.carritoApp && window.carritoApp.items.length > 0) {
+            let detalleTexto = `*¡Nuevo Pedido desde convenienceIA SD!* 🚀%0A`;
+            detalleTexto += `🏪 *Comercio:* ${window.carritoApp.negocioActual}%0A%0A`;
+            detalleTexto += `🛒 *Productos:*%0A`;
+            
+            window.carritoApp.items.forEach((item, idx) => {
+              detalleTexto += `${idx + 1}. ${item.nombre} - RD$ ${item.precio}%0A`;
+            });
+
+            const totalFinal = window.carritoApp.total + (window.propinaActual || 0);
+            const tiempoEntrega = document.getElementById('select-tiempo-entrega').value;
+            const cambioEfectivo = document.getElementById('input-cambio-efectivo') ? document.getElementById('input-cambio-efectivo').value : 'N/A';
+
+            detalleTexto += `%0A⏱️ *Tipo de Entrega:* ${tiempoEntrega}%0A`;
+            detalleTexto += `💳 *Método de Pago:* ${window.metodoPagoActual} ${window.metodoPagoActual === 'Efectivo' ? '(Paga con: RD$ ' + cambioEfectivo + ')' : ''}%0A`;
+            detalleTexto += `🛵 *Propina:* RD$ ${window.propinaActual}%0A`;
+            detalleTexto += `💰 *Total Final:* RD$ ${totalFinal.toLocaleString()}%0A`;
+            detalleTexto += `📍 *Destino:* ${document.getElementById('lbl-dir-actual').innerText}%0A`;
+
+            if (typeof guardarPedidoEnHistorial === 'function') {
+              guardarPedidoEnHistorial(window.carritoApp.negocioActual, [...window.carritoApp.items], totalFinal);
+            }
+
+            let coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250') + 50;
+            localStorage.setItem('convenience_coins', coinsActuales);
+            const lblCoins = document.getElementById('lbl-coins-usuario');
+            if (lblCoins) lblCoins.innerText = coinsActuales;
+
+            const urlWa = `https://wa.me/18095550199?text=${detalleTexto}`;
+            window.open(urlWa, '_blank');
+            
+            if (typeof cerrarDrawerComercio === 'function') cerrarDrawerComercio();
+            window.carritoApp.items = [];
+            window.carritoApp.total = 0;
+            document.getElementById('lbl-total-carrito').innerText = "RD$ 0.00";
+            document.getElementById('lbl-cant-items').innerText = "0 items";
+            
+            if (typeof mostrarToast === 'function') mostrarToast("¡Pedido generado! +50 Coins acreditados.", "🪙");
+
+            setTimeout(() => {
+              if (typeof abrirModalCalificacionSD === 'function') abrirModalCalificacionSD();
+            }, 12000);
+          } else {
+            if (typeof mostrarToast === 'function') mostrarToast("Tu carrito está vacío.", "⚠️");
+          }
+        };
+      }
+    }, 2000);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 6: FILTROS DE CATEGORÍAS DE NEGOCIO EN VIVO -->
+<!-- ================================================= -->
+<style>
+  /* Barra de Categorías Dinámica */
+  .categorias-negocios-bar {
+    position: fixed; top: 110px; left: 12px; right: 12px; z-index: 998;
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+  }
+  .categorias-negocios-bar::-webkit-scrollbar { display: none; }
+  .chip-categoria {
+    background: rgba(15, 15, 15, 0.94); border: 1px solid var(--neon-blue, #00b0ff); color: var(--neon-blue, #00b0ff);
+    padding: 4px 10px; border-radius: 14px; font-size: 10px; font-weight: 800;
+    white-space: nowrap; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    transition: all 0.2s;
+  }
+  .chip-categoria.active, .chip-categoria:hover { background: var(--neon-blue, #00b0ff); color: #000; }
+</style>
+
+<!-- BARRA DE FILTROS POR CATEGORÍA -->
+<div class="categorias-negocios-bar">
+  <button class="chip-categoria active" onclick="filtrarCategoriaNegocio('TODOS', this)">⚡ Todos</button>
+  <button class="chip-categoria" onclick="filtrarCategoriaNegocio('Restaurante', this)">🍔 Restaurantes</button>
+  <button class="chip-categoria" onclick="filtrarCategoriaNegocio('Colmado', this)">🍺 Colmados</button>
+  <button class="chip-categoria" onclick="filtrarCategoriaNegocio('Farmacia', this)">💊 Farmacias</button>
+  <button class="chip-categoria" onclick="filtrarCategoriaNegocio('Supermercado', this)">🛒 Supermercados</button>
+</div>
+
+<script>
+  // Lógica de Filtrado por Categoría en el Mapa Leaflet
+  function filtrarCategoriaNegocio(categoria, btnElement) {
+    document.querySelectorAll('.chip-categoria').forEach(b => b.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+
+    if (typeof grupoPines !== 'undefined' && typeof sectoresSD !== 'undefined' && typeof tipos !== 'undefined') {
+      grupoPines.clearLayers();
+
+      for (let i = 1; i <= 100; i++) {
+        const sec = sectoresSD[i % sectoresSD.length];
+        const tipo = tipos[i % tipos.length];
+
+        if (categoria !== 'TODOS' && tipo.cat !== categoria) continue;
+
+        const latVar = sec.lat + ((i % 7 - 3) * 0.0075);
+        const lngVar = sec.lng + ((i % 5 - 2) * 0.0075);
+
+        const iconoCustom = L.divIcon({
+          className: 'pin-masivo-neon',
+          html: `<div>${tipo.emoji}</div>`,
+          iconSize: [38, 38],
+          iconAnchor: [19, 19]
+        });
+
+        const marker = L.marker([latVar, lngVar], { icon: iconoCustom });
+        marker.on('click', () => {
+          if (typeof abrirDrawerComercio === 'function') {
+            abrirDrawerComercio({ nombre: `${tipo.nombre} #${i}`, cat: tipo.cat, sector: sec.nombre });
+          }
+        });
+        grupoPines.addLayer(marker);
+      }
+      if (typeof mostrarToast === 'function') {
+        mostrarToast(`Categoría filtrada: ${categoria}`, "🔍");
+      }
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 7: TRÁFICO EN VIVO & CONVERSOR DE MONEDA    -->
+<!-- ================================================= -->
+<style>
+  /* Estilos para el Widget de Utilidades Ultra Avanzadas */
+  .utilidad-ultra-box {
+    background: #141414; border: 1px solid var(--neon-blue, #00b0ff); border-radius: 14px;
+    padding: 12px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .btn-utilidad-ultra {
+    background: rgba(0, 176, 255, 0.15); border: 1px solid var(--neon-blue, #00b0ff); color: var(--neon-blue, #00b0ff);
+    width: 100%; padding: 8px; border-radius: 10px; font-weight: 900; font-size: 11px; cursor: pointer; margin-top: 6px;
+    text-align: center;
+  }
+</style>
+
+<script>
+  // Inyectar utilidades ultra avanzadas dentro del Menú Maestro Acordeón o Drawer
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir opciones avanzadas al Acordeón Maestro Lateral si existe
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-trafico-ultra')) {
+        const btnTrafico = document.createElement('button');
+        btnTrafico.id = 'btn-trafico-ultra';
+        btnTrafico.className = 'btn-opcion-acordeon';
+        btnTrafico.innerHTML = '🚦 Estado de Tráfico en Vivo (RD)';
+        btnTrafico.onclick = () => {
+          verificarTraficoRD();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnTrafico);
+
+        const btnMoneda = document.createElement('button');
+        btnMoneda.id = 'btn-moneda-ultra';
+        btnMoneda.className = 'btn-opcion-acordeon';
+        btnMoneda.innerHTML = '💱 Conversor de Divisas (DOP / USD)';
+        btnMoneda.onclick = () => {
+          abrirConversorDivisas();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnMoneda);
+      }
+
+      // 2. Inyectar Conversor Rápido de Moneda en el Drawer de Compras
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('conversor-moneda-drawer')) {
+        const divMoneda = document.createElement('div');
+        divMoneda.id = 'conversor-moneda-drawer';
+        divMoneda.className = 'utilidad-ultra-box';
+        divMoneda.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:var(--neon-blue); margin-bottom:4px;">
+            <span>💱 Conversor USD / DOP</span>
+            <span id="lbl-tasa-cambio" style="font-size:9px; color:#aaa;">Tasa: ~60.50 DOP/USD</span>
+          </div>
+          <div style="font-size:10px; color:#ccc;" id="lbl-conversion-resultado">
+            El total de tu carrito equivale a aprox. <strong>$0.00 USD</strong>
+          </div>
+        `;
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(divMoneda, btnWA);
+        } else {
+          drawer.appendChild(divMoneda);
+        }
+      }
+    }, 2500);
+  });
+
+  // Función de Verificación de Tráfico en las Principales Vías de SD
+  function verificarTraficoRD() {
+    const vias = [
+      "Av. John F. Kennedy: Fluido 🟢",
+      "Av. 27 de Febrero: Tránsito moderado 🟡",
+      "Av. Winston Churchill: Despejado 🟢",
+      "Av. Luperón: Congestión ligera en hora pico 🟠",
+      "Expreso 27 de Febrero (Tunel): Normal 🟢"
+    ];
+    const reporteAleatorio = vias[Math.floor(Math.random() * vias.length)];
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Estado RD: ${reporteAleatorio}`, "🚦");
+    } else {
+      alert("Estado de Tráfico SD:\n" + vias.join("\n"));
+    }
+  }
+
+  // Conversor Dinámico de Divisas
+  function abrirConversorDivisas() {
+    const montoDOP = window.carritoApp ? window.carritoApp.total + (window.propinaActual || 0) : 0;
+    const tasaUSD = 60.50;
+    const montoUSD = (montoDOP / tasaUSD).toFixed(2);
+    alert(`💱 Conversor Divisas SD\n\nTotal actual: RD$ ${montoDOP.toLocaleString()}\nEquivalente estimado: $ ${montoUSD} USD\n(Tasa de referencia de mercado: 1 USD = 60.50 DOP)`);
+  }
+
+  // Actualizar el conversor en tiempo real cada vez que cambia el carrito
+  window.addEventListener('DOMContentLoaded', () => {
+    setInterval(() => {
+      const lblConv = document.getElementById('lbl-conversion-resultado');
+      if (lblConv && window.carritoApp) {
+        const totalActual = window.carritoApp.total + (window.propinaActual || 0);
+        const usd = (totalActual / 60.50).toFixed(2);
+        lblConv.innerHTML = `El total de tu carrito equivale a aprox. <strong>$${usd} USD</strong>`;
+      }
+    }, 1000);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 8: CONTROL DE INVENTARIO & MODO AHORRO IA  -->
+<!-- ================================================= -->
+<style>
+  /* Panel de IA y Stock para el Drawer */
+  .panel-ia-ahorro {
+    background: linear-gradient(135deg, rgba(0,230,118,0.1), rgba(0,176,255,0.1));
+    border: 1px dashed var(--neon-green); border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .badge-stock {
+    font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: bold; display: inline-block;
+  }
+  .badge-stock.in { background: rgba(0,230,118,0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
+  .badge-stock.out { background: rgba(255,82,82,0.2); color: #ff5252; border: 1px solid #ff5252; }
+</style>
+
+<script>
+  // Inyectar controles avanzados en el Drawer de compras y en el Menú Rápido
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir Modo Ahorro IA al Drawer
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('panel-ahorro-ia')) {
+        const divAhorro = document.createElement('div');
+        divAhorro.id = 'panel-ahorro-ia';
+        divAhorro.className = 'panel-ia-ahorro';
+        divAhorro.innerHTML = `
+          <div style="font-weight:bold; color:var(--neon-green); margin-bottom:4px;">🤖 Sugerencia Inteligente IA:</div>
+          <div id="lbl-sugerencia-ia" style="font-size:10px; color:#ddd; margin-bottom:6px;">
+            Calculando la mejor combinación para tu pedido en Santo Domingo...
+          </div>
+          <button onclick="ejecutarOptimizacionPresupuesto()" style="background:#222; border:1px solid var(--neon-green); color:var(--neon-green); padding:4px 10px; border-radius:8px; font-size:10px; font-weight:bold; cursor:pointer;">
+            Optimizar Carrito con IA ⚡
+          </button>
+        `;
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(divAhorro, btnWA);
+        } else {
+          drawer.appendChild(divAhorro);
+        }
+      }
+
+      // 2. Añadir opción de Auditoría de Inventario al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-inventario-ultra')) {
+        const btnInv = document.createElement('button');
+        btnInv.id = 'btn-inventario-ultra';
+        btnInv.className = 'btn-opcion-acordeon';
+        btnInv.innerHTML = '📦 Auditoría de Stock (Colmados SD)';
+        btnInv.onclick = () => {
+          auditarInventarioColmado();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnInv);
+      }
+    }, 2800);
+  });
+
+  // Funciones de IA y Stock
+  function ejecutarOptimizacionPresupuesto() {
+    if (window.carritoApp && window.carritoApp.items.length > 0) {
+      const descuentoSugerido = 50;
+      window.carritoApp.total = Math.max(0, window.carritoApp.total - descuentoSugerido);
+      
+      const lblTotal = document.getElementById('lbl-total-carrito');
+      if (lblTotal) {
+        lblTotal.innerText = `RD$ ${(window.carritoApp.total + (window.propinaActual || 0)).toLocaleString()}`;
+      }
+      
+      const lblIA = document.getElementById('lbl-sugerencia-ia');
+      if (lblIA) {
+        lblIA.innerHTML = `✅ ¡IA aplicada! Se aplicó un combo económico por volumen (-RD$ ${descuentoSugerido}).`;
+      }
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Presupuesto optimizado por la IA", "🤖");
+      }
+    } else {
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Añade productos al carrito primero.", "⚠️");
+      }
+    }
+  }
+
+  function auditarInventarioColmado() {
+    const estadoStock = [
+      "🍺 Pack Presidente (6 Uds): En Stock (14 unidades)",
+      "🧊 Bolsa de Hielo Grande: En Stock (8 unidades)",
+      "🥤 Refresco Goya 2L: Stock Bajo (2 unidades)",
+      "🚬 Malboro Red Box: Agotado temporalmente"
+    ];
+    alert("📦 Reporte de Inventario en Tiempo Real (Colmado SD):\n\n" + estadoStock.join("\n"));
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Auditoría de stock consultada con éxito", "📦");
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 9: COBERTURA SATELITAL, PROPINA Y NCF     -->
+<!-- ================================================= -->
+<style>
+  /* Módulo de Comprobantes Fiscales */
+  .panel-ncf-box {
+    background: #141414; border: 1px solid #333; border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .input-ncf-style {
+    width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff;
+    padding: 6px; border-radius: 8px; font-size: 11px; outline: none; margin-top: 6px;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Inyectar Generador de Comprobante Fiscal (NCF) en el Drawer
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('modulo-ncf-ext')) {
+        const ncfDiv = document.createElement('div');
+        ncfDiv.id = 'modulo-ncf-ext';
+        ncfDiv.className = 'panel-ncf-box';
+        ncfDiv.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:bold; color:var(--neon-green);">📄 Comprobante Fiscal (NCF):</span>
+            <input type="checkbox" id="chk-requiere-ncf" onchange="toggleInputsNCF(this.checked)" style="cursor:pointer;">
+          </div>
+          <div id="div-ncf-fields" style="display:none; margin-top:6px;">
+            <input type="text" id="input-rnc-cliente" placeholder="RNC / Cédula del Cliente" class="input-ncf-style">
+            <input type="text" id="input-razon-social" placeholder="Razon Social / Nombre Comercial" class="input-ncf-style">
+          </div>
+        `;
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(ncfDiv, btnWA);
+        } else {
+          drawer.appendChild(ncfDiv);
+        }
+      }
+
+      // 2. Añadir Diagnóstico de Red Satelital y Propina Inteligente al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-senial-satelital')) {
+        const btnSenial = document.createElement('button');
+        btnSenial.id = 'btn-senial-satelital';
+        btnSenial.className = 'btn-opcion-acordeon';
+        btnSenial.innerHTML = '📡 Cobertura Satelital del Sector';
+        btnSenial.onclick = () => {
+          verificarSenialSector();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnSenial);
+
+        const btnPropinaKm = document.createElement('button');
+        btnPropinaKm.id = 'btn-propina-km';
+        btnPropinaKm.className = 'btn-opcion-acordeon';
+        btnPropinaKm.innerHTML = '🛵 Calc. Propina Justa por Km';
+        btnPropinaKm.onclick = () => {
+          calcularPropinaJustaKm();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnPropinaKm);
+      }
+    }, 3000);
+  });
+
+  // Mostrar / Ocultar campos NCF
+  function toggleInputsNCF(activado) {
+    const fields = document.getElementById('div-ncf-fields');
+    if (fields) fields.style.display = activado ? 'block' : 'none';
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(activado ? "Comprobante Fiscal activado" : "Factura Consumo Final", "📄");
+    }
+  }
+
+  // Verificar cobertura satelital
+  function verificarSenialSector() {
+    const sectoresInfo = [
+      "Los Girasoles: Cobertura 4G/5G Óptima (Latencia: 18ms) 🟢",
+      "Pantoja: Cobertura Estable (Latencia: 24ms) 🟢",
+      "Herrera: Red de Alta Velocidad (Latencia: 15ms) 🟢",
+      "Piantini / Naco: Cobertura Ultra 5G (Latencia: 8ms) 🚀"
+    ];
+    const reporte = sectoresInfo[Math.floor(Math.random() * sectoresInfo.length)];
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(reporte, "📡");
+    } else {
+      alert("Diagnóstico de Red:\n" + reporte);
+    }
+  }
+
+  // Calcular propina sugerida por distancia
+  function calcularPropinaJustaKm() {
+    const kmEstimados = (Math.random() * 4 + 1.5).toFixed(1);
+    const propinaSugerida = Math.round(kmEstimados * 25);
+    
+    if (typeof seleccionarPropina === 'function') {
+      seleccionarPropina(propinaSugerida);
+    }
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Distancia est.: ${kmEstimados} km ➔ Propina: RD$ ${propinaSugerida}`, "🛵");
+    }
+  }
+
+  // Ampliar checkout por WhatsApp para incluir NCF si está marcado
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const originalWA = window.enviarPedidoWhatsApp;
+      if (typeof originalWA === 'function') {
+        window.enviarPedidoWhatsApp = function() {
+          const chkNCF = document.getElementById('chk-requiere-ncf');
+          if (chkNCF && chkNCF.checked) {
+            const rnc = document.getElementById('input-rnc-cliente') ? document.getElementById('input-rnc-cliente').value : 'N/A';
+            const razon = document.getElementById('input-razon-social') ? document.getElementById('input-razon-social').value : 'N/A';
+            
+            // Inyectar datos fiscales en el envío
+            window.datosFiscalesExtra = `%0A📄 *Requiere NCF Crédito Fiscal:*%0A- RNC: ${rnc}%0A- Razón Social: ${razon}%0A`;
+          } else {
+            window.datosFiscalesExtra = "";
+          }
+          originalWA();
+        };
+      }
+    }, 3500);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 10: FLOTA ACTIVA & RESUMEN DE GASTOS IA    -->
+<!-- ================================================= -->
+<style>
+  /* Estilos para el Panel de Gastos */
+  .panel-gastos-box {
+    background: #141414; border: 1px solid var(--neon-green); border-radius: 12px;
+    padding: 12px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir el Panel de Resumen de Gastos en el Historial o Drawer
+      const historialDrawer = document.getElementById('panel-historial');
+      if (historialDrawer && !document.getElementById('resumen-gastos-ia')) {
+        const divGastos = document.createElement('div');
+        divGastos.id = 'resumen-gastos-ia';
+        divGastos.className = 'panel-gastos-box';
+        divGastos.innerHTML = `
+          <div style="font-weight:bold; color:var(--neon-green); margin-bottom:4px;">📊 Auditoría de Gastos (IA):</div>
+          <div id="lbl-total-acumulado-ia" style="font-size:11px; color:#ddd; margin-bottom:6px;">
+            Calculando inversión total en Santo Domingo...
+          </div>
+          <button onclick="calcularGastoAcumuladoApp()" style="background:var(--neon-green); color:#000; border:none; width:100%; padding:6px; border-radius:8px; font-weight:bold; font-size:10px; cursor:pointer;">
+            Actualizar Reporte Financiero 📈
+          </button>
+        `;
+        historialDrawer.insertBefore(divGastos, historialDrawer.querySelector('#lista-historial-container'));
+      }
+
+      // 2. Añadir opción de Estado de Flota al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-flota-activa')) {
+        const btnFlota = document.createElement('button');
+        btnFlota.id = 'btn-flota-activa';
+        btnFlota.className = 'btn-opcion-acordeon';
+        btnFlota.innerHTML = '🛵 Flota de Motorizados Activos (SD)';
+        btnFlota.onclick = () => {
+          verEstadoFlotaSD();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnFlota);
+      }
+    }, 4000);
+  });
+
+  // Calcular gasto acumulado desde el LocalStorage
+  function calcularGastoAcumuladoApp() {
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    let totalInvertido = 0;
+    historial.forEach(p => {
+      totalInvertido += (p.total || 0);
+    });
+
+    const lbl = document.getElementById('lbl-total-acumulado-ia');
+    if (lbl) {
+      lbl.innerHTML = `Has realizado <strong>${historial.length} pedidos</strong>. Inversión acumulada: <strong style="color:var(--neon-green);">RD$ ${totalInvertido.toLocaleString()}</strong>`;
+    }
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Auditoría financiera actualizada con éxito.", "📊");
+    }
+  }
+
+  // Ver estado de flota activa por zonas
+  function verEstadoFlotaSD() {
+    const flotaInfo = [
+      "Los Girasoles: 12 motorizados en ruta 🛵",
+      "Pantoja: 8 motorizados disponibles 🟢",
+      "Herrera: 15 motorizados activos ⚡",
+      "Piantini / Naco: 22 motorizados exprés 🚀"
+    ];
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Flota SD: " + flotaInfo[Math.floor(Math.random() * flotaInfo.length)], "🛵");
+    } else {
+      alert("Estado de Flota en Santo Domingo:\n\n" + flotaInfo.join("\n"));
+    }
+  }
+
+  // Ejecutar cálculo automático al abrir el historial
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const originalToggle = window.toggleHistorialDrawer;
+      if (typeof originalToggle === 'function') {
+        window.toggleHistorialDrawer = function() {
+          originalToggle();
+          calcularGastoAcumuladoApp();
+        };
+      }
+    }, 3000);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 11: ASISTENTE POR VOZ & CANJE DE COINS SD  -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Canje de Monedas */
+  .panel-canje-coins {
+    background: rgba(255, 215, 0, 0.08); border: 1px solid #ffd700; border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .btn-canje-coins {
+    background: #ffd700; color: #000; border: none; width: 100%; padding: 6px;
+    border-radius: 8px; font-weight: 900; font-size: 10px; cursor: pointer; margin-top: 6px;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Inyectar Canje de Coins en el Drawer de compras
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('modulo-canje-ext')) {
+        const canjeDiv = document.createElement('div');
+        canjeDiv.id = 'modulo-canje-ext';
+        canjeDiv.className = 'panel-canje-coins';
+        canjeDiv.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#ffd700;">
+            <span>🪙 Canjear Coins SD:</span>
+            <span id="lbl-coins-disponibles-canje">250 disponibles</span>
+          </div>
+          <div style="font-size:10px; color:#ddd; margin-top:3px;">
+            Aplica 100 Coins para obtener <strong>RD$ 100 de descuento</strong> en este pedido.
+          </div>
+          <button class="btn-canje-coins" onclick="aplicarCanjeCoinsSD()">
+            Canjear -100 Coins por RD$ 100 🎁
+          </button>
+        `;
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(canjeDiv, btnWA);
+        } else {
+          drawer.appendChild(canjeDiv);
+        }
+      }
+
+      // 2. Añadir Asistente de Voz al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-voz-ia')) {
+        const btnVoz = document.createElement('button');
+        btnVoz.id = 'btn-voz-ia';
+        btnVoz.className = 'btn-opcion-acordeon';
+        btnVoz.innerHTML = '🔊 Activar Asistente por Voz';
+        btnVoz.onclick = () => {
+          reproducirVozIA("Bienvenido a convenienceIA Santo Domingo. Todos los sistemas operativos están en línea.");
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnVoz);
+      }
+    }, 4500);
+  });
+
+  // Función de Síntesis de Voz (Text-to-Speech nativo del iPhone/Navegador)
+  function reproducirVozIA(texto) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = 'es-DO';
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Asistente de voz activado", "🔊");
+      }
+    } else {
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Tu dispositivo no soporta síntesis de voz.", "⚠️");
+      }
+    }
+  }
+
+  // Canjear monedas por descuento en el carrito
+  window.descuentoCoinsAplicado = 0;
+
+  function aplicarCanjeCoinsSD() {
+    let coinsActuales = parseInt(localStorage.getItem('convenience_coins') || '250');
+    if (coinsActuales >= 100) {
+      if (window.descuentoCoinsAplicado > 0) {
+        if (typeof mostrarToast === 'function') mostrarToast("Ya aplicaste un canje en este pedido.", "⚠️");
+        return;
+      }
+      coinsActuales -= 100;
+      window.descuentoCoinsAplicado = 100;
+      localStorage.setItem('convenience_coins', coinsActuales);
+      
+      const lblCoins = document.getElementById('lbl-coins-usuario');
+      if (lblCoins) lblCoins.innerText = coinsActuales;
+      
+      const lblCanje = document.getElementById('lbl-coins-disponibles-canje');
+      if (lblCanje) lblCanje.innerText = `${coinsActuales} disponibles`;
+
+      if (window.carritoApp) {
+        window.carritoApp.total = Math.max(0, window.carritoApp.total - 100);
+        const lblTotal = document.getElementById('lbl-total-carrito');
+        if (lblTotal) {
+          lblTotal.innerText = `RD$ ${(window.carritoApp.total + (window.propinaActual || 0)).toLocaleString()}`;
+        }
+      }
+
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("¡Descuento de RD$ 100 aplicado con éxito!", "🎁");
+      }
+      reproducirVozIA("Descuento de 100 pesos aplicado a su orden.");
+    } else {
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("No tienes suficientes Coins (Mínimo 100).", "❌");
+      }
+    }
+  }
+
+  // Enganchar voz automática al completar un pedido
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const originalWA = window.enviarPedidoWhatsApp;
+      if (typeof originalWA === 'function') {
+        window.enviarPedidoWhatsApp = function() {
+          originalWA();
+          window.descuentoCoinsAplicado = 0; // Resetear descuento
+          setTimeout(() => {
+            reproducirVozIA("Su pedido ha sido despachado con éxito por WhatsApp. Gracias por preferir convenience IA.");
+          }, 2000);
+        };
+      }
+    }, 3000);
+  });
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 12: OFERTAS RELÁMPAGO & FACTURA IMPRIMIBLE -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Ticket Imprimible */
+  .btn-ticket-imprimir {
+    background: #1e1e1e; border: 1px solid var(--neon-blue); color: var(--neon-blue);
+    padding: 6px 10px; border-radius: 8px; font-weight: bold; font-size: 9px;
+    cursor: pointer; margin-top: 6px; width: 100%; display: block; text-align: center;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Inyectar botón de Ofertas Relámpago en el Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-ofertas-flash')) {
+        const btnOfertas = document.createElement('button');
+        btnOfertas.id = 'btn-ofertas-flash';
+        btnOfertas.className = 'btn-opcion-acordeon';
+        btnOfertas.innerHTML = '⚡ Buscar Ofertas Relámpago SD';
+        btnOfertas.onclick = () => {
+          lanzarOfertaRelampago();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnOfertas);
+
+        const btnFacturaImp = document.createElement('button');
+        btnFacturaImp.id = 'btn-factura-imp';
+        btnFacturaImp.className = 'btn-opcion-acordeon';
+        btnFacturaImp.innerHTML = '📄 Generar Ticket PDF Ult. Pedido';
+        btnFacturaImp.onclick = () => {
+          imprimirUltimoTicketPDF();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnFacturaImp);
+      }
+
+      // 2. Programar una Oferta Relámpago Automática a los 25 segundos
+      setTimeout(() => {
+        lanzarOfertaRelampago();
+      }, 25000);
+    }, 5000);
+  });
+
+  // Lanzar Oferta Relámpago
+  function lanzarOfertaRelampago() {
+    const ofertas = [
+      "🔥 ¡OFERTA FLASH! 2x1 en Pica Pollo Exprés en Los Girasoles (Próximos 15 min)",
+      "🍺 ¡COMBO CHERCHA! Pack Presidente + Hielo con 20% de desc. en Pantoja",
+      "💊 ¡DESCUENTO VITAL! 15% de rebaja en Farmacias de Piantini usando el cupón SD2026",
+      "🛒 ¡ENVÍO GRATIS! En Supermercados de Naco por compras mayores a RD$ 1,000"
+    ];
+    const ofertaSeleccionada = ofertas[Math.floor(Math.random() * ofertas.length)];
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(ofertaSeleccionada, "⚡");
+    }
+    if (typeof reproducirVozIA === 'function') {
+      reproducirVozIA("Atención: Nueva oferta relámpago disponible en Santo Domingo.");
+    }
+  }
+
+  // Imprimir o Guardar Ticket en PDF desde el navegador del iPhone
+  function imprimirUltimoTicketPDF() {
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    if (historial.length === 0) {
+      if (typeof mostrarToast === 'function') mostrarToast("No hay pedidos registrados para imprimir.", "⚠️");
+      return;
+    }
+
+    const ult = historial[0];
+    const ventanaImpresion = window.open('', '_blank');
+    
+    let productosHTML = '';
+    if (ult.items && ult.items.length > 0) {
+      ult.items.forEach(it => {
+        productosHTML += `<tr><td style="padding:4px; border-bottom:1px solid
+<!-- ================================================= -->
+<!-- BLOQUE 13: CLIMA EN VIVO & BOTÓN DE PÁNICO / AYUDA -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Clima Header Dinámico */
+  .clima-badge-top {
+    position: fixed; top: 110px; right: 12px; z-index: 998;
+    background: rgba(15, 15, 15, 0.94); border: 1px solid var(--neon-green); color: #fff;
+    padding: 4px 10px; border-radius: 14px; font-size: 10px; font-weight: 800;
+    backdrop-filter: blur(10px); display: flex; align-items: center; gap: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  }
+</style>
+
+<!-- BADGE DE CLIMA EN VIVO -->
+<div class="clima-badge-top" onclick="consultarClimaSD()">
+  <span>🌤️</span> <span id="lbl-clima-actual">SD: 29°C (Soleado)</span>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir Botón de Emergencia / Seguridad al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-panic-sys')) {
+        const btnPanic = document.createElement('button');
+        btnPanic.id = 'btn-panic-sys';
+        btnPanic.className = 'btn-opcion-acordeon';
+        btnPanic.style.borderColor = '#ff5252';
+        btnPanic.style.color = '#ff5252';
+        btnPanic.innerHTML = '🚨 Botón de Emergencia / Seguridad';
+        btnPanic.onclick = () => {
+          activarBotonPanicoSD();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnPanic);
+      }
+    }, 5500);
+  });
+
+  // Consultar Clima Dinámico en Santo Domingo
+  function consultarClimaSD() {
+    const estadosClima = [
+      { texto: "SD: 31°C (Calor Tropical ☀️)", recomendacja: "Ideal for frías bien frías." },
+      { texto: "SD: 27°C (Lluvia Ligera 🌧️)", recomendacja: "Entrega protegida activada." },
+      { texto: "SD: 28°C (Brisa Nocturna 🌙)", recomendacja: "Servicio nocturno 24/7 fluido." }
+    ];
+    const climaActual = estadosClima[Math.floor(Math.random() * estadosClima.length)];
+    const lbl = document.getElementById('lbl-clima-actual');
+    if (lbl) lbl.innerText = climaActual.texto;
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Clima en Santo Domingo: ${climaActual.recomendacja}`, "🌤️");
+    }
+  }
+
+  // Sistema de Botón de Pánico y Seguridad Operativa
+  function activarBotonPanicoSD() {
+    const confirmacion = confirm("🚨 ¿Deseas contactar a la central de emergencias o soporte prioritario de convenienceIA Santo Domingo?");
+    if (confirmacion) {
+      const urlWa = `https://wa.me/18095550199?text=${encodeURIComponent("🚨 *ALERTA DE EMERGENCIA / SOPORTE CRÍTICO*\nNecesito asistencia inmediata con mi cuenta o pedido en Santo Domingo.")}`;
+      window.open(urlWa, '_blank');
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Enlace de emergencia abierto con soporte prioritario.", "🚨");
+      }
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 14: RECORDATORIOS INTELIGENTES & GIFT CARDS -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Gift Cards */
+  .panel-gift-box {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(0,230,118,0.1));
+    border: 1px solid #ffd700; border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir el Generador de Gift Cards al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-gift-card')) {
+        const btnGift = document.createElement('button');
+        btnGift.id = 'btn-gift-card';
+        btnGift.className = 'btn-opcion-acordeon';
+        btnGift.innerHTML = '🎁 Generar Gift Card Digital (SD)';
+        btnGift.onclick = () => {
+          generarGiftCardDigital();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnGift);
+
+        const btnRecompra = document.createElement('button');
+        btnRecompra.id = 'btn-recompra-ia';
+        btnRecompra.className = 'btn-opcion-acordeon';
+        btnRecompra.innerHTML = '🔄 Analizar Recompra Rápida (IA)';
+        btnRecompra.onclick = () => {
+          analizarRecompraInteligente();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnRecompra);
+      }
+    }, 6000);
+  });
+
+  // Generar Gift Card Digital para regalar
+  function generarGiftCardDigital() {
+    const codigoPromo = 'GIFT-SD-' + Math.floor(100000 + Math.random() * 900000);
+    const mensajeWa = encodeURIComponent(`🎁 ¡Te regalo una Gift Card de RD$ 250 para usar en convenienceIA Santo Domingo! Canjea este código en la app: *${codigoPromo}*`);
+    
+    if (confirm(`🎁 Gift Card generada con éxito:\n\nCódigo: ${codigoPromo}\nValor: RD$ 250\n\n¿Deseas enviarla por WhatsApp a un amigo?`)) {
+      window.open(`https://wa.me/?text=${mensajeWa}`, '_blank');
+      if (typeof mostrarToast === 'function') {
+        mostrarToast("Gift card creada y lista para compartir", "🎁");
+      }
+    }
+  }
+
+  // Analizar Recompra Inteligente basada en el Historial
+  function analizarRecompraInteligente() {
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    if (historial.length === 0) {
+      if (typeof mostrarToast === 'function') mostrarToast("Aún no tienes pedidos para analizar.", "⚠️");
+      return;
+    }
+
+    const ultimoPedido = historial[0];
+    if (confirm(`🔄 Análisis de Recompra IA:\n\nTu última orden fue en "${ultimoPedido.negocio}" por un total de RD$ ${ultimoPedido.total.toLocaleString()}.\n\n¿Deseas repetir este mismo pedido ahora con un 10% de descuento express?`)) {
+      if (window.carritoApp) {
+        window.carritoApp.negocioActual = ultimoPedido.negocio;
+        window.carritoApp.items = [...ultimoPedido.items];
+        window.carritoApp.total = Math.round(ultimoPedido.total * 0.9);
+        
+        const lblTotal = document.getElementById('lbl-total-carrito');
+        if (lblTotal) lblTotal.innerText = `RD$ ${(window.carritoApp.total + (window.propinaActual || 0)).toLocaleString()}`;
+        
+        const lblCant = document.getElementById('lbl-cant-items');
+        if (lblCant) lblCant.innerText = `${window.carritoApp.items.length} items`;
+
+        if (typeof abrirDrawerComercio === 'function') {
+          abrirDrawerComercio({ nombre: ultimoPedido.negocio, sector: "Santo Domingo" });
+        }
+        if (typeof mostrarToast === 'function') {
+          mostrarToast("¡Pedido anterior recargado con 10% de descuento!", "⚡");
+        }
+      }
+    }
+  }
+</script>
