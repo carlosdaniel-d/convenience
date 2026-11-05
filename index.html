@@ -3100,3 +3100,62 @@ setTimeout(() => {
     }, 1800);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: FORZAR PINES VISIBLES  -->
+<!-- ========================================== -->
+<style>
+  .pin-forzado-neon {
+    background: #141414 !important;
+    border: 2px solid #00E676 !important;
+    box-shadow: 0 0 18px rgba(0, 230, 118, 0.9) !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    z-index: 999999 !important;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof map !== 'undefined' && map && typeof L !== 'undefined') {
+        // Coordenadas clave en Santo Domingo para forzar los pines visibles al instante
+        const comerciosForzados = [
+          { nombre: "Pica Pollo Pantoja Express", cat: "Restaurante", lat: 18.5265, lng: -69.9910, emoji: "🍔" },
+          { nombre: "Colmado La Bendición Girasoles", cat: "Colmado", lat: 18.5130, lng: -69.9750, emoji: "🍺" },
+          { nombre: "Farmacia Punto Vital Herrera", cat: "Farmacia", lat: 18.4750, lng: -69.9650, emoji: "💊" },
+          { nombre: "Supermercado Piantini Center", cat: "Supermercado", lat: 18.4710, lng: -69.9310, emoji: "🛒" },
+          { nombre: "Colmado Alcarrizos 24h", cat: "Colmado", lat: 18.5380, lng: -70.0150, emoji: "🍺" },
+          { nombre: "Restaurante Naco Gourmet", cat: "Restaurante", lat: 18.4750, lng: -69.9230, emoji: "🍔" }
+        ];
+
+        comerciosForzados.forEach(c => {
+          const iconoHtml = L.divIcon({
+            className: 'pin-forzado-neon',
+            html: `<div>${c.emoji}</div>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+          });
+
+          const marcador = L.marker([c.lat, c.lng], { icon: iconoHtml }).addTo(map);
+          
+          marcador.on('click', () => {
+            if (typeof abrirDetalleComercio === 'function') {
+              abrirDetalleComercio({
+                nombre: c.nombre,
+                cat: c.cat,
+                pago: "Efectivo, Tarjeta, Banreservas"
+              });
+            } else {
+              alert(`🏪 ${c.nombre}\nCategoría: ${c.cat}\n¡Abierto en Santo Domingo!`);
+            }
+          });
+        });
+      }
+    }, 1500);
+  });
+</script>
