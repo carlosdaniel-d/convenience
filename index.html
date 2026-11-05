@@ -16,26 +16,28 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
+    /* FORZAR PANTALLA COMPLETA ABSOLUTA */
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       background-color: #0d0d0d;
       color: #ffffff;
       overflow: hidden;
+      position: fixed;
     }
 
-    /* MAPA EN CONTENEDOR RAIZ VISIBLE */
+    /* CONTENEDOR DEL MAPA CON POSICIÓN FIJA Y ALTURA REAL */
     #map {
-      width: 100vw;
-      height: 100vh;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      background: #0d0d0d;
+      width: 100% !important;
+      height: 100% !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 1 !important;
+      background: #0d0d0d !important;
     }
 
-    /* EFECTO DARK NEON EN EL MAPA LEAFLET */
+    /* FILTRO ESTÉTICO DARK NEON PARA LAS BALDOSAS */
     .leaflet-tile-pane {
       filter: brightness(0.65) invert(1) contrast(2.5) hue-rotate(200deg) saturate(0.4) !important;
     }
@@ -53,7 +55,7 @@
       justify-content: center;
     }
 
-    /* INTERFAZ FLOTANTE SUPERIOR ORDENADA */
+    /* INTERFAZ FLOTANTE SUPERIOR */
     .header-app {
       position: absolute;
       top: 10px;
@@ -71,8 +73,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(24, 24, 24, 0.92);
-      backdrop-filter: blur(8px);
+      background: rgba(24, 24, 24, 0.95);
       padding: 8px 14px;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -114,12 +115,11 @@
       font-size: 11px;
       font-weight: bold;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0,230,118,0.3);
     }
 
     .input-busqueda {
       width: 100%;
-      background: rgba(24, 24, 24, 0.92);
+      background: rgba(24, 24, 24, 0.95);
       border: 1px solid #333;
       padding: 8px 14px;
       border-radius: 20px;
@@ -127,20 +127,17 @@
       font-size: 12px;
       outline: none;
     }
-    .input-busqueda:focus { border-color: #00E676; }
 
-    /* CATEGORÍAS EN SCROLL HORIZONTAL */
     .categorias-scroll {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 2px;
       scrollbar-width: none;
     }
     .categorias-scroll::-webkit-scrollbar { display: none; }
 
     .chip-btn {
-      background: rgba(24, 24, 24, 0.9);
+      background: rgba(24, 24, 24, 0.95);
       border: 1px solid #333;
       color: #ccc;
       padding: 6px 12px;
@@ -155,13 +152,8 @@
       color: #000;
       border-color: #00E676;
     }
-    .chip-btn.sos {
-      background: #ff5252;
-      color: #fff;
-      border-color: #ff5252;
-    }
 
-    /* INTERFAZ FLOTANTE INFERIOR */
+    /* BARRA INFERIOR */
     .bottom-bar {
       position: absolute;
       bottom: 20px;
@@ -176,7 +168,7 @@
     }
 
     .control-card {
-      background: rgba(24, 24, 24, 0.92);
+      background: rgba(24, 24, 24, 0.95);
       border: 1px solid #333;
       padding: 6px 12px;
       border-radius: 14px;
@@ -194,7 +186,7 @@
       cursor: pointer;
     }
 
-    /* MODALES */
+    /* MODAL */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -206,7 +198,6 @@
       padding: 20px;
     }
     .modal-overlay.hidden { display: none; }
-
     .modal-box {
       background: #181818;
       border: 1px solid #333;
@@ -215,15 +206,6 @@
       max-width: 380px;
       padding: 20px;
     }
-
-    .btn-close {
-      background: transparent;
-      border: none;
-      color: #aaa;
-      font-size: 18px;
-      cursor: pointer;
-      float: right;
-    }
   </style>
 </head>
 <body>
@@ -231,7 +213,7 @@
   <!-- MAPA DE FONDO -->
   <div id="map"></div>
 
-  <!-- HEADER Y FILTROS SUPERIORES -->
+  <!-- HEADER Y FILTROS -->
   <div class="header-app">
     <div class="top-bar">
       <div class="brand-title"><span></span> convenienceIA</div>
@@ -239,10 +221,10 @@
     </div>
 
     <div class="banner-flash">
-      ⚡ ¡OFERTA SD! Usa el cupón <span style="background:#000; color:#00E676; padding:1px 5px; border-radius:4px;">SD2026</span> (15% OFF)
+      ⚡ ¡OFERTA SD! Usa el cupón <span style="background:#000; color:#00E676; padding:1px 5px; border-radius:4px;">SD2026</span>
     </div>
 
-    <input type="text" id="buscador-input" class="input-busqueda" placeholder="🔍 Buscar negocio o comida (ej. Pizza, Pantoja)..." oninput="filtrarNegocios(this.value)">
+    <input type="text" class="input-busqueda" placeholder="🔍 Buscar negocio (ej. Pantoja, Herrera)..." oninput="filtrarNegocios(this.value)">
 
     <div class="categorias-scroll">
       <button class="chip-btn active" onclick="filtrarCategoria('todos')">Todos</button>
@@ -250,30 +232,24 @@
       <button class="chip-btn" onclick="filtrarCategoria('Farmacia')">💊 Farmacia</button>
       <button class="chip-btn" onclick="filtrarCategoria('Supermercado')">🛒 Súper</button>
       <button class="chip-btn" onclick="filtrarCategoria('Colmado')">🍺 Colmados</button>
-      <button class="chip-btn" onclick="toggleModoAhorro()">🔋 Ahorro</button>
-      <button class="chip-btn sos" onclick="alert('🚨 Activando asistencia de emergencia en Santo Domingo...')">🚨 SOS 24h</button>
     </div>
   </div>
 
-  <!-- BARRA INFERIOR DE ACCIONES -->
+  <!-- BARRA INFERIOR -->
   <div class="bottom-bar">
     <div class="control-card">
-      <span style="color:#00E676; font-weight:bold;">📡 Radio: <span id="radio-val">5</span> km</span><br>
-      <input type="range" min="1" max="15" value="5" style="accent-color:#00E676; width:90px;" oninput="document.getElementById('radio-val').innerText = this.value">
+      <span style="color:#00E676; font-weight:bold;">📡 Radio: <span id="radio-val">5</span> km</span>
     </div>
-
-    <button class="btn-action-main" onclick="abrirCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
+    <button class="btn-action-main" onclick="document.getElementById('modal-factura').classList.remove('hidden')">🛒 Carrito</button>
   </div>
 
-  <!-- MODAL DE CHECKOUT Y FACTURA -->
+  <!-- MODAL -->
   <div id="modal-factura" class="modal-overlay hidden">
     <div class="modal-box">
-      <button onclick="cerrarFactura()" class="btn-close">&times;</button>
+      <button onclick="document.getElementById('modal-factura').classList.add('hidden')" style="background:none;border:none;color:#aaa;float:right;font-size:18px;cursor:pointer;">&times;</button>
       <h3 style="color:#00E676; margin-bottom:10px;">🧾 Ticket Digital</h3>
-      <div id="detalle-factura" style="font-size:12px; color:#ccc; border-top:1px dashed #444; border-bottom:1px dashed #444; padding:10px 0; margin:10px 0;">
-        <p>No hay productos guardados.</p>
-      </div>
-      <button onclick="cerrarFactura()" class="btn-action-main" style="width:100%; background:#00E676; color:#000;">Aceptar 🛵</button>
+      <p style="font-size:12px; color:#ccc; margin-bottom:15px;">Pedidos sincronizados correctamente.</p>
+      <button onclick="document.getElementById('modal-factura').classList.add('hidden')" class="btn-action-main" style="width:100%; background:#00E676; color:#000;">Aceptar</button>
     </div>
   </div>
 
@@ -281,33 +257,40 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
   <script>
-    // 1. INICIALIZAR MAPA
-    let map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    // INICIALIZACIÓN BLINDADA DEL MAPA CON RETRASO DE DOM
+    let map;
+    let marcadoresGroup;
 
-    // 2. BASE DE DATOS MASIVA DE NEGOCIOS REALES EN SANTO DOMINGO
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        // Crear mapa asegurando coordenadas de Santo Domingo
+        map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 12);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: ''
+        }).addTo(map);
+
+        marcadoresGroup = L.layerGroup().addTo(map);
+        renderizarMarcadores(listaNegocios);
+        
+        // Forzar redibujado inmediato
+        map.invalidateSize();
+      }, 200);
+    });
+
     const listaNegocios = [
-      // Zona Central
       { id: 1, nombre: "Chef Pepper Piantini", cat: "Restaurante", lat: 18.4712, lng: -69.9315 },
       { id: 2, nombre: "Farmacia Carol - Naco", cat: "Farmacia", lat: 18.4758, lng: -69.9234 },
       { id: 3, nombre: "Supermercado Bravo Enriquillo", cat: "Supermercado", lat: 18.4510, lng: -69.9520 },
-      // Los Girasoles
-      { id: 4, nombre: "Colmado Calle G", cat: "Colmado", lat: 18.5120, lng: -69.9750 },
-      { id: 5, nombre: "Colmado Popular 24h", cat: "Colmado", lat: 18.5145, lng: -69.9721 },
-      // Pantoja
-      { id: 6, nombre: "L&R Comercial Pantoja", cat: "Supermercado", lat: 18.5250, lng: -69.9910 },
-      { id: 7, nombre: "Distribuidora Pantoja", cat: "Farmacia", lat: 18.5280, lng: -69.9885 },
-      // Los Alcarrizos
-      { id: 8, nombre: "La Clave Comercial", cat: "Supermercado", lat: 18.5385, lng: -70.0150 },
-      { id: 9, nombre: "Jeeh Games Store", cat: "Restaurante", lat: 18.5410, lng: -70.0120 },
-      // Herrera
-      { id: 10, nombre: "L&R Comercial Deluxe", cat: "Supermercado", lat: 18.4750, lng: -69.9650 },
-      { id: 11, nombre: "Food Shop & Bar Herrera", cat: "Restaurante", lat: 18.4780, lng: -69.9620 }
+      { id: 4, nombre: "Colmado Calle G (Girasoles)", cat: "Colmado", lat: 18.5120, lng: -69.9750 },
+      { id: 5, nombre: "L&R Comercial Pantoja", cat: "Supermercado", lat: 18.5250, lng: -69.9910 },
+      { id: 6, nombre: "La Clave Comercial (Alcarrizos)", cat: "Supermercado", lat: 18.5385, lng: -70.0150 },
+      { id: 7, nombre: "L&R Comercial Deluxe (Herrera)", cat: "Supermercado", lat: 18.4750, lng: -69.9650 }
     ];
 
-    let marcadoresGroup = L.layerGroup().addTo(map);
-
     function renderizarMarcadores(datos) {
+      if (!marcadoresGroup) return;
       marcadoresGroup.clearLayers();
       datos.forEach(n => {
         const customIcon = L.divIcon({
@@ -323,40 +306,18 @@
       });
     }
 
-    renderizarMarcadores(listaNegocios);
-
-    // 3. FUNCIONES DE FILTRADO Y BÚSQUEDA
-    function filtrarCategoria(categoria) {
-      if (categoria === 'todos') {
+    function filtrarCategoria(cat) {
+      if (cat === 'todos') {
         renderizarMarcadores(listaNegocios);
       } else {
-        const filtrados = listaNegocios.filter(n => n.cat === categoria);
-        renderizarMarcadores(filtrados);
+        renderizarMarcadores(listaNegocios.filter(n => n.cat === cat));
       }
     }
 
     function filtrarNegocios(q) {
       const query = q.toLowerCase();
-      const res = listaNegocios.filter(n => n.nombre.toLowerCase().includes(query) || n.cat.toLowerCase().includes(query));
-      renderizarMarcadores(res);
+      renderizarMarcadores(listaNegocios.filter(n => n.nombre.toLowerCase().includes(query) || n.cat.toLowerCase().includes(query)));
     }
-
-    function toggleModoAhorro() {
-      document.body.style.filter = document.body.style.filter === "grayscale(100%)" ? "none" : "grayscale(100%)";
-    }
-
-    // 4. CARRITO Y FACTURA
-    function abrirCarrito() {
-      document.getElementById('modal-factura').classList.remove('hidden');
-    }
-    function cerrarFactura() {
-      document.getElementById('modal-factura').classList.add('hidden');
-    }
-
-    // RECALCULADO FORZADO PARA NAVEGADORES MÓVILES
-    window.addEventListener('load', () => {
-      setTimeout(() => { map.invalidateSize(); }, 400);
-    });
   </script>
 </body>
 </html>
