@@ -1930,3 +1930,130 @@ setTimeout(() => {
     }
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: EXPANSIÓN DE AJUSTES   -->
+<!-- ========================================== -->
+<style>
+  /* Inyección para permitir scroll fluido en Ajustes cuando hay muchas opciones */
+  #modal-ajustes .modal-box {
+    max-height: 85vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  
+  .ajustes-seccion-titulo {
+    font-size: 10px;
+    font-weight: bold;
+    color: #00E676;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .select-ajustes {
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    outline: none;
+  }
+</style>
+
+<script>
+  // Inyección acumulativa de nuevas opciones dentro del Modal de Ajustes
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-ajustes .modal-box');
+      const contenedorActual = modalBox ? modalBox.querySelector('div[style*="margin: 10px 0"]') : null;
+      
+      if (contenedorActual && !document.getElementById('ajustes-extra-injected')) {
+        const divExtras = document.createElement('div');
+        divExtras.id = 'ajustes-extra-injected';
+        divExtras.innerHTML = `
+          <div class="ajustes-seccion-titulo">🎨 Personalización & Experiencia</div>
+          
+          <div class="ajustes-item">
+            <span>💵 Moneda Mostrar</span>
+            <select class="select-ajustes" id="setting-moneda" onchange="guardarAjuste('moneda', this.value)">
+              <option value="DOP">DOP (RD$)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+
+          <div class="ajustes-item">
+            <span>🌙 Estilo de Mapa</span>
+            <select class="select-ajustes" id="setting-mapa-style" onchange="cambiarEstiloMapa(this.value)">
+              <option value="dark">Dark Neon (Predeterminado)</option>
+              <option value="satelite">Modo Normal</option>
+            </select>
+          </div>
+
+          <div class="ajustes-seccion-titulo">🔒 Seguridad & Datos</div>
+
+          <div class="ajustes-item">
+            <span>🔑 Confirmar Pedidos con PIN</span>
+            <label class="switch-toggle">
+              <input type="checkbox" id="setting-pin" onchange="guardarAjuste('pin', this.checked)">
+              <span class="slider-switch"></span>
+            </label>
+          </div>
+
+          <div class="ajustes-item">
+            <span>🧹 Limpiar Caché Local</span>
+            <button onclick="limpiarCacheApp()" style="background:#222; border:1px solid #ff5252; color:#ff5252; padding:2px 8px; border-radius:6px; font-size:9px; cursor:pointer;">Limpiar 🗑️</button>
+          </div>
+
+          <div class="ajustes-seccion-titulo">🎧 Soporte & Cuenta</div>
+
+          <div class="ajustes-item">
+            <span>💬 Soporte 24/7 (Santo Domingo)</span>
+            <button onclick="abrirSoporteWhatsApp()" style="background:rgba(0,230,118,0.2); border:1px solid #00E676; color:#00E676; padding:2px 8px; border-radius:6px; font-size:9px; cursor:pointer;">WhatsApp 📲</button>
+          </div>
+        `;
+        
+        contenedorActual.appendChild(divExtras);
+        cargarNuevosAjustes();
+      }
+    }, 1100);
+  });
+
+  function cargarNuevosAjustes() {
+    ['moneda', 'pin'].forEach(clave => {
+      const val = localStorage.getItem(`setting_${clave}`);
+      if (val !== null) {
+        const el = document.getElementById(`setting_${clave}`);
+        if (el) {
+          if (el.type === 'checkbox') el.checked = (val === 'true');
+          else el.value = val;
+        }
+      }
+    });
+  }
+
+  function cambiarEstiloMapa(val) {
+    guardarAjuste('mapa_style', val);
+    const tilePane = document.querySelector('.leaflet-tile-pane');
+    if (tilePane) {
+      if (val === 'satelite') {
+        tilePane.style.filter = 'none';
+      } else {
+        tilePane.style.filter = 'brightness(0.65) invert(1) contrast(2.5) hue-rotate(200deg) saturate(0.4)';
+      }
+    }
+  }
+
+  function limpiarCacheApp() {
+    if (confirm("¿Deseas reiniciar la caché y datos guardados de la app?")) {
+      localStorage.clear();
+      alert("🧹 Caché y preferencias reiniciadas.");
+      location.reload();
+    }
+  }
+
+  function abrirSoporteWhatsApp() {
+    alert("📲 Conectando con Soporte en Vivo convenienceIA Santo Domingo vía WhatsApp...");
+  }
+</script>
