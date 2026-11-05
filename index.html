@@ -910,3 +910,112 @@ setTimeout(() => {
     });
   }
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: MÓDULOS TITÁN AVANZADOS-->
+<!-- ========================================== -->
+<style>
+  /* Barra de Estado de Envío en Vivo */
+  .tracker-stepper {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    position: relative;
+  }
+  .step-node {
+    font-size: 9px;
+    color: #777;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .step-node.active {
+    color: #00E676;
+    font-weight: bold;
+  }
+
+  /* Botón Flotante de Ofertas Flash Sectoriales */
+  .btn-flash-sector {
+    position: fixed;
+    bottom: 75px;
+    left: 15px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 10px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    cursor: pointer;
+  }
+</style>
+
+<!-- Botón de Ofertas Flash Sectoriales -->
+<button class="btn-flash-sector" onclick="lanzarOfertaFlashSector()">🔥 Oferta Flash Sector</button>
+
+<script>
+  // 1. Módulo de Cálculo Avanzado con ITBIS (18%) e Impuestos Locales
+  window.calcularTotalConImpuestos = function(subtotal) {
+    const itbis = subtotal * 0.18;
+    const envio = parseInt(document.getElementById('costo-envio')?.innerText) || 125;
+    const totalFinal = subtotal + itbis + envio;
+    return {
+      itbis: itbis.toFixed(2),
+      totalFinal: totalFinal.toFixed(2)
+    };
+  };
+
+  // 2. Rastreador Satelital de Pedido en Vivo (Simulador de Estados)
+  window.simularEstadoPedido = function() {
+    const estados = [
+      "👨‍🍳 Pedido recibido y en preparación...",
+      "🛵 Repartidor en ruta hacia tu zona...",
+      "📍 ¡El repartidor está cerca de tu ubicación!",
+      "🎉 ¡Pedido entregado con éxito!"
+    ];
+    
+    let index = 0;
+    const intervaloEstado = setInterval(() => {
+      if (index < estados.length) {
+        if (typeof lanzarNotificacionPush === 'function') {
+          lanzarNotificacionPush(estados[index]);
+        }
+        index++;
+      } else {
+        clearInterval(intervaloEstado);
+      }
+    }, 4000);
+  };
+
+  // 3. Generador Inteligente de Ofertas Flash por Sector en Santo Domingo
+  function lanzarOfertaFlashSector() {
+    const sectores = ["Pantoja", "Los Alcarrizos", "Herrera", "Los Girasoles", "Piantini"];
+    const sectorAleatorio = sectores[Math.floor(Math.random() * sectores.length)];
+    
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(`🔥 ¡Descuento flash del 20% activado en ${sectorAleatorio} por tiempo limitado!`);
+    } else {
+      alert(`🔥 ¡Descuento flash del 20% activado en ${sectorAleatorio}!`);
+    }
+
+    if (typeof reproducirAlertaAudio === 'function') {
+      reproducirAlertaAudio();
+    }
+  }
+
+  // Activar simulador de estados al presionar confirmar pedido en el ticket
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const btnConfirmar = document.querySelector('#modal-factura button:last-child');
+      if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', () => {
+          simularEstadoPedido();
+          if (typeof calcularCashbackCoins === 'function') {
+            calcularCashbackCoins(500); // Bonifica coins automáticas al pedir
+          }
+        });
+      }
+    }, 1000);
+  });
+</script>
