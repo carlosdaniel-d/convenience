@@ -590,3 +590,60 @@
   </script>
 </body>
 </html>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: WIDGET CLIMA & PUSH    -->
+<!-- ========================================== -->
+<style>
+  /* Widget de Clima y Tráfico en la parte superior derecha */
+  .widget-clima-sd {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    z-index: 1000;
+    background: rgba(24, 24, 24, 0.92);
+    border: 1px solid #00E676;
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Toast de Notificación Push Flotante */
+  .push-toast {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    background: #181818;
+    border: 1px solid #00E676;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4);
+    transition: top 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .push-toast.visible {
+    top: 15px;
+  }
+</style>
+
+<!-- Banner Flotante de Clima/Tráfico SD -->
+<div class="widget-clima-sd">
+  <span>☀️ Santo Domingo: 29°C</span>
+  <span style="color: #00E676; font-size: 9px;">🟢 Tráfico: Fluido (Oeste)</span>
+</div>
+
+<!-- Toast Notificación Push -->
+<div id="push-notification" class="push-toast">
+  <span>🔔</span>
+  <span id="push-message">¡Bienvenido a convenienceIA Santo Domingo!</span>
+</div>
