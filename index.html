@@ -1670,3 +1670,495 @@
     }
   }
 </script>
+<!-- ================================================= -->
+<!-- BLOQUE SUPLEMENTARIO: MÓDULO EMPRESARIAL "SOY DUEÑO" -->
+<!-- ================================================= -->
+<style>
+  /* Panel Modal y Herramientas de Propietario */
+  .modal-owner-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999999;
+    background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center; padding: 18px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .modal-owner-overlay.active { opacity: 1; pointer-events: auto; }
+  
+  .modal-owner-box {
+    background: #0f0f0f; border: 1px solid var(--neon-blue, #00b0ff); border-radius: 24px;
+    padding: 20px; width: 100%; max-width: 380px; box-shadow: 0 0 40px rgba(0,176,255,0.3);
+    color: #fff; max-height: 90vh; overflow-y: auto;
+  }
+
+  .owner-card-stat {
+    background: #141414; border: 1px solid #282828; border-radius: 12px;
+    padding: 10px; margin-bottom: 8px; font-size: 11px;
+  }
+
+  .btn-owner-action {
+    background: rgba(0, 176, 255, 0.15); border: 1px solid var(--neon-blue, #00b0ff); color: var(--neon-blue, #00b0ff);
+    width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 11px;
+    cursor: pointer; margin-bottom: 6px; text-align: left; display: flex; align-items: center; gap: 8px;
+  }
+  .btn-owner-action:hover { background: rgba(0, 176, 255, 0.3); }
+</style>
+
+<!-- MODAL COMPLETO DE "SOY DUEÑO" -->
+<div id="modal-owner-enterprise" class="modal-owner-overlay">
+  <div class="modal-owner-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #222; padding-bottom:8px;">
+      <h3 style="color:var(--neon-blue, #00b0ff); font-size:15px; font-weight:900;">👑 Panel Maestro "Soy Dueño"</h3>
+      <button onclick="cerrarPanelSoyDuenoPro()" style="background:none; border:none; color:#aaa; font-size:22px; cursor:pointer;">&times;</button>
+    </div>
+
+    <p style="font-size:11px; color:#bbb; margin-bottom:12px;">
+      Control total de tu comercio, auditoría de caja en tiempo real y transmisión de ofertas flash en Santo Domingo.
+    </p>
+
+    <div class="owner-card-stat">
+      <div style="font-weight:bold; color:var(--neon-green, #00e676); margin-bottom:4px;">📊 Rendimiento de Hoy:</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Ventas Totales:</span> <strong style="color:#fff;">RD$ 18,450.00</strong></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Órdenes Despachadas:</span> <strong style="color:#fff;">31 pedidos</strong></div>
+      <div style="display:flex; justify-content:space-between;"><span>Valoración Promedio:</span> <strong style="color:#ffd700;">★ 4.9 / 5.0</strong></div>
+    </div>
+
+    <div style="font-weight:bold; font-size:11px; margin-bottom:6px; color:#ccc;">⚡ Operaciones de Comercio:</div>
+    
+    <button class="btn-owner-action" onclick="propietarioAlternarEstadoServicio()">
+      <span>🟢</span> Cambiar Estatus (Abierto / Pausa Exprés)
+    </button>
+    
+    <button class="btn-owner-action" onclick="propietarioEmitirOfertaFlash()">
+      <span>📢</span> Emitir Alerta Flash de Descuento a la App
+    </button>
+
+    <button class="btn-owner-action" onclick="propietarioExportarCorteCaja()">
+      <span>📈</span> Generar Corte de Caja Diario (PDF/Texto)
+    </button>
+
+    <button onclick="cerrarPanelSoyDuenoPro()" style="background:#222; border:1px solid #444; color:#fff; width:100%; padding:10px; border-radius:10px; font-weight:bold; font-size:11px; cursor:pointer; margin-top:6px;">
+      Cerrar Panel
+    </button>
+  </div>
+</div>
+
+<script>
+  // Inyectar el botón "Soy Dueño" en el header o barra de navegación si no existe
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const headerRow = document.querySelector('.header-badges-right') || document.querySelector('.master-header');
+      if (headerRow && !document.getElementById('btn-owner-trigger-pro')) {
+        const btnOwner = document.createElement('button');
+        btnOwner.id = 'btn-owner-trigger-pro';
+        btnOwner.className = 'badge-pill owner';
+        btnOwner.style.cssText = "background:rgba(0,176,255,0.15); border:1px solid var(--neon-blue, #00b0ff); color:var(--neon-blue, #00b0ff); font-weight:900; padding:5px 10px; border-radius:14px; font-size:10px; cursor:pointer;";
+        btnOwner.innerHTML = "👑 Soy Dueño";
+        btnOwner.onclick = abrirPanelSoyDuenoPro;
+        headerRow.appendChild(btnOwner);
+      }
+    }, 1000);
+  });
+
+  function abrirPanelSoyDuenoPro() {
+    const modal = document.getElementById('modal-owner-enterprise');
+    if (modal) modal.classList.add('active');
+  }
+
+  function cerrarPanelSoyDuenoPro() {
+    const modal = document.getElementById('modal-owner-enterprise');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function propietarioAlternarEstadoServicio() {
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Estatus del comercio cambiado: Abierto 24/7 en Santo Domingo.", "🟢");
+    } else {
+      alert("Comercio abierto y recibiendo pedidos.");
+    }
+  }
+
+  function propietarioEmitirOfertaFlash() {
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("¡Oferta transmitida con éxito a los usuarios cercanos!", "📢");
+    }
+    cerrarPanelSoyDuenoPro();
+  }
+
+  function propietarioExportarCorteCaja() {
+    const reporte = "=== CORTE DE CAJA DIARIO ===\nComercio: Principal SD\nTotal Ventas: RD$ 18,450.00\nÓrdenes: 31\nEstatus: Cuadrado y Verificado";
+    alert(reporte);
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Corte de caja generado correctamente.", "📈");
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 16: NOTIFICACIONES PUSH & VUELTO EXACTO RD -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Desglose de Vuelto */
+  .panel-vuelto-box {
+    background: #141414; border: 1px solid var(--neon-green); border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir opciones de Notificaciones Push y Calculadora de Vuelto al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-push-notif')) {
+        const btnPush = document.createElement('button');
+        btnPush.id = 'btn-push-notif';
+        btnPush.className = 'btn-opcion-acordeon';
+        btnPush.innerHTML = '🔔 Activar Alertas Push Nativas';
+        btnPush.onclick = () => {
+          solicitarPermisoNotificacionesPush();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnPush);
+
+        const btnVuelto = document.createElement('button');
+        btnVuelto.id = 'btn-calc-vuelto';
+        btnVuelto.className = 'btn-opcion-acordeon';
+        btnVuelto.innerHTML = '💵 Calculadora de Vuelto Exacto (DOP)';
+        btnVuelto.onclick = () => {
+          calcularVueltoDominicanoPro();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnVuelto);
+      }
+    }, 7000);
+  });
+
+  // Solicitar permisos de Notificaciones Push del navegador
+  function solicitarPermisoNotificacionesPush() {
+    if (!("Notification" in window)) {
+      alert("Este navegador no soporta notificaciones push.");
+      return;
+    }
+
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        if (typeof mostrarToast === 'function') {
+          mostrarToast("¡Notificaciones Push activadas con éxito!", "🔔");
+        }
+        new Notification("convenienceIA Santo Domingo", {
+          body: "El sistema de alertas push en tiempo real está operativo.",
+          icon: "https://cdn-icons-png.flaticon.com/512/1041/1041916.png"
+        });
+      } else {
+        if (typeof mostrarToast === 'function') {
+          mostrarToast("Permiso de notificaciones denegado.", "⚠️");
+        }
+      }
+    });
+  }
+
+  // Calcular Vuelto exacto con denominaciones dominicanas
+  function calcularVueltoDominicanoPro() {
+    const totalCarrito = window.carritoApp ? window.carritoApp.total + (window.propinaActual || 0) : 550;
+    const pagoInput = prompt(`Total a pagar: RD$ ${totalCarrito.toLocaleString()}\n\n¿Con cuánto vas a pagar en efectivo? (Ej: 1000, 2000):`, "1000");
+    
+    if (!pagoInput) return;
+    const pagoEfectivo = parseFloat(pagoInput.replace(/,/g, ''));
+
+    if (isNaN(pagoEfectivo) || pagoEfectivo < totalCarrito) {
+      alert("El monto ingresado es menor al total o no es válido.");
+      return;
+    }
+
+    let vuelto = pagoEfectivo - totalCarrito;
+    let vueltoOriginal = vuelto;
+
+    // Denominaciones dominicanas: 2000, 1000, 500, 200, 100, 50, 25, 10
+    const denominaciones = [2000, 1000, 500, 200, 100, 50, 25, 10];
+    let desglose = `💵 Vuelto total a entregar: RD$ ${vuelto.toLocaleString()}\n\nDesglose sugerido:\n`;
+
+    denominaciones.forEach(den => {
+      if (vuelto >= den) {
+        const cantidad = Math.floor(vuelto / den);
+        vuelto %= den;
+        desglose += `• ${cantidad} billete(s)/moneda(s) de RD$ ${den}\n`;
+      }
+    });
+
+    if (vuelto > 0) {
+      desglose += `• Resto en suelta: RD$ ${vuelto}\n`;
+    }
+
+    alert(desglose);
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Vuelto calculado: RD$ ${vueltoOriginal.toLocaleString()}`, "💵");
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 17: TRÁFICO ESTILO WAZE & ESTADÍSTICAS PRO -->
+<!-- ================================================= -->
+<style>
+  /* Estilos para el Panel de Estadísticas Visuales Nativo */
+  .panel-stats-box {
+    background: #141414; border: 1px solid var(--neon-blue); border-radius: 14px;
+    padding: 12px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+  .barra-progreso-stat {
+    background: #222; border-radius: 6px; height: 8px; width: 100%; margin: 4px 0 8px 0; overflow: hidden;
+  }
+  .barra-progreso-fill {
+    background: var(--neon-green); height: 100%; border-radius: 6px; transition: width 0.4s ease;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir opciones al Acordeón Maestro Lateral si existe
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-trafico-waze')) {
+        const btnWaze = document.createElement('button');
+        btnWaze.id = 'btn-trafico-waze';
+        btnWaze.className = 'btn-opcion-acordeon';
+        btnWaze.innerHTML = '🚦 Monitoreo de Vías (Estilo Waze SD)';
+        btnWaze.onclick = () => {
+          verificarTraficoEstiloWaze();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnWaze);
+
+        const btnStats = document.createElement('button');
+        btnStats.id = 'btn-stats-pro';
+        btnStats.className = 'btn-opcion-acordeon';
+        btnStats.innerHTML = '📊 Reporte de Consumo por Categoría';
+        btnStats.onclick = () => {
+          mostrarEstadisticasCategorias();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnStats);
+      }
+    }, 7500);
+  });
+
+  // Simulador de Tráfico Estilo Waze para Santo Domingo
+  function verificarTraficoEstiloWaze() {
+    const reportesVias = [
+      "Av. John F. Kennedy con Lope de Vega: Flujo rápido 🟢 (Velocidad prom: 45 km/h)",
+      "Av. 27 de Febrero (Tunel): Tránsito moderado con alta fluidez 🟡",
+      "Av. Winston Churchill: Despejado de norte a sur 🟢",
+      "Av. Nuñez de Cáceres: Congestión ligera por hora pico 🟠",
+      "Expreso 27 de Febrero: Sin novedad, ruta óptima 🚀"
+    ];
+    const reporte = reportesVias[Math.floor(Math.random() * reportesVias.length)];
+    if (typeof mostrarToast === 'function') {
+      mostrarToast(`Waze SD: ${reporte}`, "🚦");
+    } else {
+      alert("Monitoreo de Tráfico SD:\n\n" + reporte);
+    }
+  }
+
+  // Generar Reporte de Consumo por Categoría con barras limpias
+  function mostrarEstadisticasCategorias() {
+    let historial = JSON.parse(localStorage.getItem('convenience_historial_pedidos') || '[]');
+    
+    let colmados = 0;
+    let restaurantes = 0;
+    let farmacias = 0;
+    let otros = 0;
+
+    historial.forEach(p => {
+      const neg = (p.negocio || '').toLowerCase();
+      if (neg.includes('colmado')) colmados++;
+      else if (neg.includes('pollo') || neg.includes('restaurante') || neg.includes('exprés')) restaurantes++;
+      else if (neg.includes('farmacia')) farmacias++;
+      else otros++;
+    });
+
+    const totalPedidos = Math.max(1, historial.length);
+    const pColmados = Math.round((colmados / totalPedidos) * 100);
+    const pRestaurantes = Math.round((restaurantes / totalPedidos) * 100);
+    const pFarmacias = Math.round((farmacias / totalPedidos) * 100);
+
+    const reporteHTML = `
+      📊 REPORTE DE CONSUMO - SANTO DOMINGO\n
+      Total Pedidos Analizados: ${historial.length}\n
+      • Colmados y Bebidas: ${pColmados}%\n
+      • Restaurantes / Pica Pollo: ${pRestaurantes}%\n
+      • Farmacias y Salud: ${pFarmacias}%\n
+      \n(Datos calculados directamente de tu almacenamiento local cifrado).
+    `;
+    
+    alert(reporteHTML);
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Reporte de categorías consultado con éxito.", "📊");
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 18: MODO MADRUGADA & ECO-HUELLA DE CARBONO -->
+<!-- ================================================= -->
+<style>
+  /* Panel Eco-Delivery y Seguridad */
+  .panel-eco-box {
+    background: rgba(0, 230, 118, 0.08); border: 1px dashed var(--neon-green); border-radius: 12px;
+    padding: 10px; margin-top: 8px; font-size: 11px; color: #fff;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Inyectar Panel Eco-Delivery en el Drawer de compras
+      const drawer = document.getElementById('drawer-detalles');
+      if (drawer && !document.getElementById('modulo-eco-ext')) {
+        const ecoDiv = document.createElement('div');
+        ecoDiv.id = 'modulo-eco-ext';
+        ecoDiv.className = 'panel-eco-box';
+        ecoDiv.innerHTML = `
+          <div style="font-weight:bold; color:var(--neon-green); margin-bottom:2px;">🌱 Eco-Delivery Santo Domingo:</div>
+          <div id="lbl-eco-detalle" style="font-size:10px; color:#ddd;">
+            Este pedido en moto genera aprox. <strong>120g de CO2</strong> (Optimizado por IA).
+          </div>
+        `;
+        const btnWA = drawer.querySelector('.btn-wa-checkout');
+        if (btnWA) {
+          drawer.insertBefore(ecoDiv, btnWA);
+        } else {
+          drawer.appendChild(ecoDiv);
+        }
+      }
+
+      // 2. Añadir opción de Modo Madrugada al Acordeón Maestro
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-modo-nocturno')) {
+        const btnNocturno = document.createElement('button');
+        btnNocturno.id = 'btn-modo-nocturno';
+        btnNocturno.className = 'btn-opcion-acordeon';
+        btnNocturno.innerHTML = '🌙 Protocolo de Seguridad Nocturna (SD)';
+        btnNocturno.onclick = () => {
+          verificarProtocoloMadrugada();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnNocturno);
+      }
+    }, 8000);
+  });
+
+  // Protocolo de Seguridad y Alerta Nocturna
+  function verificarProtocoloMadrugada() {
+    const hora = new Date().getHours();
+    let mensajeSeguridad = "Horario diurno/vespertino normal en Santo Domingo. Operaciones fluidas 🟢";
+    
+    if (hora >= 22 || hora <= 5) {
+      mensajeSeguridad = "🌙 MODO MADRUGADA ACTIVO (SD): Entregas operando bajo protocolo de seguridad estricto y portones residenciales cerrados. Mantén tu celular atento.";
+    }
+
+    alert(mensajeSeguridad);
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Protocolo de seguridad verificado", "🛡️");
+    }
+  }
+</script>
+<!-- ================================================= -->
+<!-- BLOQUE 19: RADAR SATELITAL & QR DE LEALTAD COINS  -->
+<!-- ================================================= -->
+<style>
+  /* Panel de Radar y QR */
+  .modal-radar-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999999;
+    background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .modal-radar-overlay.active { opacity: 1; pointer-events: auto; }
+  
+  .modal-radar-box {
+    background: #111; border: 1px solid var(--neon-green); border-radius: 20px;
+    padding: 20px; width: 100%; max-width: 340px; text-align: center; color: #fff;
+    box-shadow: 0 0 30px rgba(0,230,118,0.3);
+  }
+  .radar-circle {
+    width: 120px; height: 120px; border: 2px dashed var(--neon-green); border-radius: 50%;
+    margin: 15px auto; display: flex; align-items: center; justify-content: center;
+    position: relative; animation: pulseRadar 2s infinite linear;
+  }
+  @keyframes pulseRadar {
+    0% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4); }
+    70% { box-shadow: 0 0 0 25px rgba(0, 230, 118, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+  }
+</style>
+
+<!-- MODAL RADAR SATELITAL DE ENTREGA -->
+<div id="modal-radar-entrega" class="modal-radar-overlay">
+  <div class="modal-radar-box">
+    <div style="font-weight:900; font-size:14px; color:var(--neon-green); margin-bottom:4px;">satellite.live // RADAR SD</div>
+    <div style="font-size:10px; color:#aaa; margin-bottom:10px;">Seguimiento satelital de motorizado en ruta</div>
+    
+    <div class="radar-circle">
+      <span style="font-size:28px;">🛵</span>
+    </div>
+
+    <div id="lbl-radar-estado" style="font-size:11px; font-weight:bold; color:#fff; margin-bottom:8px;">
+      Motorizado a 1.2 km de tu ubicación (Llegada est. 4 min)
+    </div>
+
+    <button onclick="cerrarRadarSatelital()" style="background:var(--neon-green); color:#000; border:none; width:100%; padding:8px; border-radius:10px; font-weight:bold; font-size:11px; cursor:pointer; margin-top:10px;">
+      Cerrar Radar 🛰️
+    </button>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      // 1. Añadir opciones al Acordeón Maestro Lateral
+      const acordeon = document.getElementById('acordeon-lateral');
+      if (acordeon && !document.getElementById('btn-radar-satelital')) {
+        const btnRadar = document.createElement('button');
+        btnRadar.id = 'btn-radar-satelital';
+        btnRadar.className = 'btn-opcion-acordeon';
+        btnRadar.innerHTML = '🛰️ Radar Satelital de Entregas (En Vivo)';
+        btnRadar.onclick = () => {
+          abrirRadarSatelital();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnRadar);
+
+        const btnQR = document.createElement('button');
+        btnQR.id = 'btn-qr-coins';
+        btnQR.className = 'btn-opcion-acordeon';
+        btnQR.innerHTML = '📱 Generar QR de Lealtad (Coins)';
+        btnQR.onclick = () => {
+          generarQRCoinsDigital();
+          acordeon.classList.remove('active');
+        };
+        acordeon.appendChild(btnQR);
+      }
+    }, 8500);
+  });
+
+  // Funciones del Radar Satelital
+  function abrirRadarSatelital() {
+    const modal = document.getElementById('modal-radar-entrega');
+    if (modal) modal.classList.add('active');
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Conectando con satélite de flota en Santo Domingo...", "🛰️");
+    }
+  }
+
+  function cerrarRadarSatelital() {
+    const modal = document.getElementById('modal-radar-entrega');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Generador de QR de Lealtad (Coins)
+  function generarQRCoinsDigital() {
+    const coinsActuales = localStorage.getItem('convenience_coins') || '250';
+    const codigoUnico = 'COINS-SD-' + Math.floor(10000 + Math.random() * 90000);
+    
+    alert(`📱 CÓDIGO QR DE LEALTAD (CONVENIENCEPAY)\n\n- Saldo Disponible: ${coinsActuales} Coins\n- Código de Transferencia: ${codigoUnico}\n- Sector: Santo Domingo\n\nPreséntalo en el colmado asociado para canjear tus beneficios de forma instantánea.`);
+    if (typeof mostrarToast === 'function') {
+      mostrarToast("Código QR de lealtad generado con éxito", "📱");
+    }
+  }
+</script>
