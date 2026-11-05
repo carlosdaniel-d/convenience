@@ -2701,3 +2701,146 @@ const respuesta = await fetch(URL_DE_TU_SERVIDOR, {
     }, 1000);
   });
 </script>
+<!-- ================================================= -->
+<!-- SISTEMA DE LISTA MAESTRA DE COMERCIOS (CONVENIENCEIA) -->
+<!-- ================================================= -->
+<style>
+  .contenedor-lista-maestra {
+    padding: 15px;
+    padding-bottom: 90px;
+    background: #0b0b0f;
+    min-height: 100vh;
+    color: #fff;
+    box-sizing: border-box;
+  }
+  .buscador-master {
+    width: 100%;
+    background: #16161f;
+    border: 1px solid var(--neon-blue, #00E6FF);
+    border-radius: 10px;
+    padding: 12px 15px;
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 15px;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 230, 255, 0.2);
+    box-sizing: border-box;
+  }
+  .tarjeta-comercio-lista {
+    background: linear-gradient(135deg, #14141c, #1f1f2e);
+    border: 1px solid rgba(0, 230, 255, 0.3);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .tarjeta-comercio-lista:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 230, 255, 0.5);
+    border-color: var(--neon-blue, #00E6FF);
+  }
+  .info-comercio h4 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    color: #fff;
+  }
+  .info-comercio p {
+    margin: 0;
+    font-size: 12px;
+    color: #888;
+  }
+  .badge-sector {
+    background: rgba(0, 230, 255, 0.15);
+    color: var(--neon-blue, #00E6FF);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+</style>
+
+<script>
+  // Directorio maestro con todos los comercios organizados para Santo Domingo
+  const listaMaestraNegocios = [
+    { id: 1, nombre: "Colmado Los Girasoles", sector: "Girasoles", tipo: "Colmado & Súper", tiempo: "10-15 min", icon: "🛒" },
+    { id: 2, nombre: "Fritura & Picacarne Pantoja", sector: "Pantoja", tipo: "Comida Rápida", tiempo: "15-20 min", icon: "🍔" },
+    { id: 3, nombre: "Bebidas El Triángulo Piantini", sector: "Piantini", tipo: "Drinks & Liquor", tiempo: "20-25 min", icon: "🍺" },
+    { id: 4, nombre: "Farmacia San Judas Tadeo", sector: "Herrera", tipo: "Salud & Farmacia", tiempo: "10-15 min", icon: "💊" },
+    { id: 5, nombre: "Supermercado Brisas del Norte", sector: "Girasoles", tipo: "Supermercado", tiempo: "15-25 min", icon: "🛒" },
+    { id: 6, nombre: "Comida Rápida 24/7 Piantini", sector: "Piantini", tipo: "Burgers & Grill", tiempo: "15-20 min", icon: "🍔" },
+    { id: 7, nombre: "Colmado La Fe Herrera", sector: "Herrera", tipo: "Colmado Tradicional", tiempo: "10-15 min", icon: "🛒" },
+    { id: 8, nombre: "Drink Express Pantoja", sector: "Pantoja", tipo: "Bebidas Frías", tiempo: "15-20 min", icon: "🍺" }
+  ];
+
+  function renderizarListaMaestra(filtroTexto = '', filtroSector = 'Todos') {
+    // Ocultar el mapa anterior si existía para limpiar la vista por completo
+    const contenedorMapa = document.querySelector('.map-container');
+    if (contenedorMapa) {
+      contenedorMapa.style.display = 'none';
+    }
+
+    let vistaLista = document.getElementById('vista-lista-maestra-app');
+    if (!vistaLista) {
+      vistaLista = document.createElement('div');
+      vistaLista.id = 'vista-lista-maestra-app';
+      vistaLista.className = 'contenedor-lista-maestra';
+      document.body.appendChild(vistaLista);
+    }
+
+    // Filtrar comercios en tiempo real
+    const filtrados = listaMaestraNegocios.filter(item => {
+      const coincideTexto = item.nombre.toLowerCase().includes(filtroTexto.toLowerCase()) || item.sector.toLowerCase().includes(filtroTexto.toLowerCase()) || item.tipo.toLowerCase().includes(filtroTexto.toLowerCase());
+      const coincideSector = filtroSector === 'Todos' || item.sector.toLowerCase() === filtroSector.toLowerCase();
+      return coincideTexto && coincideSector;
+    });
+
+    vistaLista.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; color: var(--neon-blue); font-size: 16px;">⚡ Directorio Oficial Santo Domingo</h3>
+        <span style="font-size: 11px; color: #888;">${filtrados.length} comercios</span>
+      </div>
+      <input type="text" id="input-busqueda-master" class="buscador-master" placeholder="🔍 Buscar colmado, súper, bebida o sector..." value="${filtroTexto}">
+      <div id="items-comercios-container">
+        ${filtrados.length === 0 ? '<p style="text-align:center; color:#777; margin-top:30px;">No se encontraron comercios con ese criterio.</p>' : ''}
+        ${filtrados.map(c => `
+          <div class="tarjeta-comercio-lista" onclick="abrirDrawerComercio('${c.nombre}')">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-size: 24px; background: rgba(0,230,255,0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,230,255,0.3);">${c.icon}</div>
+              <div class="info-comercio">
+                <h4>${c.nombre}</h4>
+                <p>${c.tipo} • ⏱️ ${c.tiempo}</p>
+              </div>
+            </div>
+            <span class="badge-sector">${c.sector}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    // Mantener la reactividad del buscador
+    const inputBuscador = document.getElementById('input-busqueda-master');
+    if (inputBuscador) {
+      inputBuscador.oninput = (e) => {
+        renderizarListaMaestra(e.target.value, filtroSector);
+        setTimeout(() => {
+          const nuevoInput = document.getElementById('input-busqueda-master');
+          if (nuevoInput) {
+            nuevoInput.focus();
+            nuevoInput.selectionStart = nuevoInput.selectionEnd = nuevoInput.value.length;
+          }
+        }, 50);
+      };
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      renderizarListaMaestra();
+    }, 1000);
+  });
+</script>
