@@ -1129,3 +1129,101 @@ setTimeout(() => {
     }, 1200);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: RESEÑAS Y ALERTAS VIP  -->
+<!-- ========================================== -->
+<style>
+  /* Selector de Estrellas de Reseña */
+  .star-rating-box {
+    display: flex;
+    gap: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 4px 0;
+  }
+  .star-item {
+    color: #444;
+    transition: color 0.2s;
+  }
+  .star-item.selected {
+    color: #ffd700;
+  }
+
+  /* Botón Flotante VIP de Alertas de Tráfico Capitalino */
+  .btn-trafico-vip {
+    position: fixed;
+    bottom: 165px;
+    left: 15px;
+    z-index: 1000;
+    background: rgba(24, 24, 24, 0.95);
+    border: 1px solid #ff5252;
+    color: #ff5252;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+</style>
+
+<!-- Botón Flotante de Alerta de Tráfico VIP -->
+<button class="btn-trafico-vip" onclick="mostrarAlertaTraficoSD()">🚦 Alerta Tráfico SD</button>
+
+<script>
+  // 1. Alerta Dinámica de Tráfico en Santo Domingo
+  function mostrarAlertaTraficoSD() {
+    const alertas = [
+      "🚦 Tráfico pesado en la Av. John F. Kennedy con Luperón. Rutas alternas activadas.",
+      "🟢 Zona Oeste (Pantoja / Alcarrizos): Flujo vehicular despejado y fluido.",
+      "⚠️ Precaución: Alta congestión en la 27 de Febrero hacia el Distrito Nacional."
+    ];
+    const alertaSeleccionada = alertas[Math.floor(Math.random() * alertas.length)];
+    
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(alertaSeleccionada);
+    } else {
+      alert(alertaSeleccionada);
+    }
+  }
+
+  // 2. Sistema de Calificación con Estrellas Interactivas
+  window.seleccionarEstrella = function(index) {
+    const estrellas = document.querySelectorAll('.star-item');
+    estrellas.forEach((star, i) => {
+      if (i <= index) {
+        star.classList.add('selected');
+      } else {
+        star.classList.remove('selected');
+      }
+    });
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush(`⭐ ¡Gracias por calificar con ${index + 1} estrellas!`);
+    }
+  };
+
+  // Inyectar sección de reseñas y estrellas automáticamente dentro del modal de factura si existe
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const modalBox = document.querySelector('#modal-factura .modal-box div');
+      if (modalBox && !document.getElementById('seccion-resenas-injected')) {
+        const divResena = document.createElement('div');
+        divResena.id = 'seccion-resenas-injected';
+        divResena.style.marginTop = "8px";
+        divResena.style.borderTop = "1px dashed #444";
+        divResena.style.paddingTop = "6px";
+        divResena.innerHTML = `
+          <span style="font-size:10px; color:#aaa;">⭐ Califica tu experiencia de entrega:</span>
+          <div class="star-rating-box">
+            <span class="star-item selected" onclick="seleccionarEstrella(0)">★</span>
+            <span class="star-item selected" onclick="seleccionarEstrella(1)">★</span>
+            <span class="star-item selected" onclick="seleccionarEstrella(2)">★</span>
+            <span class="star-item selected" onclick="seleccionarEstrella(3)">★</span>
+            <span class="star-item selected" onclick="seleccionarEstrella(4)">★</span>
+          </div>
+        `;
+        modalBox.appendChild(divResena);
+      }
+    }, 1400);
+  });
+</script>
