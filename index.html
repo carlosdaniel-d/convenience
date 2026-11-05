@@ -2339,3 +2339,119 @@ setTimeout(() => {
     }, 2400);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: MENÚ DESPLEGABLE LATERAL -->
+<!-- ========================================== -->
+<style>
+  /* Ocultar los botones flotantes sueltos anteriores y unificarlos */
+  .btn-ahorro, .btn-logros-vip, .btn-trafico-vip, .btn-utilidades-extra, 
+  .btn-flash-sector, .btn-rango-vip, .btn-grupo-chercha, .btn-voz-global, .btn-ia-dueno {
+    display: none !important;
+  }
+
+  /* Botón Principal Desplegable */
+  .menu-master-flotante {
+    position: fixed;
+    bottom: 30px;
+    left: 15px;
+    z-index: 10000;
+    background: linear-gradient(135deg, #00E676, #00b0ff);
+    color: #000;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Contenedor Acordeon de Opciones Lateral */
+  .acordeon-lateral-box {
+    position: fixed;
+    bottom: 80px;
+    left: 15px;
+    z-index: 9999;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #00E676;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 12px;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    transform: translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+  }
+
+  .acordeon-lateral-box.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .btn-opcion-acordeon {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-opcion-acordeon:hover {
+    background: #252525;
+    border-color: #00E676;
+    color: #00E676;
+  }
+</style>
+
+<!-- Botón Maestro que Abre/Cierra el Menú -->
+<button class="menu-master-flotante" onclick="toggleMenuLateralMaster()">
+  ⚡ Menú Rápido SD
+</button>
+
+<!-- Acordeon Lateral con Todas las Opciones -->
+<div id="acordeon-lateral" class="acordeon-lateral-box">
+  <span style="font-size: 9px; color: #888; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px;">🛠️ Utilidades & IA</span>
+  
+  <button class="btn-opcion-acordeon" onclick="verLogrosComprador(); toggleMenuLateralMaster();">🏆 Logros VIP</button>
+  <button class="btn-opcion-acordeon" onclick="verRangoLealtad(); toggleMenuLateralMaster();">⭐ Nivel de Usuario</button>
+  <button class="btn-opcion-acordeon" onclick="mostrarAlertaTraficoSD(); toggleMenuLateralMaster();">🚦 Alerta Tráfico SD</button>
+  <button class="btn-opcion-acordeon" onclick="lanzarOfertaFlashSector(); toggleMenuLateralMaster();">🔥 Oferta Flash Sector</button>
+  <button class="btn-opcion-acordeon" onclick="abrirModoGrupo(); toggleMenuLateralMaster();">🍕 Pedido en Grupo</button>
+  <button class="btn-opcion-acordeon" onclick="activarAsistenteVozGlobal(); toggleMenuLateralMaster();">🎙️ IA Asistente Voz</button>
+  <button class="btn-opcion-acordeon" onclick="abrirPanelDuenoIA(); toggleMenuLateralMaster();">🤖 Bot IA WhatsApp/IG</button>
+  <button class="btn-opcion-acordeon" onclick="abrirUtilidadesExtra(); toggleMenuLateralMaster();">⚙️ Utilidades Extra</button>
+</div>
+
+<script>
+  function toggleMenuLateralMaster() {
+    const box = document.getElementById('acordeon-lateral');
+    if (box) {
+      box.classList.toggle('active');
+    }
+  }
+
+  // Cerrar el menú si se hace clic fuera de él en el mapa
+  window.addEventListener('click', (e) => {
+    const box = document.getElementById('acordeon-lateral');
+    const btnMaster = document.querySelector('.menu-master-flotante');
+    if (box && btnMaster && !box.contains(e.target) && !btnMaster.contains(e.target)) {
+      box.classList.remove('active');
+    }
+  });
+</script>
