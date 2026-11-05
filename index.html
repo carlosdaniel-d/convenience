@@ -241,3 +241,95 @@
   </script>
 </body>
 </html>
+<style>
+  /* Filtro Dark Neon automático sobre el mapa libre para evitar errores de API */
+  .leaflet-layer, .leaflet-control-zoom, .leaflet-popup {
+    filter: brightness(0.85) invert(1) contrast(2.2) hue-rotate(200deg) saturate(0.8) !important;
+  }
+  /* Asegurar visibilidad perfecta de los pines */
+  .pin-masivo-neon {
+    background: #141414 !important;
+    border: 2px solid #00E676 !important;
+    box-shadow: 0 0 16px rgba(0, 230, 118, 0.9) !important;
+    border-radius: 50% !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    z-index: 1000 !important;
+  }
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof map !== 'undefined' && map && typeof L !== 'undefined') {
+        
+        // 1. Remover capas de mapas anteriores rotas y usar OpenStreetMap libre
+        map.eachLayer((layer) => {
+          if (layer instanceof L.TileLayer) {
+            map.removeLayer(layer);
+          }
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // 2. Coordenadas reales ampliadas de los sectores de Santo Domingo
+        const sectoresSD = [
+          { nombre: "Girasoles", lat: 18.5130, lng: -69.9750 },
+          { nombre: "Pantoja", lat: 18.5265, lng: -69.9910 },
+          { nombre: "Los Alcarrizos", lat: 18.5380, lng: -70.0150 },
+          { nombre: "Herrera", lat: 18.4750, lng: -69.9650 },
+          { nombre: "Piantini", lat: 18.4710, lng: -69.9310 },
+          { nombre: "Naco", lat: 18.4750, lng: -69.9230 },
+          { nombre: "Bella Vista", lat: 18.4550, lng: -69.9450 },
+          { nombre: "Gazcue", lat: 18.4670, lng: -69.8970 },
+          { nombre: "Zona Colonial", lat: 18.4730, lng: -69.8860 },
+          { nombre: "Villa Mella", lat: 18.5450, lng: -69.9020 },
+          { nombre: "Sabana Perdida", lat: 18.5310, lng: -69.8680 },
+          { nombre: "Ensanche Ozama", lat: 18.4850, lng: -69.8690 }
+        ];
+
+        const tipos = [
+          { cat: "Restaurante", emoji: "🍔", nombre: "Pica Pollo Expreso" },
+          { cat: "Colmado", emoji: "🍺", nombre: "Colmado La Bendición" },
+          { cat: "Farmacia", emoji: "💊", nombre: "Farmacia Punto Vital" },
+          { cat: "Supermercado", emoji: "🛒", nombre: "Supermercado Express" }
+        ];
+
+        if (window.grupoPinesMaster) {
+          map.removeLayer(window.grupoPinesMaster);
+        }
+        window.grupoPinesMaster = L.layerGroup().addTo(map);
+
+        // 3. Generar y esparcir los 200 comercios correctamente por toda la capital
+        for (let i = 1; i <= 200; i++) {
+          const sec = sectoresSD[i % sectoresSD.length];
+          const tipo = tipos[i % tipos.length];
+          
+          // Dispersión amplia y realista
+          const latVar = sec.lat + ((i % 7 - 3) * 0.006);
+          const lngVar = sec.lng + ((i % 5 - 2) * 0.006);
+
+          const iconoCustom = L.divIcon({
+            className: 'pin-masivo-neon',
+            html: `<div>${tipo.emoji}</div>`,
+            iconSize: [38, 38],
+            iconAnchor: [19, 19]
+          });
+
+          const marker = L.marker([latVar, lngVar], { icon: iconoCustom });
+          marker.on('click', () => {
+            alert(`🏪 ${tipo.nombre} #${i} (${sec.nombre})\nCategoría: ${tipo.cat}\nEstado: 🟢 ABIERTOS 24/7\nMétodos: Efectivo, Tarjeta, ConveniencePay`);
+          });
+          window.grupoPinesMaster.addLayer(marker);
+        }
+      }
+    }, 1200);
+  });
+</script>
