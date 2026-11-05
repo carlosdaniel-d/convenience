@@ -2671,3 +2671,107 @@ setTimeout(() => {
     }, 1600);
   });
 </script>
+<!-- ========================================== -->
+<!-- BLOQUE ACUMULATIVO: SPLASH SCREEN BIENVENIDA -->
+<!-- ========================================== -->
+<style>
+  /* Estilos de la Pantalla de Carga / Splash Screen */
+  .splash-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #0d0d0d;
+    z-index: 9999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    color: #fff;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  .splash-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .splash-logo-box {
+    width: 85px;
+    height: 85px;
+    background: rgba(0, 230, 118, 0.15);
+    border: 2px solid #00E676;
+    box-shadow: 0 0 30px rgba(0, 230, 118, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    margin-bottom: 16px;
+    animation: pulseSplash 2s infinite;
+  }
+  @keyframes pulseSplash {
+    0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 230, 118, 0.3); }
+    50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 230, 118, 0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 230, 118, 0.3); }
+  }
+  .splash-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #00E676;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .splash-desc {
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.5;
+    max-width: 320px;
+    margin-bottom: 24px;
+  }
+  .splash-btn {
+    background: #00E676;
+    color: #000;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+  }
+</style>
+
+<!-- Estructura HTML de la Pantalla de Presentación -->
+<div id="splash-bienvenida" class="splash-overlay hidden">
+  <div class="splash-logo-box">⚡</div>
+  <div class="splash-title">convenienceIA SD</div>
+  <div class="splash-desc">
+    El primer ecosistema inteligente de delivery y comercios locales en Santo Domingo (Girasoles, Pantoja, Alcarrizos, Herrera y más). 
+    <br><br>
+    📍 Pide de forma instantánea, acumula <em>ConvenienceCoins</em> y disfruta de atención automatizada 24/7.
+  </div>
+  <button class="splash-btn" onclick="cerrarSplashBienvenida()">Comenzar Experiencia 🚀</button>
+</div>
+
+<script>
+  // Mostrar el splash unicamente la primera vez que entra al sitio
+  window.addEventListener('DOMContentLoaded', () => {
+    const yaEntro = localStorage.getItem('convenience_primera_vez');
+    if (!yaEntro) {
+      const splash = document.getElementById('splash-bienvenida');
+      if (splash) {
+        splash.classList.remove('hidden');
+      }
+    }
+  });
+
+  function cerrarSplashBienvenida() {
+    localStorage.setItem('convenience_primera_vez', 'true');
+    const splash = document.getElementById('splash-bienvenida');
+    if (splash) {
+      splash.classList.add('hidden');
+    }
+    if (typeof lanzarNotificacionPush === 'function') {
+      lanzarNotificacionPush("✨ ¡Bienvenido a convenienceIA Santo Domingo!");
+    }
+  }
+</script>
